@@ -1,0 +1,5614 @@
+{
+  "rotas": [
+    {
+      "id": 1,
+      "nome": "ROTA 1",
+      "promoterId": "ROTA_1",
+      "agenda": {
+        "Segunda-feira": {
+          "limit": 480,
+          "timeUsed": 334,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "10752",
+              "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+              "latitude": -3.8361488,
+              "longitude": -38.5733762,
+              "visitDurationMinutes": 201,
+              "frequency": 5,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "11:31:00"
+            },
+            {
+              "order": 2,
+              "clientId": "12643",
+              "clientName": "POPULAR ATACADISTA - JOSE WALTER",
+              "latitude": -3.83328621,
+              "longitude": -38.55279781,
+              "visitDurationMinutes": 124,
+              "frequency": 3,
+              "travelTimeMinutes": 7,
+              "travelDistanceKm": 3.1,
+              "arrivalTime": "11:38:00",
+              "departureTime": "13:42:00"
+            }
+          ]
+        },
+        "Terça-feira": {
+          "limit": 480,
+          "timeUsed": 237,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "10752",
+              "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+              "latitude": -3.8361488,
+              "longitude": -38.5733762,
+              "visitDurationMinutes": 201,
+              "frequency": 5,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "11:31:00"
+            }
+          ]
+        },
+        "Quarta-feira": {
+          "limit": 480,
+          "timeUsed": 221,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "10752",
+              "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+              "latitude": -3.8361488,
+              "longitude": -38.5733762,
+              "visitDurationMinutes": 201,
+              "frequency": 5,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "11:31:00"
+            }
+          ]
+        },
+        "Quinta-feira": {
+          "limit": 480,
+          "timeUsed": 138,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "12643",
+              "clientName": "POPULAR ATACADISTA - JOSE WALTER",
+              "latitude": -3.83328621,
+              "longitude": -38.55279781,
+              "visitDurationMinutes": 124,
+              "frequency": 3,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "10:14:00"
+            }
+          ]
+        },
+        "Sexta-feira": {
+          "limit": 480,
+          "timeUsed": 221,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "10752",
+              "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+              "latitude": -3.8361488,
+              "longitude": -38.5733762,
+              "visitDurationMinutes": 201,
+              "frequency": 5,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "11:31:00"
+            }
+          ]
+        },
+        "Sábado": {
+          "limit": 240,
+          "timeUsed": 201,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "10752",
+              "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+              "latitude": -3.8361488,
+              "longitude": -38.5733762,
+              "visitDurationMinutes": 201,
+              "frequency": 5,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "11:31:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "nome": "ROTA 2",
+      "promoterId": "ROTA_2",
+      "agenda": {
+        "Segunda-feira": {
+          "limit": 480,
+          "timeUsed": 474,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "11220",
+              "clientName": "MAE RAINHA - MARACANAU",
+              "latitude": -3.85564449,
+              "longitude": -38.5796747,
+              "visitDurationMinutes": 174,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "11:04:00"
+            },
+            {
+              "order": 2,
+              "clientId": "11844",
+              "clientName": "COMPREMAX - NOVA METROPOLE",
+              "latitude": -3.76944093,
+              "longitude": -38.65433696,
+              "visitDurationMinutes": 104,
+              "frequency": 2,
+              "travelTimeMinutes": 18,
+              "travelDistanceKm": 8,
+              "arrivalTime": "11:22:00",
+              "departureTime": "13:06:00"
+            },
+            {
+              "order": 3,
+              "clientId": "11163",
+              "clientName": "COMPREMAX - ICARAI",
+              "latitude": -3.67322246,
+              "longitude": -38.67026304,
+              "visitDurationMinutes": 151,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "13:21:00",
+              "departureTime": "15:52:00"
+            }
+          ]
+        },
+        "Terça-feira": {
+          "limit": 480,
+          "timeUsed": 455,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "239",
+              "clientName": "SUPER CAUCAIA - LJ 02",
+              "latitude": -3.7342526,
+              "longitude": -38.65836087,
+              "visitDurationMinutes": 107,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:57:00"
+            },
+            {
+              "order": 2,
+              "clientId": "11268",
+              "clientName": "PASSAKI - CAUCAIA",
+              "latitude": -3.73335329,
+              "longitude": -38.6569974,
+              "visitDurationMinutes": 89,
+              "frequency": 2,
+              "travelTimeMinutes": 2,
+              "travelDistanceKm": 0.9,
+              "arrivalTime": "09:59:00",
+              "departureTime": "11:28:00"
+            },
+            {
+              "order": 3,
+              "clientId": "658",
+              "clientName": "BRASILEIRO - RODOLFO TEOFILO",
+              "latitude": -3.7466444,
+              "longitude": -38.5504395,
+              "visitDurationMinutes": 103,
+              "frequency": 2,
+              "travelTimeMinutes": 18,
+              "travelDistanceKm": 8,
+              "arrivalTime": "11:46:00",
+              "departureTime": "13:29:00"
+            },
+            {
+              "order": 4,
+              "clientId": "3643",
+              "clientName": "CLAECK SUPERMERCADO - PRQ JERUSALEM",
+              "latitude": -3.806077,
+              "longitude": -38.5966382,
+              "visitDurationMinutes": 103,
+              "frequency": 2,
+              "travelTimeMinutes": 16,
+              "travelDistanceKm": 7.1,
+              "arrivalTime": "13:45:00",
+              "departureTime": "15:28:00"
+            }
+          ]
+        },
+        "Quarta-feira": {
+          "limit": 480,
+          "timeUsed": 474,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "11220",
+              "clientName": "MAE RAINHA - MARACANAU",
+              "latitude": -3.85564449,
+              "longitude": -38.5796747,
+              "visitDurationMinutes": 174,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "11:04:00"
+            },
+            {
+              "order": 2,
+              "clientId": "11844",
+              "clientName": "COMPREMAX - NOVA METROPOLE",
+              "latitude": -3.76944093,
+              "longitude": -38.65433696,
+              "visitDurationMinutes": 104,
+              "frequency": 2,
+              "travelTimeMinutes": 18,
+              "travelDistanceKm": 8,
+              "arrivalTime": "11:22:00",
+              "departureTime": "13:06:00"
+            },
+            {
+              "order": 3,
+              "clientId": "11163",
+              "clientName": "COMPREMAX - ICARAI",
+              "latitude": -3.67322246,
+              "longitude": -38.67026304,
+              "visitDurationMinutes": 151,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "13:21:00",
+              "departureTime": "15:52:00"
+            }
+          ]
+        },
+        "Quinta-feira": {
+          "limit": 480,
+          "timeUsed": 458,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "239",
+              "clientName": "SUPER CAUCAIA - LJ 02",
+              "latitude": -3.7342526,
+              "longitude": -38.65836087,
+              "visitDurationMinutes": 107,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:57:00"
+            },
+            {
+              "order": 2,
+              "clientId": "4381",
+              "clientName": "COMPREMAX - OFERTAO MAX",
+              "latitude": -3.72905976,
+              "longitude": -38.65588134,
+              "visitDurationMinutes": 91,
+              "frequency": 2,
+              "travelTimeMinutes": 3,
+              "travelDistanceKm": 1.3,
+              "arrivalTime": "10:00:00",
+              "departureTime": "11:31:00"
+            },
+            {
+              "order": 3,
+              "clientId": "658",
+              "clientName": "BRASILEIRO - RODOLFO TEOFILO",
+              "latitude": -3.7466444,
+              "longitude": -38.5504395,
+              "visitDurationMinutes": 103,
+              "frequency": 2,
+              "travelTimeMinutes": 19,
+              "travelDistanceKm": 8.4,
+              "arrivalTime": "11:50:00",
+              "departureTime": "13:33:00"
+            },
+            {
+              "order": 4,
+              "clientId": "3643",
+              "clientName": "CLAECK SUPERMERCADO - PRQ JERUSALEM",
+              "latitude": -3.806077,
+              "longitude": -38.5966382,
+              "visitDurationMinutes": 103,
+              "frequency": 2,
+              "travelTimeMinutes": 16,
+              "travelDistanceKm": 7.1,
+              "arrivalTime": "13:49:00",
+              "departureTime": "15:32:00"
+            }
+          ]
+        },
+        "Sexta-feira": {
+          "limit": 480,
+          "timeUsed": 472,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "11268",
+              "clientName": "PASSAKI - CAUCAIA",
+              "latitude": -3.73335329,
+              "longitude": -38.6569974,
+              "visitDurationMinutes": 89,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:39:00"
+            },
+            {
+              "order": 2,
+              "clientId": "12796",
+              "clientName": "NOVO SIQUEIRA - LJ1",
+              "latitude": -3.80892581,
+              "longitude": -38.62755341,
+              "visitDurationMinutes": 75,
+              "frequency": 2,
+              "travelTimeMinutes": 16,
+              "travelDistanceKm": 7.1,
+              "arrivalTime": "09:55:00",
+              "departureTime": "11:10:00"
+            },
+            {
+              "order": 3,
+              "clientId": "4891",
+              "clientName": "BRASILEIRO - MARAPONGA",
+              "latitude": -3.80487293,
+              "longitude": -38.56576242,
+              "visitDurationMinutes": 73,
+              "frequency": 2,
+              "travelTimeMinutes": 16,
+              "travelDistanceKm": 7.1,
+              "arrivalTime": "11:26:00",
+              "departureTime": "12:39:00"
+            },
+            {
+              "order": 4,
+              "clientId": "9593",
+              "clientName": "SUPER TELEFRANGO - LJ 04",
+              "latitude": -3.8034992,
+              "longitude": -38.5341911,
+              "visitDurationMinutes": 78,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "12:49:00",
+              "departureTime": "14:07:00"
+            },
+            {
+              "order": 5,
+              "clientId": "5158",
+              "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 03",
+              "latitude": -3.8090825,
+              "longitude": -38.524932,
+              "visitDurationMinutes": 84,
+              "frequency": 2,
+              "travelTimeMinutes": 4,
+              "travelDistanceKm": 1.8,
+              "arrivalTime": "14:11:00",
+              "departureTime": "15:35:00"
+            }
+          ]
+        },
+        "Sábado": {
+          "limit": 240,
+          "timeUsed": 208,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "4381",
+              "clientName": "COMPREMAX - OFERTAO MAX",
+              "latitude": -3.72905976,
+              "longitude": -38.65588134,
+              "visitDurationMinutes": 91,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:41:00"
+            },
+            {
+              "order": 2,
+              "clientId": "11743",
+              "clientName": "SUPER PORTUGAL- SAPIRANGA",
+              "latitude": -3.79508034,
+              "longitude": -38.47443215,
+              "visitDurationMinutes": 81,
+              "frequency": 2,
+              "travelTimeMinutes": 36,
+              "travelDistanceKm": 16,
+              "arrivalTime": "10:17:00",
+              "departureTime": "11:38:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 3,
+      "nome": "ROTA 3",
+      "promoterId": "ROTA_3",
+      "agenda": {
+        "Segunda-feira": {
+          "limit": 480,
+          "timeUsed": 479,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "12237",
+              "clientName": "NOVO SIQUEIRA - LJ02",
+              "latitude": -3.80683521,
+              "longitude": -38.62994815,
+              "visitDurationMinutes": 75,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:25:00"
+            },
+            {
+              "order": 2,
+              "clientId": "9319",
+              "clientName": "SUPER PORTUGAL - GRANJA PORTUGAL",
+              "latitude": -3.777836,
+              "longitude": -38.597821,
+              "visitDurationMinutes": 69,
+              "frequency": 2,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "09:36:00",
+              "departureTime": "10:45:00"
+            },
+            {
+              "order": 3,
+              "clientId": "620",
+              "clientName": "SUPER PORTUGAL - VILA PERI",
+              "latitude": -3.7802372,
+              "longitude": -38.5784333,
+              "visitDurationMinutes": 62,
+              "frequency": 2,
+              "travelTimeMinutes": 5,
+              "travelDistanceKm": 2.2,
+              "arrivalTime": "10:50:00",
+              "departureTime": "11:52:00"
+            },
+            {
+              "order": 4,
+              "clientId": "2807",
+              "clientName": "SUPER PORTUGAL - SERRINHA",
+              "latitude": -3.7872948,
+              "longitude": -38.5439698,
+              "visitDurationMinutes": 58,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "12:02:00",
+              "departureTime": "13:00:00"
+            },
+            {
+              "order": 5,
+              "clientId": "11455",
+              "clientName": "SUPER BENFICA - BENFICA",
+              "latitude": -3.7451759,
+              "longitude": -38.5402234,
+              "visitDurationMinutes": 69,
+              "frequency": 2,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "13:11:00",
+              "departureTime": "14:20:00"
+            },
+            {
+              "order": 6,
+              "clientId": "3765",
+              "clientName": "MAIS LUZ - (KALBIR LJ 02)",
+              "latitude": -3.8548937,
+              "longitude": -38.5789869,
+              "visitDurationMinutes": 64,
+              "frequency": 2,
+              "travelTimeMinutes": 25,
+              "travelDistanceKm": 11.1,
+              "arrivalTime": "14:45:00",
+              "departureTime": "15:49:00"
+            }
+          ]
+        },
+        "Terça-feira": {
+          "limit": 480,
+          "timeUsed": 466,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "12706",
+              "clientName": "SUPER TELEFRANGO - LJ 07",
+              "latitude": -3.80072549,
+              "longitude": -38.53008014,
+              "visitDurationMinutes": 74,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:24:00"
+            },
+            {
+              "order": 2,
+              "clientId": "4828",
+              "clientName": "SUPER TELEFRANGO - LJ 03",
+              "latitude": -3.8298712,
+              "longitude": -38.4916118,
+              "visitDurationMinutes": 64,
+              "frequency": 2,
+              "travelTimeMinutes": 14,
+              "travelDistanceKm": 6.2,
+              "arrivalTime": "09:38:00",
+              "departureTime": "10:42:00"
+            },
+            {
+              "order": 3,
+              "clientId": "368",
+              "clientName": "SUPER PORTUGAL - TAUAPE",
+              "latitude": -3.7560405,
+              "longitude": -38.5114051,
+              "visitDurationMinutes": 52,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "10:57:00",
+              "departureTime": "11:49:00"
+            },
+            {
+              "order": 4,
+              "clientId": "284",
+              "clientName": "SAO FRANCISCO - MATRIZ LJ 01",
+              "latitude": -3.7966519,
+              "longitude": -38.6007377,
+              "visitDurationMinutes": 58,
+              "frequency": 2,
+              "travelTimeMinutes": 22,
+              "travelDistanceKm": 9.8,
+              "arrivalTime": "12:11:00",
+              "departureTime": "13:09:00"
+            },
+            {
+              "order": 5,
+              "clientId": "12843",
+              "clientName": "SUPER PORTUGAL- CONJUNTO CEARA",
+              "latitude": -3.76400599,
+              "longitude": -38.60235407,
+              "visitDurationMinutes": 58,
+              "frequency": 2,
+              "travelTimeMinutes": 9,
+              "travelDistanceKm": 4,
+              "arrivalTime": "13:18:00",
+              "departureTime": "14:16:00"
+            },
+            {
+              "order": 6,
+              "clientId": "181",
+              "clientName": "SUPER CAUCAIA - LJ 01",
+              "latitude": -3.73546304,
+              "longitude": -38.65846975,
+              "visitDurationMinutes": 63,
+              "frequency": 2,
+              "travelTimeMinutes": 14,
+              "travelDistanceKm": 6.2,
+              "arrivalTime": "14:30:00",
+              "departureTime": "15:33:00"
+            }
+          ]
+        },
+        "Quarta-feira": {
+          "limit": 480,
+          "timeUsed": 475,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "12237",
+              "clientName": "NOVO SIQUEIRA - LJ02",
+              "latitude": -3.80683521,
+              "longitude": -38.62994815,
+              "visitDurationMinutes": 75,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:25:00"
+            },
+            {
+              "order": 2,
+              "clientId": "4089",
+              "clientName": "COMPREMAX - METROPOLE",
+              "latitude": -3.7666193,
+              "longitude": -38.6538536,
+              "visitDurationMinutes": 61,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "09:35:00",
+              "departureTime": "10:36:00"
+            },
+            {
+              "order": 3,
+              "clientId": "4832",
+              "clientName": "SUPER TELEFRANGO - LJ 02",
+              "latitude": -3.7734318,
+              "longitude": -38.5835181,
+              "visitDurationMinutes": 50,
+              "frequency": 2,
+              "travelTimeMinutes": 14,
+              "travelDistanceKm": 6.2,
+              "arrivalTime": "10:50:00",
+              "departureTime": "11:40:00"
+            },
+            {
+              "order": 4,
+              "clientId": "2807",
+              "clientName": "SUPER PORTUGAL - SERRINHA",
+              "latitude": -3.7872948,
+              "longitude": -38.5439698,
+              "visitDurationMinutes": 58,
+              "frequency": 2,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "11:51:00",
+              "departureTime": "12:49:00"
+            },
+            {
+              "order": 5,
+              "clientId": "11455",
+              "clientName": "SUPER BENFICA - BENFICA",
+              "latitude": -3.7451759,
+              "longitude": -38.5402234,
+              "visitDurationMinutes": 69,
+              "frequency": 2,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "13:00:00",
+              "departureTime": "14:09:00"
+            },
+            {
+              "order": 6,
+              "clientId": "3765",
+              "clientName": "MAIS LUZ - (KALBIR LJ 02)",
+              "latitude": -3.8548937,
+              "longitude": -38.5789869,
+              "visitDurationMinutes": 64,
+              "frequency": 2,
+              "travelTimeMinutes": 25,
+              "travelDistanceKm": 11.1,
+              "arrivalTime": "14:34:00",
+              "departureTime": "15:38:00"
+            }
+          ]
+        },
+        "Quinta-feira": {
+          "limit": 480,
+          "timeUsed": 478,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "12706",
+              "clientName": "SUPER TELEFRANGO - LJ 07",
+              "latitude": -3.80072549,
+              "longitude": -38.53008014,
+              "visitDurationMinutes": 74,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:24:00"
+            },
+            {
+              "order": 2,
+              "clientId": "620",
+              "clientName": "SUPER PORTUGAL - VILA PERI",
+              "latitude": -3.7802372,
+              "longitude": -38.5784333,
+              "visitDurationMinutes": 62,
+              "frequency": 2,
+              "travelTimeMinutes": 12,
+              "travelDistanceKm": 5.3,
+              "arrivalTime": "09:36:00",
+              "departureTime": "10:38:00"
+            },
+            {
+              "order": 3,
+              "clientId": "9319",
+              "clientName": "SUPER PORTUGAL - GRANJA PORTUGAL",
+              "latitude": -3.777836,
+              "longitude": -38.597821,
+              "visitDurationMinutes": 69,
+              "frequency": 2,
+              "travelTimeMinutes": 4,
+              "travelDistanceKm": 1.8,
+              "arrivalTime": "10:42:00",
+              "departureTime": "11:51:00"
+            },
+            {
+              "order": 4,
+              "clientId": "153",
+              "clientName": "SUPER PORTUGAL - BRAGANCA",
+              "latitude": -3.7807845,
+              "longitude": -38.5966783,
+              "visitDurationMinutes": 48,
+              "frequency": 2,
+              "travelTimeMinutes": 2,
+              "travelDistanceKm": 0.9,
+              "arrivalTime": "11:53:00",
+              "departureTime": "12:41:00"
+            },
+            {
+              "order": 5,
+              "clientId": "181",
+              "clientName": "SUPER CAUCAIA - LJ 01",
+              "latitude": -3.73546304,
+              "longitude": -38.65846975,
+              "visitDurationMinutes": 63,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "12:56:00",
+              "departureTime": "13:59:00"
+            },
+            {
+              "order": 6,
+              "clientId": "4828",
+              "clientName": "SUPER TELEFRANGO - LJ 03",
+              "latitude": -3.8298712,
+              "longitude": -38.4916118,
+              "visitDurationMinutes": 64,
+              "frequency": 2,
+              "travelTimeMinutes": 35,
+              "travelDistanceKm": 15.6,
+              "arrivalTime": "14:34:00",
+              "departureTime": "15:38:00"
+            }
+          ]
+        },
+        "Sexta-feira": {
+          "limit": 480,
+          "timeUsed": 467,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "4089",
+              "clientName": "COMPREMAX - METROPOLE",
+              "latitude": -3.7666193,
+              "longitude": -38.6538536,
+              "visitDurationMinutes": 61,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:11:00"
+            },
+            {
+              "order": 2,
+              "clientId": "4793",
+              "clientName": "SUPER TELEFRANGO - LJ 01",
+              "latitude": -3.7760576,
+              "longitude": -38.60597,
+              "visitDurationMinutes": 53,
+              "frequency": 2,
+              "travelTimeMinutes": 8,
+              "travelDistanceKm": 3.6,
+              "arrivalTime": "09:19:00",
+              "departureTime": "10:12:00"
+            },
+            {
+              "order": 3,
+              "clientId": "12843",
+              "clientName": "SUPER PORTUGAL- CONJUNTO CEARA",
+              "latitude": -3.76400599,
+              "longitude": -38.60235407,
+              "visitDurationMinutes": 58,
+              "frequency": 2,
+              "travelTimeMinutes": 3,
+              "travelDistanceKm": 1.3,
+              "arrivalTime": "10:15:00",
+              "departureTime": "11:13:00"
+            },
+            {
+              "order": 4,
+              "clientId": "9318",
+              "clientName": "SAO FRANCISCO - FILIAL LJ 03",
+              "latitude": -3.7881221,
+              "longitude": -38.6107546,
+              "visitDurationMinutes": 51,
+              "frequency": 2,
+              "travelTimeMinutes": 6,
+              "travelDistanceKm": 2.7,
+              "arrivalTime": "11:19:00",
+              "departureTime": "12:10:00"
+            },
+            {
+              "order": 5,
+              "clientId": "284",
+              "clientName": "SAO FRANCISCO - MATRIZ LJ 01",
+              "latitude": -3.7966519,
+              "longitude": -38.6007377,
+              "visitDurationMinutes": 58,
+              "frequency": 2,
+              "travelTimeMinutes": 3,
+              "travelDistanceKm": 1.3,
+              "arrivalTime": "12:13:00",
+              "departureTime": "13:11:00"
+            },
+            {
+              "order": 6,
+              "clientId": "2292",
+              "clientName": "CLAECK SUPERMERCADO - PRQ SANTANA",
+              "latitude": -3.8142935,
+              "longitude": -38.5831318,
+              "visitDurationMinutes": 51,
+              "frequency": 2,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "13:22:00",
+              "departureTime": "14:13:00"
+            },
+            {
+              "order": 7,
+              "clientId": "368",
+              "clientName": "SUPER PORTUGAL - TAUAPE",
+              "latitude": -3.7560405,
+              "longitude": -38.5114051,
+              "visitDurationMinutes": 52,
+              "frequency": 2,
+              "travelTimeMinutes": 23,
+              "travelDistanceKm": 10.2,
+              "arrivalTime": "14:36:00",
+              "departureTime": "15:28:00"
+            }
+          ]
+        },
+        "Sábado": {
+          "limit": 240,
+          "timeUsed": 227,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "4832",
+              "clientName": "SUPER TELEFRANGO - LJ 02",
+              "latitude": -3.7734318,
+              "longitude": -38.5835181,
+              "visitDurationMinutes": 50,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:00:00"
+            },
+            {
+              "order": 2,
+              "clientId": "153",
+              "clientName": "SUPER PORTUGAL - BRAGANCA",
+              "latitude": -3.7807845,
+              "longitude": -38.5966783,
+              "visitDurationMinutes": 48,
+              "frequency": 2,
+              "travelTimeMinutes": 5,
+              "travelDistanceKm": 2.2,
+              "arrivalTime": "09:05:00",
+              "departureTime": "09:53:00"
+            },
+            {
+              "order": 3,
+              "clientId": "611",
+              "clientName": "SUPER PORTUGAL - MARAPONGA",
+              "latitude": -3.7842908,
+              "longitude": -38.5691114,
+              "visitDurationMinutes": 47,
+              "frequency": 2,
+              "travelTimeMinutes": 8,
+              "travelDistanceKm": 3.6,
+              "arrivalTime": "10:01:00",
+              "departureTime": "10:48:00"
+            },
+            {
+              "order": 4,
+              "clientId": "9630",
+              "clientName": "CLAECK SUPERMERCADO - ARACAPE",
+              "latitude": -3.8317798,
+              "longitude": -38.58973,
+              "visitDurationMinutes": 48,
+              "frequency": 2,
+              "travelTimeMinutes": 13,
+              "travelDistanceKm": 5.8,
+              "arrivalTime": "11:01:00",
+              "departureTime": "11:49:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 4,
+      "nome": "ROTA 4",
+      "promoterId": "ROTA_4",
+      "agenda": {
+        "Segunda-feira": {
+          "limit": 480,
+          "timeUsed": 478,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "884",
+              "clientName": "SUPER PORTUGAL - CIDADE DOS FUNC",
+              "latitude": -3.7899059,
+              "longitude": -38.495258,
+              "visitDurationMinutes": 46,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "08:56:00"
+            },
+            {
+              "order": 2,
+              "clientId": "193",
+              "clientName": "EXITO - MONTE CASTELO",
+              "latitude": -3.7211932,
+              "longitude": -38.5583364,
+              "visitDurationMinutes": 135,
+              "frequency": 1,
+              "travelTimeMinutes": 19,
+              "travelDistanceKm": 8.4,
+              "arrivalTime": "09:15:00",
+              "departureTime": "11:30:00"
+            },
+            {
+              "order": 3,
+              "clientId": "931",
+              "clientName": "MERCADINHO RAIMUNDINHO",
+              "latitude": -3.766361,
+              "longitude": -38.6211393,
+              "visitDurationMinutes": 85,
+              "frequency": 1,
+              "travelTimeMinutes": 18,
+              "travelDistanceKm": 8,
+              "arrivalTime": "11:48:00",
+              "departureTime": "13:13:00"
+            },
+            {
+              "order": 4,
+              "clientId": "2279",
+              "clientName": "EXITO - ACAPULCO",
+              "latitude": -3.758694,
+              "longitude": -38.625415,
+              "visitDurationMinutes": 59,
+              "frequency": 1,
+              "travelTimeMinutes": 4,
+              "travelDistanceKm": 1.8,
+              "arrivalTime": "13:17:00",
+              "departureTime": "14:16:00"
+            },
+            {
+              "order": 5,
+              "clientId": "1230",
+              "clientName": "VITORIA REAL",
+              "latitude": -3.7716837,
+              "longitude": -38.6552574,
+              "visitDurationMinutes": 102,
+              "frequency": 1,
+              "travelTimeMinutes": 9,
+              "travelDistanceKm": 4,
+              "arrivalTime": "14:25:00",
+              "departureTime": "16:07:00"
+            }
+          ]
+        },
+        "Terça-feira": {
+          "limit": 480,
+          "timeUsed": 477,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "1967",
+              "clientName": "SAO FRANCISCO - FILIAL LJ 02",
+              "latitude": -3.7865804,
+              "longitude": -38.5979579,
+              "visitDurationMinutes": 46,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "08:56:00"
+            },
+            {
+              "order": 2,
+              "clientId": "898",
+              "clientName": "SANTA EDWIGES - JD GUANABARA - LJ 01",
+              "latitude": -3.7249377,
+              "longitude": -38.5890115,
+              "visitDurationMinutes": 178,
+              "frequency": 1,
+              "travelTimeMinutes": 14,
+              "travelDistanceKm": 6.2,
+              "arrivalTime": "09:10:00",
+              "departureTime": "12:08:00"
+            },
+            {
+              "order": 3,
+              "clientId": "10978",
+              "clientName": "SUPER PORTUGAL - JOAQUIM TAVORA",
+              "latitude": -3.74863598,
+              "longitude": -38.51500582,
+              "visitDurationMinutes": 39,
+              "frequency": 2,
+              "travelTimeMinutes": 19,
+              "travelDistanceKm": 8.4,
+              "arrivalTime": "12:27:00",
+              "departureTime": "13:06:00"
+            },
+            {
+              "order": 4,
+              "clientId": "3078",
+              "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 01",
+              "latitude": -3.8169208,
+              "longitude": -38.5316105,
+              "visitDurationMinutes": 34,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "13:21:00",
+              "departureTime": "13:55:00"
+            },
+            {
+              "order": 5,
+              "clientId": "2415",
+              "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 02",
+              "latitude": -3.84607,
+              "longitude": -38.516918,
+              "visitDurationMinutes": 34,
+              "frequency": 2,
+              "travelTimeMinutes": 8,
+              "travelDistanceKm": 3.6,
+              "arrivalTime": "14:03:00",
+              "departureTime": "14:37:00"
+            },
+            {
+              "order": 6,
+              "clientId": "9295",
+              "clientName": "PARA TY - ICARAI",
+              "latitude": -3.67554656,
+              "longitude": -38.66738313,
+              "visitDurationMinutes": 53,
+              "frequency": 1,
+              "travelTimeMinutes": 36,
+              "travelDistanceKm": 16,
+              "arrivalTime": "15:13:00",
+              "departureTime": "16:06:00"
+            }
+          ]
+        },
+        "Quarta-feira": {
+          "limit": 480,
+          "timeUsed": 467,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "884",
+              "clientName": "SUPER PORTUGAL - CIDADE DOS FUNC",
+              "latitude": -3.7899059,
+              "longitude": -38.495258,
+              "visitDurationMinutes": 46,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "08:56:00"
+            },
+            {
+              "order": 2,
+              "clientId": "5192",
+              "clientName": "R CENTER - PAUPINA",
+              "latitude": -3.83829143,
+              "longitude": -38.48757653,
+              "visitDurationMinutes": 79,
+              "frequency": 1,
+              "travelTimeMinutes": 13,
+              "travelDistanceKm": 5.8,
+              "arrivalTime": "09:09:00",
+              "departureTime": "10:28:00"
+            },
+            {
+              "order": 3,
+              "clientId": "3584",
+              "clientName": "SANTA EDWIGES - JD GUANABARA - LJ 02",
+              "latitude": -3.726481,
+              "longitude": -38.5888279,
+              "visitDurationMinutes": 76,
+              "frequency": 1,
+              "travelTimeMinutes": 31,
+              "travelDistanceKm": 13.8,
+              "arrivalTime": "10:59:00",
+              "departureTime": "12:15:00"
+            },
+            {
+              "order": 4,
+              "clientId": "719",
+              "clientName": "EXITO - PRQ ALBANO",
+              "latitude": -3.7594355,
+              "longitude": -38.6163545,
+              "visitDurationMinutes": 84,
+              "frequency": 1,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "12:26:00",
+              "departureTime": "13:50:00"
+            },
+            {
+              "order": 5,
+              "clientId": "1450",
+              "clientName": "SUPERMERCADO MAR & SOL",
+              "latitude": -3.67349324,
+              "longitude": -38.66970537,
+              "visitDurationMinutes": 68,
+              "frequency": 1,
+              "travelTimeMinutes": 18,
+              "travelDistanceKm": 8,
+              "arrivalTime": "14:08:00",
+              "departureTime": "15:16:00"
+            }
+          ]
+        },
+        "Quinta-feira": {
+          "limit": 480,
+          "timeUsed": 469,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "1967",
+              "clientName": "SAO FRANCISCO - FILIAL LJ 02",
+              "latitude": -3.7865804,
+              "longitude": -38.5979579,
+              "visitDurationMinutes": 46,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "08:56:00"
+            },
+            {
+              "order": 2,
+              "clientId": "317",
+              "clientName": "EXITO - PRQ POTIRA II",
+              "latitude": -3.75701496,
+              "longitude": -38.63685327,
+              "visitDurationMinutes": 67,
+              "frequency": 1,
+              "travelTimeMinutes": 14,
+              "travelDistanceKm": 6.2,
+              "arrivalTime": "09:10:00",
+              "departureTime": "10:17:00"
+            },
+            {
+              "order": 3,
+              "clientId": "9597",
+              "clientName": "VITORIANO - E F LUNA",
+              "latitude": -3.7603291,
+              "longitude": -38.5423981,
+              "visitDurationMinutes": 66,
+              "frequency": 1,
+              "travelTimeMinutes": 19,
+              "travelDistanceKm": 8.4,
+              "arrivalTime": "10:36:00",
+              "departureTime": "11:42:00"
+            },
+            {
+              "order": 4,
+              "clientId": "10978",
+              "clientName": "SUPER PORTUGAL - JOAQUIM TAVORA",
+              "latitude": -3.74863598,
+              "longitude": -38.51500582,
+              "visitDurationMinutes": 39,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "11:52:00",
+              "departureTime": "12:31:00"
+            },
+            {
+              "order": 5,
+              "clientId": "3078",
+              "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 01",
+              "latitude": -3.8169208,
+              "longitude": -38.5316105,
+              "visitDurationMinutes": 34,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "12:46:00",
+              "departureTime": "13:20:00"
+            },
+            {
+              "order": 6,
+              "clientId": "2415",
+              "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 02",
+              "latitude": -3.84607,
+              "longitude": -38.516918,
+              "visitDurationMinutes": 34,
+              "frequency": 2,
+              "travelTimeMinutes": 8,
+              "travelDistanceKm": 3.6,
+              "arrivalTime": "13:28:00",
+              "departureTime": "14:02:00"
+            },
+            {
+              "order": 7,
+              "clientId": "4028",
+              "clientName": "LAREDO - MESSEJANA",
+              "latitude": -3.8298139,
+              "longitude": -38.4907932,
+              "visitDurationMinutes": 75,
+              "frequency": 1,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "14:13:00",
+              "departureTime": "15:28:00"
+            }
+          ]
+        },
+        "Sexta-feira": {
+          "limit": 480,
+          "timeUsed": 475,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "715",
+              "clientName": "EXITO - PRQ POTIRA III",
+              "latitude": -3.767533,
+              "longitude": -38.6248232,
+              "visitDurationMinutes": 64,
+              "frequency": 1,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:14:00"
+            },
+            {
+              "order": 2,
+              "clientId": "1142",
+              "clientName": "SUPERMERCADO CRISOSTOMO - LJ 01",
+              "latitude": -3.846401,
+              "longitude": -38.656205,
+              "visitDurationMinutes": 56,
+              "frequency": 1,
+              "travelTimeMinutes": 17,
+              "travelDistanceKm": 7.6,
+              "arrivalTime": "09:31:00",
+              "departureTime": "10:27:00"
+            },
+            {
+              "order": 3,
+              "clientId": "3771",
+              "clientName": "SUPER MOBYDICK",
+              "latitude": -3.6736142,
+              "longitude": -38.6696458,
+              "visitDurationMinutes": 49,
+              "frequency": 1,
+              "travelTimeMinutes": 25,
+              "travelDistanceKm": 11.1,
+              "arrivalTime": "10:52:00",
+              "departureTime": "11:41:00"
+            },
+            {
+              "order": 4,
+              "clientId": "9296",
+              "clientName": "SUPER CUMBUCO - CAUCAIA - LJ 02",
+              "latitude": -3.64063684,
+              "longitude": -38.70421562,
+              "visitDurationMinutes": 58,
+              "frequency": 1,
+              "travelTimeMinutes": 7,
+              "travelDistanceKm": 3.1,
+              "arrivalTime": "11:48:00",
+              "departureTime": "12:46:00"
+            },
+            {
+              "order": 5,
+              "clientId": "3968",
+              "clientName": "LAREDO - CENTRO",
+              "latitude": -3.7309369,
+              "longitude": -38.5376384,
+              "visitDurationMinutes": 49,
+              "frequency": 1,
+              "travelTimeMinutes": 34,
+              "travelDistanceKm": 15.1,
+              "arrivalTime": "13:20:00",
+              "departureTime": "14:09:00"
+            },
+            {
+              "order": 6,
+              "clientId": "10749",
+              "clientName": "SUPER LUA - PROF MURILO",
+              "latitude": -3.7242051,
+              "longitude": -38.4636954,
+              "visitDurationMinutes": 55,
+              "frequency": 1,
+              "travelTimeMinutes": 18,
+              "travelDistanceKm": 8,
+              "arrivalTime": "14:27:00",
+              "departureTime": "15:22:00"
+            }
+          ]
+        },
+        "Sábado": {
+          "limit": 240,
+          "timeUsed": 240,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "3776",
+              "clientName": "OFERTASSO - CONJ PALMEIRAS",
+              "latitude": -3.8471524,
+              "longitude": -38.5283154,
+              "visitDurationMinutes": 49,
+              "frequency": 1,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "08:59:00"
+            },
+            {
+              "order": 2,
+              "clientId": "1708",
+              "clientName": "NOSSA SRA DE FATIMA",
+              "latitude": -3.8359504,
+              "longitude": -38.5950891,
+              "visitDurationMinutes": 48,
+              "frequency": 1,
+              "travelTimeMinutes": 14,
+              "travelDistanceKm": 6.2,
+              "arrivalTime": "09:13:00",
+              "departureTime": "10:01:00"
+            },
+            {
+              "order": 3,
+              "clientId": "762",
+              "clientName": "R CENTER - PRQ SANTA ROSA",
+              "latitude": -3.8119541,
+              "longitude": -38.5972122,
+              "visitDurationMinutes": 43,
+              "frequency": 1,
+              "travelTimeMinutes": 6,
+              "travelDistanceKm": 2.7,
+              "arrivalTime": "10:07:00",
+              "departureTime": "10:50:00"
+            },
+            {
+              "order": 4,
+              "clientId": "2365",
+              "clientName": "SUPERMERCADO SUPER DIKA",
+              "latitude": -3.741646,
+              "longitude": -38.659527,
+              "visitDurationMinutes": 48,
+              "frequency": 1,
+              "travelTimeMinutes": 17,
+              "travelDistanceKm": 7.6,
+              "arrivalTime": "11:07:00",
+              "departureTime": "11:55:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": 5,
+      "nome": "ROTA 5",
+      "promoterId": "ROTA_5",
+      "agenda": {
+        "Segunda-feira": {
+          "limit": 480,
+          "timeUsed": 479,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "595",
+              "clientName": "MERCADINHO JALS",
+              "latitude": -3.7691711,
+              "longitude": -38.6569162,
+              "visitDurationMinutes": 45,
+              "frequency": 1,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "08:55:00"
+            },
+            {
+              "order": 2,
+              "clientId": "2368",
+              "clientName": "MARBOX SUPER - ARATURI",
+              "latitude": -3.7658197,
+              "longitude": -38.6401005,
+              "visitDurationMinutes": 39,
+              "frequency": 1,
+              "travelTimeMinutes": 5,
+              "travelDistanceKm": 2.2,
+              "arrivalTime": "09:00:00",
+              "departureTime": "09:39:00"
+            },
+            {
+              "order": 3,
+              "clientId": "803",
+              "clientName": "LAREDO - GENIBAU",
+              "latitude": -3.7567884,
+              "longitude": -38.6017086,
+              "visitDurationMinutes": 41,
+              "frequency": 1,
+              "travelTimeMinutes": 11,
+              "travelDistanceKm": 4.9,
+              "arrivalTime": "09:50:00",
+              "departureTime": "10:31:00"
+            },
+            {
+              "order": 4,
+              "clientId": "4888",
+              "clientName": "CLAECK SUPERMERCADO - JARDIM FLUMINENSE",
+              "latitude": -3.81534018,
+              "longitude": -38.60506827,
+              "visitDurationMinutes": 91,
+              "frequency": 2,
+              "travelTimeMinutes": 13,
+              "travelDistanceKm": 5.8,
+              "arrivalTime": "10:44:00",
+              "departureTime": "12:15:00"
+            },
+            {
+              "order": 5,
+              "clientId": "3249",
+              "clientName": "KALBIR ATACAREJO - LJ 01",
+              "latitude": -3.8496108,
+              "longitude": -38.5809081,
+              "visitDurationMinutes": 25,
+              "frequency": 1,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "12:25:00",
+              "departureTime": "12:50:00"
+            },
+            {
+              "order": 6,
+              "clientId": "1998",
+              "clientName": "SUPERMERCADO PROGRESSO",
+              "latitude": -3.8775392,
+              "longitude": -38.6087159,
+              "visitDurationMinutes": 94,
+              "frequency": 3,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "13:00:00",
+              "departureTime": "14:34:00"
+            },
+            {
+              "order": 7,
+              "clientId": "2240",
+              "clientName": "SUPER CUMBUCO - CUMBUCO - LJ 01",
+              "latitude": -3.625908,
+              "longitude": -38.7283622,
+              "visitDurationMinutes": 31,
+              "frequency": 1,
+              "travelTimeMinutes": 44,
+              "travelDistanceKm": 19.6,
+              "arrivalTime": "15:18:00",
+              "departureTime": "15:49:00"
+            }
+          ]
+        },
+        "Terça-feira": {
+          "limit": 480,
+          "timeUsed": 449,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "11037",
+              "clientName": "SUPERMERCADO CRISOSTOMO - LJ 02",
+              "latitude": -3.77769483,
+              "longitude": -38.60700068,
+              "visitDurationMinutes": 47,
+              "frequency": 1,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "08:57:00"
+            },
+            {
+              "order": 2,
+              "clientId": "830",
+              "clientName": "SUPER DA BARRA - JACARECANGA",
+              "latitude": -3.706271,
+              "longitude": -38.574687,
+              "visitDurationMinutes": 46,
+              "frequency": 1,
+              "travelTimeMinutes": 18,
+              "travelDistanceKm": 8,
+              "arrivalTime": "09:15:00",
+              "departureTime": "10:01:00"
+            },
+            {
+              "order": 3,
+              "clientId": "12604",
+              "clientName": "CANTINHO DAS FRUTAS - CAUCAIA",
+              "latitude": -3.69547409,
+              "longitude": -38.5977858,
+              "visitDurationMinutes": 43,
+              "frequency": 1,
+              "travelTimeMinutes": 5,
+              "travelDistanceKm": 2.2,
+              "arrivalTime": "10:06:00",
+              "departureTime": "10:49:00"
+            },
+            {
+              "order": 4,
+              "clientId": "840",
+              "clientName": "CANTINHO DAS FRUTAS - PIRAMBU",
+              "latitude": -3.7128686,
+              "longitude": -38.5486857,
+              "visitDurationMinutes": 43,
+              "frequency": 1,
+              "travelTimeMinutes": 12,
+              "travelDistanceKm": 5.3,
+              "arrivalTime": "11:01:00",
+              "departureTime": "11:44:00"
+            },
+            {
+              "order": 5,
+              "clientId": "11912",
+              "clientName": "SUPER BENFICA- JOSE BONIFACIO",
+              "latitude": -3.73839532,
+              "longitude": -38.53222215,
+              "visitDurationMinutes": 45,
+              "frequency": 1,
+              "travelTimeMinutes": 9,
+              "travelDistanceKm": 4,
+              "arrivalTime": "11:53:00",
+              "departureTime": "12:38:00"
+            },
+            {
+              "order": 6,
+              "clientId": "11219",
+              "clientName": "MAE RAINHA - ITAITINGA",
+              "latitude": -3.97234558,
+              "longitude": -38.52976029,
+              "visitDurationMinutes": 124,
+              "frequency": 2,
+              "travelTimeMinutes": 37,
+              "travelDistanceKm": 16.4,
+              "arrivalTime": "13:15:00",
+              "departureTime": "15:19:00"
+            }
+          ]
+        },
+        "Quarta-feira": {
+          "limit": 480,
+          "timeUsed": 393,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "718",
+              "clientName": "COMPREMAX - JUREMA",
+              "latitude": -3.77334061,
+              "longitude": -38.62707738,
+              "visitDurationMinutes": 114,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "10:04:00"
+            },
+            {
+              "order": 2,
+              "clientId": "348",
+              "clientName": "COMPREMAX - SGT HERMINIO",
+              "latitude": -3.730491,
+              "longitude": -38.5771848,
+              "visitDurationMinutes": 142,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "10:19:00",
+              "departureTime": "12:41:00"
+            },
+            {
+              "order": 3,
+              "clientId": "1998",
+              "clientName": "SUPERMERCADO PROGRESSO",
+              "latitude": -3.8775392,
+              "longitude": -38.6087159,
+              "visitDurationMinutes": 94,
+              "frequency": 3,
+              "travelTimeMinutes": 28,
+              "travelDistanceKm": 12.4,
+              "arrivalTime": "13:09:00",
+              "departureTime": "14:43:00"
+            }
+          ]
+        },
+        "Quinta-feira": {
+          "limit": 480,
+          "timeUsed": 281,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "4888",
+              "clientName": "CLAECK SUPERMERCADO - JARDIM FLUMINENSE",
+              "latitude": -3.81534018,
+              "longitude": -38.60506827,
+              "visitDurationMinutes": 91,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:41:00"
+            },
+            {
+              "order": 2,
+              "clientId": "151",
+              "clientName": "COMPREMAX - MISTER HULL",
+              "latitude": -3.7392121,
+              "longitude": -38.5924565,
+              "visitDurationMinutes": 174,
+              "frequency": 2,
+              "travelTimeMinutes": 16,
+              "travelDistanceKm": 7.1,
+              "arrivalTime": "09:57:00",
+              "departureTime": "12:51:00"
+            }
+          ]
+        },
+        "Sexta-feira": {
+          "limit": 480,
+          "timeUsed": 466,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "718",
+              "clientName": "COMPREMAX - JUREMA",
+              "latitude": -3.77334061,
+              "longitude": -38.62707738,
+              "visitDurationMinutes": 114,
+              "frequency": 2,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "10:04:00"
+            },
+            {
+              "order": 2,
+              "clientId": "348",
+              "clientName": "COMPREMAX - SGT HERMINIO",
+              "latitude": -3.730491,
+              "longitude": -38.5771848,
+              "visitDurationMinutes": 142,
+              "frequency": 2,
+              "travelTimeMinutes": 15,
+              "travelDistanceKm": 6.7,
+              "arrivalTime": "10:19:00",
+              "departureTime": "12:41:00"
+            },
+            {
+              "order": 3,
+              "clientId": "11219",
+              "clientName": "MAE RAINHA - ITAITINGA",
+              "latitude": -3.97234558,
+              "longitude": -38.52976029,
+              "visitDurationMinutes": 124,
+              "frequency": 2,
+              "travelTimeMinutes": 44,
+              "travelDistanceKm": 19.6,
+              "arrivalTime": "13:25:00",
+              "departureTime": "15:29:00"
+            }
+          ]
+        },
+        "Sábado": {
+          "limit": 240,
+          "timeUsed": 94,
+          "stops": [
+            {
+              "order": 1,
+              "clientId": "1998",
+              "clientName": "SUPERMERCADO PROGRESSO",
+              "latitude": -3.8775392,
+              "longitude": -38.6087159,
+              "visitDurationMinutes": 94,
+              "frequency": 3,
+              "travelTimeMinutes": 10,
+              "travelDistanceKm": 4.4,
+              "arrivalTime": "08:10:00",
+              "departureTime": "09:44:00"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "routes": [
+    {
+      "day": "Segunda-feira",
+      "promoterId": "ROTA_1",
+      "routeNumber": 1,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "10752",
+          "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+          "latitude": -3.8361488,
+          "longitude": -38.5733762,
+          "visitDurationMinutes": 201,
+          "frequency": 5,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "11:31:00"
+        },
+        {
+          "order": 2,
+          "clientId": "12643",
+          "clientName": "POPULAR ATACADISTA - JOSE WALTER",
+          "latitude": -3.83328621,
+          "longitude": -38.55279781,
+          "visitDurationMinutes": 124,
+          "frequency": 3,
+          "travelTimeMinutes": 7,
+          "travelDistanceKm": 3.1,
+          "arrivalTime": "11:38:00",
+          "departureTime": "13:42:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 27,
+      "totalVisitTimeMinutes": 325,
+      "totalTimeMinutes": 352,
+      "totalTravelDistanceKm": 11.9
+    },
+    {
+      "day": "Terça-feira",
+      "promoterId": "ROTA_1",
+      "routeNumber": 1,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "10752",
+          "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+          "latitude": -3.8361488,
+          "longitude": -38.5733762,
+          "visitDurationMinutes": 201,
+          "frequency": 5,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "11:31:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 20,
+      "totalVisitTimeMinutes": 201,
+      "totalTimeMinutes": 221,
+      "totalTravelDistanceKm": 8.8
+    },
+    {
+      "day": "Quarta-feira",
+      "promoterId": "ROTA_1",
+      "routeNumber": 1,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "10752",
+          "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+          "latitude": -3.8361488,
+          "longitude": -38.5733762,
+          "visitDurationMinutes": 201,
+          "frequency": 5,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "11:31:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 20,
+      "totalVisitTimeMinutes": 201,
+      "totalTimeMinutes": 221,
+      "totalTravelDistanceKm": 8.8
+    },
+    {
+      "day": "Quinta-feira",
+      "promoterId": "ROTA_1",
+      "routeNumber": 1,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "12643",
+          "clientName": "POPULAR ATACADISTA - JOSE WALTER",
+          "latitude": -3.83328621,
+          "longitude": -38.55279781,
+          "visitDurationMinutes": 124,
+          "frequency": 3,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "10:14:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 20,
+      "totalVisitTimeMinutes": 124,
+      "totalTimeMinutes": 144,
+      "totalTravelDistanceKm": 8.8
+    },
+    {
+      "day": "Sexta-feira",
+      "promoterId": "ROTA_1",
+      "routeNumber": 1,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "10752",
+          "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+          "latitude": -3.8361488,
+          "longitude": -38.5733762,
+          "visitDurationMinutes": 201,
+          "frequency": 5,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "11:31:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 20,
+      "totalVisitTimeMinutes": 201,
+      "totalTimeMinutes": 221,
+      "totalTravelDistanceKm": 8.8
+    },
+    {
+      "day": "Sábado",
+      "promoterId": "ROTA_1",
+      "routeNumber": 1,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "10752",
+          "clientName": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+          "latitude": -3.8361488,
+          "longitude": -38.5733762,
+          "visitDurationMinutes": 201,
+          "frequency": 5,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "11:31:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 20,
+      "totalVisitTimeMinutes": 201,
+      "totalTimeMinutes": 221,
+      "totalTravelDistanceKm": 8.8
+    },
+    {
+      "day": "Segunda-feira",
+      "promoterId": "ROTA_2",
+      "routeNumber": 2,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "11220",
+          "clientName": "MAE RAINHA - MARACANAU",
+          "latitude": -3.85564449,
+          "longitude": -38.5796747,
+          "visitDurationMinutes": 174,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "11:04:00"
+        },
+        {
+          "order": 2,
+          "clientId": "11844",
+          "clientName": "COMPREMAX - NOVA METROPOLE",
+          "latitude": -3.76944093,
+          "longitude": -38.65433696,
+          "visitDurationMinutes": 104,
+          "frequency": 2,
+          "travelTimeMinutes": 18,
+          "travelDistanceKm": 8,
+          "arrivalTime": "11:22:00",
+          "departureTime": "13:06:00"
+        },
+        {
+          "order": 3,
+          "clientId": "11163",
+          "clientName": "COMPREMAX - ICARAI",
+          "latitude": -3.67322246,
+          "longitude": -38.67026304,
+          "visitDurationMinutes": 151,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "13:21:00",
+          "departureTime": "15:52:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 53,
+      "totalVisitTimeMinutes": 429,
+      "totalTimeMinutes": 482,
+      "totalTravelDistanceKm": 23.5
+    },
+    {
+      "day": "Terça-feira",
+      "promoterId": "ROTA_2",
+      "routeNumber": 2,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "239",
+          "clientName": "SUPER CAUCAIA - LJ 02",
+          "latitude": -3.7342526,
+          "longitude": -38.65836087,
+          "visitDurationMinutes": 107,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:57:00"
+        },
+        {
+          "order": 2,
+          "clientId": "11268",
+          "clientName": "PASSAKI - CAUCAIA",
+          "latitude": -3.73335329,
+          "longitude": -38.6569974,
+          "visitDurationMinutes": 89,
+          "frequency": 2,
+          "travelTimeMinutes": 2,
+          "travelDistanceKm": 0.9,
+          "arrivalTime": "09:59:00",
+          "departureTime": "11:28:00"
+        },
+        {
+          "order": 3,
+          "clientId": "658",
+          "clientName": "BRASILEIRO - RODOLFO TEOFILO",
+          "latitude": -3.7466444,
+          "longitude": -38.5504395,
+          "visitDurationMinutes": 103,
+          "frequency": 2,
+          "travelTimeMinutes": 18,
+          "travelDistanceKm": 8,
+          "arrivalTime": "11:46:00",
+          "departureTime": "13:29:00"
+        },
+        {
+          "order": 4,
+          "clientId": "3643",
+          "clientName": "CLAECK SUPERMERCADO - PRQ JERUSALEM",
+          "latitude": -3.806077,
+          "longitude": -38.5966382,
+          "visitDurationMinutes": 103,
+          "frequency": 2,
+          "travelTimeMinutes": 16,
+          "travelDistanceKm": 7.1,
+          "arrivalTime": "13:45:00",
+          "departureTime": "15:28:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 56,
+      "totalVisitTimeMinutes": 402,
+      "totalTimeMinutes": 458,
+      "totalTravelDistanceKm": 24.799999999999997
+    },
+    {
+      "day": "Quarta-feira",
+      "promoterId": "ROTA_2",
+      "routeNumber": 2,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "11220",
+          "clientName": "MAE RAINHA - MARACANAU",
+          "latitude": -3.85564449,
+          "longitude": -38.5796747,
+          "visitDurationMinutes": 174,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "11:04:00"
+        },
+        {
+          "order": 2,
+          "clientId": "11844",
+          "clientName": "COMPREMAX - NOVA METROPOLE",
+          "latitude": -3.76944093,
+          "longitude": -38.65433696,
+          "visitDurationMinutes": 104,
+          "frequency": 2,
+          "travelTimeMinutes": 18,
+          "travelDistanceKm": 8,
+          "arrivalTime": "11:22:00",
+          "departureTime": "13:06:00"
+        },
+        {
+          "order": 3,
+          "clientId": "11163",
+          "clientName": "COMPREMAX - ICARAI",
+          "latitude": -3.67322246,
+          "longitude": -38.67026304,
+          "visitDurationMinutes": 151,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "13:21:00",
+          "departureTime": "15:52:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 53,
+      "totalVisitTimeMinutes": 429,
+      "totalTimeMinutes": 482,
+      "totalTravelDistanceKm": 23.5
+    },
+    {
+      "day": "Quinta-feira",
+      "promoterId": "ROTA_2",
+      "routeNumber": 2,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "239",
+          "clientName": "SUPER CAUCAIA - LJ 02",
+          "latitude": -3.7342526,
+          "longitude": -38.65836087,
+          "visitDurationMinutes": 107,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:57:00"
+        },
+        {
+          "order": 2,
+          "clientId": "4381",
+          "clientName": "COMPREMAX - OFERTAO MAX",
+          "latitude": -3.72905976,
+          "longitude": -38.65588134,
+          "visitDurationMinutes": 91,
+          "frequency": 2,
+          "travelTimeMinutes": 3,
+          "travelDistanceKm": 1.3,
+          "arrivalTime": "10:00:00",
+          "departureTime": "11:31:00"
+        },
+        {
+          "order": 3,
+          "clientId": "658",
+          "clientName": "BRASILEIRO - RODOLFO TEOFILO",
+          "latitude": -3.7466444,
+          "longitude": -38.5504395,
+          "visitDurationMinutes": 103,
+          "frequency": 2,
+          "travelTimeMinutes": 19,
+          "travelDistanceKm": 8.4,
+          "arrivalTime": "11:50:00",
+          "departureTime": "13:33:00"
+        },
+        {
+          "order": 4,
+          "clientId": "3643",
+          "clientName": "CLAECK SUPERMERCADO - PRQ JERUSALEM",
+          "latitude": -3.806077,
+          "longitude": -38.5966382,
+          "visitDurationMinutes": 103,
+          "frequency": 2,
+          "travelTimeMinutes": 16,
+          "travelDistanceKm": 7.1,
+          "arrivalTime": "13:49:00",
+          "departureTime": "15:32:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 58,
+      "totalVisitTimeMinutes": 404,
+      "totalTimeMinutes": 462,
+      "totalTravelDistanceKm": 25.6
+    },
+    {
+      "day": "Sexta-feira",
+      "promoterId": "ROTA_2",
+      "routeNumber": 2,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "11268",
+          "clientName": "PASSAKI - CAUCAIA",
+          "latitude": -3.73335329,
+          "longitude": -38.6569974,
+          "visitDurationMinutes": 89,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:39:00"
+        },
+        {
+          "order": 2,
+          "clientId": "12796",
+          "clientName": "NOVO SIQUEIRA - LJ1",
+          "latitude": -3.80892581,
+          "longitude": -38.62755341,
+          "visitDurationMinutes": 75,
+          "frequency": 2,
+          "travelTimeMinutes": 16,
+          "travelDistanceKm": 7.1,
+          "arrivalTime": "09:55:00",
+          "departureTime": "11:10:00"
+        },
+        {
+          "order": 3,
+          "clientId": "4891",
+          "clientName": "BRASILEIRO - MARAPONGA",
+          "latitude": -3.80487293,
+          "longitude": -38.56576242,
+          "visitDurationMinutes": 73,
+          "frequency": 2,
+          "travelTimeMinutes": 16,
+          "travelDistanceKm": 7.1,
+          "arrivalTime": "11:26:00",
+          "departureTime": "12:39:00"
+        },
+        {
+          "order": 4,
+          "clientId": "9593",
+          "clientName": "SUPER TELEFRANGO - LJ 04",
+          "latitude": -3.8034992,
+          "longitude": -38.5341911,
+          "visitDurationMinutes": 78,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "12:49:00",
+          "departureTime": "14:07:00"
+        },
+        {
+          "order": 5,
+          "clientId": "5158",
+          "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 03",
+          "latitude": -3.8090825,
+          "longitude": -38.524932,
+          "visitDurationMinutes": 84,
+          "frequency": 2,
+          "travelTimeMinutes": 4,
+          "travelDistanceKm": 1.8,
+          "arrivalTime": "14:11:00",
+          "departureTime": "15:35:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 66,
+      "totalVisitTimeMinutes": 399,
+      "totalTimeMinutes": 465,
+      "totalTravelDistanceKm": 29.200000000000003
+    },
+    {
+      "day": "Sábado",
+      "promoterId": "ROTA_2",
+      "routeNumber": 2,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "4381",
+          "clientName": "COMPREMAX - OFERTAO MAX",
+          "latitude": -3.72905976,
+          "longitude": -38.65588134,
+          "visitDurationMinutes": 91,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:41:00"
+        },
+        {
+          "order": 2,
+          "clientId": "11743",
+          "clientName": "SUPER PORTUGAL- SAPIRANGA",
+          "latitude": -3.79508034,
+          "longitude": -38.47443215,
+          "visitDurationMinutes": 81,
+          "frequency": 2,
+          "travelTimeMinutes": 36,
+          "travelDistanceKm": 16,
+          "arrivalTime": "10:17:00",
+          "departureTime": "11:38:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 56,
+      "totalVisitTimeMinutes": 172,
+      "totalTimeMinutes": 228,
+      "totalTravelDistanceKm": 24.799999999999997
+    },
+    {
+      "day": "Segunda-feira",
+      "promoterId": "ROTA_3",
+      "routeNumber": 3,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "12237",
+          "clientName": "NOVO SIQUEIRA - LJ02",
+          "latitude": -3.80683521,
+          "longitude": -38.62994815,
+          "visitDurationMinutes": 75,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:25:00"
+        },
+        {
+          "order": 2,
+          "clientId": "9319",
+          "clientName": "SUPER PORTUGAL - GRANJA PORTUGAL",
+          "latitude": -3.777836,
+          "longitude": -38.597821,
+          "visitDurationMinutes": 69,
+          "frequency": 2,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "09:36:00",
+          "departureTime": "10:45:00"
+        },
+        {
+          "order": 3,
+          "clientId": "620",
+          "clientName": "SUPER PORTUGAL - VILA PERI",
+          "latitude": -3.7802372,
+          "longitude": -38.5784333,
+          "visitDurationMinutes": 62,
+          "frequency": 2,
+          "travelTimeMinutes": 5,
+          "travelDistanceKm": 2.2,
+          "arrivalTime": "10:50:00",
+          "departureTime": "11:52:00"
+        },
+        {
+          "order": 4,
+          "clientId": "2807",
+          "clientName": "SUPER PORTUGAL - SERRINHA",
+          "latitude": -3.7872948,
+          "longitude": -38.5439698,
+          "visitDurationMinutes": 58,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "12:02:00",
+          "departureTime": "13:00:00"
+        },
+        {
+          "order": 5,
+          "clientId": "11455",
+          "clientName": "SUPER BENFICA - BENFICA",
+          "latitude": -3.7451759,
+          "longitude": -38.5402234,
+          "visitDurationMinutes": 69,
+          "frequency": 2,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "13:11:00",
+          "departureTime": "14:20:00"
+        },
+        {
+          "order": 6,
+          "clientId": "3765",
+          "clientName": "MAIS LUZ - (KALBIR LJ 02)",
+          "latitude": -3.8548937,
+          "longitude": -38.5789869,
+          "visitDurationMinutes": 64,
+          "frequency": 2,
+          "travelTimeMinutes": 25,
+          "travelDistanceKm": 11.1,
+          "arrivalTime": "14:45:00",
+          "departureTime": "15:49:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 82,
+      "totalVisitTimeMinutes": 397,
+      "totalTimeMinutes": 479,
+      "totalTravelDistanceKm": 36.3
+    },
+    {
+      "day": "Terça-feira",
+      "promoterId": "ROTA_3",
+      "routeNumber": 3,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "12706",
+          "clientName": "SUPER TELEFRANGO - LJ 07",
+          "latitude": -3.80072549,
+          "longitude": -38.53008014,
+          "visitDurationMinutes": 74,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:24:00"
+        },
+        {
+          "order": 2,
+          "clientId": "4828",
+          "clientName": "SUPER TELEFRANGO - LJ 03",
+          "latitude": -3.8298712,
+          "longitude": -38.4916118,
+          "visitDurationMinutes": 64,
+          "frequency": 2,
+          "travelTimeMinutes": 14,
+          "travelDistanceKm": 6.2,
+          "arrivalTime": "09:38:00",
+          "departureTime": "10:42:00"
+        },
+        {
+          "order": 3,
+          "clientId": "368",
+          "clientName": "SUPER PORTUGAL - TAUAPE",
+          "latitude": -3.7560405,
+          "longitude": -38.5114051,
+          "visitDurationMinutes": 52,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "10:57:00",
+          "departureTime": "11:49:00"
+        },
+        {
+          "order": 4,
+          "clientId": "284",
+          "clientName": "SAO FRANCISCO - MATRIZ LJ 01",
+          "latitude": -3.7966519,
+          "longitude": -38.6007377,
+          "visitDurationMinutes": 58,
+          "frequency": 2,
+          "travelTimeMinutes": 22,
+          "travelDistanceKm": 9.8,
+          "arrivalTime": "12:11:00",
+          "departureTime": "13:09:00"
+        },
+        {
+          "order": 5,
+          "clientId": "12843",
+          "clientName": "SUPER PORTUGAL- CONJUNTO CEARA",
+          "latitude": -3.76400599,
+          "longitude": -38.60235407,
+          "visitDurationMinutes": 58,
+          "frequency": 2,
+          "travelTimeMinutes": 9,
+          "travelDistanceKm": 4,
+          "arrivalTime": "13:18:00",
+          "departureTime": "14:16:00"
+        },
+        {
+          "order": 6,
+          "clientId": "181",
+          "clientName": "SUPER CAUCAIA - LJ 01",
+          "latitude": -3.73546304,
+          "longitude": -38.65846975,
+          "visitDurationMinutes": 63,
+          "frequency": 2,
+          "travelTimeMinutes": 14,
+          "travelDistanceKm": 6.2,
+          "arrivalTime": "14:30:00",
+          "departureTime": "15:33:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 94,
+      "totalVisitTimeMinutes": 369,
+      "totalTimeMinutes": 463,
+      "totalTravelDistanceKm": 41.7
+    },
+    {
+      "day": "Quarta-feira",
+      "promoterId": "ROTA_3",
+      "routeNumber": 3,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "12237",
+          "clientName": "NOVO SIQUEIRA - LJ02",
+          "latitude": -3.80683521,
+          "longitude": -38.62994815,
+          "visitDurationMinutes": 75,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:25:00"
+        },
+        {
+          "order": 2,
+          "clientId": "4089",
+          "clientName": "COMPREMAX - METROPOLE",
+          "latitude": -3.7666193,
+          "longitude": -38.6538536,
+          "visitDurationMinutes": 61,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "09:35:00",
+          "departureTime": "10:36:00"
+        },
+        {
+          "order": 3,
+          "clientId": "4832",
+          "clientName": "SUPER TELEFRANGO - LJ 02",
+          "latitude": -3.7734318,
+          "longitude": -38.5835181,
+          "visitDurationMinutes": 50,
+          "frequency": 2,
+          "travelTimeMinutes": 14,
+          "travelDistanceKm": 6.2,
+          "arrivalTime": "10:50:00",
+          "departureTime": "11:40:00"
+        },
+        {
+          "order": 4,
+          "clientId": "2807",
+          "clientName": "SUPER PORTUGAL - SERRINHA",
+          "latitude": -3.7872948,
+          "longitude": -38.5439698,
+          "visitDurationMinutes": 58,
+          "frequency": 2,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "11:51:00",
+          "departureTime": "12:49:00"
+        },
+        {
+          "order": 5,
+          "clientId": "11455",
+          "clientName": "SUPER BENFICA - BENFICA",
+          "latitude": -3.7451759,
+          "longitude": -38.5402234,
+          "visitDurationMinutes": 69,
+          "frequency": 2,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "13:00:00",
+          "departureTime": "14:09:00"
+        },
+        {
+          "order": 6,
+          "clientId": "3765",
+          "clientName": "MAIS LUZ - (KALBIR LJ 02)",
+          "latitude": -3.8548937,
+          "longitude": -38.5789869,
+          "visitDurationMinutes": 64,
+          "frequency": 2,
+          "travelTimeMinutes": 25,
+          "travelDistanceKm": 11.1,
+          "arrivalTime": "14:34:00",
+          "departureTime": "15:38:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 91,
+      "totalVisitTimeMinutes": 377,
+      "totalTimeMinutes": 468,
+      "totalTravelDistanceKm": 40.3
+    },
+    {
+      "day": "Quinta-feira",
+      "promoterId": "ROTA_3",
+      "routeNumber": 3,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "12706",
+          "clientName": "SUPER TELEFRANGO - LJ 07",
+          "latitude": -3.80072549,
+          "longitude": -38.53008014,
+          "visitDurationMinutes": 74,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:24:00"
+        },
+        {
+          "order": 2,
+          "clientId": "620",
+          "clientName": "SUPER PORTUGAL - VILA PERI",
+          "latitude": -3.7802372,
+          "longitude": -38.5784333,
+          "visitDurationMinutes": 62,
+          "frequency": 2,
+          "travelTimeMinutes": 12,
+          "travelDistanceKm": 5.3,
+          "arrivalTime": "09:36:00",
+          "departureTime": "10:38:00"
+        },
+        {
+          "order": 3,
+          "clientId": "9319",
+          "clientName": "SUPER PORTUGAL - GRANJA PORTUGAL",
+          "latitude": -3.777836,
+          "longitude": -38.597821,
+          "visitDurationMinutes": 69,
+          "frequency": 2,
+          "travelTimeMinutes": 4,
+          "travelDistanceKm": 1.8,
+          "arrivalTime": "10:42:00",
+          "departureTime": "11:51:00"
+        },
+        {
+          "order": 4,
+          "clientId": "153",
+          "clientName": "SUPER PORTUGAL - BRAGANCA",
+          "latitude": -3.7807845,
+          "longitude": -38.5966783,
+          "visitDurationMinutes": 48,
+          "frequency": 2,
+          "travelTimeMinutes": 2,
+          "travelDistanceKm": 0.9,
+          "arrivalTime": "11:53:00",
+          "departureTime": "12:41:00"
+        },
+        {
+          "order": 5,
+          "clientId": "181",
+          "clientName": "SUPER CAUCAIA - LJ 01",
+          "latitude": -3.73546304,
+          "longitude": -38.65846975,
+          "visitDurationMinutes": 63,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "12:56:00",
+          "departureTime": "13:59:00"
+        },
+        {
+          "order": 6,
+          "clientId": "4828",
+          "clientName": "SUPER TELEFRANGO - LJ 03",
+          "latitude": -3.8298712,
+          "longitude": -38.4916118,
+          "visitDurationMinutes": 64,
+          "frequency": 2,
+          "travelTimeMinutes": 35,
+          "travelDistanceKm": 15.6,
+          "arrivalTime": "14:34:00",
+          "departureTime": "15:38:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 88,
+      "totalVisitTimeMinutes": 380,
+      "totalTimeMinutes": 468,
+      "totalTravelDistanceKm": 39.1
+    },
+    {
+      "day": "Sexta-feira",
+      "promoterId": "ROTA_3",
+      "routeNumber": 3,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "4089",
+          "clientName": "COMPREMAX - METROPOLE",
+          "latitude": -3.7666193,
+          "longitude": -38.6538536,
+          "visitDurationMinutes": 61,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:11:00"
+        },
+        {
+          "order": 2,
+          "clientId": "4793",
+          "clientName": "SUPER TELEFRANGO - LJ 01",
+          "latitude": -3.7760576,
+          "longitude": -38.60597,
+          "visitDurationMinutes": 53,
+          "frequency": 2,
+          "travelTimeMinutes": 8,
+          "travelDistanceKm": 3.6,
+          "arrivalTime": "09:19:00",
+          "departureTime": "10:12:00"
+        },
+        {
+          "order": 3,
+          "clientId": "12843",
+          "clientName": "SUPER PORTUGAL- CONJUNTO CEARA",
+          "latitude": -3.76400599,
+          "longitude": -38.60235407,
+          "visitDurationMinutes": 58,
+          "frequency": 2,
+          "travelTimeMinutes": 3,
+          "travelDistanceKm": 1.3,
+          "arrivalTime": "10:15:00",
+          "departureTime": "11:13:00"
+        },
+        {
+          "order": 4,
+          "clientId": "9318",
+          "clientName": "SAO FRANCISCO - FILIAL LJ 03",
+          "latitude": -3.7881221,
+          "longitude": -38.6107546,
+          "visitDurationMinutes": 51,
+          "frequency": 2,
+          "travelTimeMinutes": 6,
+          "travelDistanceKm": 2.7,
+          "arrivalTime": "11:19:00",
+          "departureTime": "12:10:00"
+        },
+        {
+          "order": 5,
+          "clientId": "284",
+          "clientName": "SAO FRANCISCO - MATRIZ LJ 01",
+          "latitude": -3.7966519,
+          "longitude": -38.6007377,
+          "visitDurationMinutes": 58,
+          "frequency": 2,
+          "travelTimeMinutes": 3,
+          "travelDistanceKm": 1.3,
+          "arrivalTime": "12:13:00",
+          "departureTime": "13:11:00"
+        },
+        {
+          "order": 6,
+          "clientId": "2292",
+          "clientName": "CLAECK SUPERMERCADO - PRQ SANTANA",
+          "latitude": -3.8142935,
+          "longitude": -38.5831318,
+          "visitDurationMinutes": 51,
+          "frequency": 2,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "13:22:00",
+          "departureTime": "14:13:00"
+        },
+        {
+          "order": 7,
+          "clientId": "368",
+          "clientName": "SUPER PORTUGAL - TAUAPE",
+          "latitude": -3.7560405,
+          "longitude": -38.5114051,
+          "visitDurationMinutes": 52,
+          "frequency": 2,
+          "travelTimeMinutes": 23,
+          "travelDistanceKm": 10.2,
+          "arrivalTime": "14:36:00",
+          "departureTime": "15:28:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 74,
+      "totalVisitTimeMinutes": 384,
+      "totalTimeMinutes": 458,
+      "totalTravelDistanceKm": 32.800000000000004
+    },
+    {
+      "day": "Sábado",
+      "promoterId": "ROTA_3",
+      "routeNumber": 3,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "4832",
+          "clientName": "SUPER TELEFRANGO - LJ 02",
+          "latitude": -3.7734318,
+          "longitude": -38.5835181,
+          "visitDurationMinutes": 50,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:00:00"
+        },
+        {
+          "order": 2,
+          "clientId": "153",
+          "clientName": "SUPER PORTUGAL - BRAGANCA",
+          "latitude": -3.7807845,
+          "longitude": -38.5966783,
+          "visitDurationMinutes": 48,
+          "frequency": 2,
+          "travelTimeMinutes": 5,
+          "travelDistanceKm": 2.2,
+          "arrivalTime": "09:05:00",
+          "departureTime": "09:53:00"
+        },
+        {
+          "order": 3,
+          "clientId": "611",
+          "clientName": "SUPER PORTUGAL - MARAPONGA",
+          "latitude": -3.7842908,
+          "longitude": -38.5691114,
+          "visitDurationMinutes": 47,
+          "frequency": 2,
+          "travelTimeMinutes": 8,
+          "travelDistanceKm": 3.6,
+          "arrivalTime": "10:01:00",
+          "departureTime": "10:48:00"
+        },
+        {
+          "order": 4,
+          "clientId": "9630",
+          "clientName": "CLAECK SUPERMERCADO - ARACAPE",
+          "latitude": -3.8317798,
+          "longitude": -38.58973,
+          "visitDurationMinutes": 48,
+          "frequency": 2,
+          "travelTimeMinutes": 13,
+          "travelDistanceKm": 5.8,
+          "arrivalTime": "11:01:00",
+          "departureTime": "11:49:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 46,
+      "totalVisitTimeMinutes": 193,
+      "totalTimeMinutes": 239,
+      "totalTravelDistanceKm": 20.4
+    },
+    {
+      "day": "Segunda-feira",
+      "promoterId": "ROTA_4",
+      "routeNumber": 4,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "884",
+          "clientName": "SUPER PORTUGAL - CIDADE DOS FUNC",
+          "latitude": -3.7899059,
+          "longitude": -38.495258,
+          "visitDurationMinutes": 46,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "08:56:00"
+        },
+        {
+          "order": 2,
+          "clientId": "193",
+          "clientName": "EXITO - MONTE CASTELO",
+          "latitude": -3.7211932,
+          "longitude": -38.5583364,
+          "visitDurationMinutes": 135,
+          "frequency": 1,
+          "travelTimeMinutes": 19,
+          "travelDistanceKm": 8.4,
+          "arrivalTime": "09:15:00",
+          "departureTime": "11:30:00"
+        },
+        {
+          "order": 3,
+          "clientId": "931",
+          "clientName": "MERCADINHO RAIMUNDINHO",
+          "latitude": -3.766361,
+          "longitude": -38.6211393,
+          "visitDurationMinutes": 85,
+          "frequency": 1,
+          "travelTimeMinutes": 18,
+          "travelDistanceKm": 8,
+          "arrivalTime": "11:48:00",
+          "departureTime": "13:13:00"
+        },
+        {
+          "order": 4,
+          "clientId": "2279",
+          "clientName": "EXITO - ACAPULCO",
+          "latitude": -3.758694,
+          "longitude": -38.625415,
+          "visitDurationMinutes": 59,
+          "frequency": 1,
+          "travelTimeMinutes": 4,
+          "travelDistanceKm": 1.8,
+          "arrivalTime": "13:17:00",
+          "departureTime": "14:16:00"
+        },
+        {
+          "order": 5,
+          "clientId": "1230",
+          "clientName": "VITORIA REAL",
+          "latitude": -3.7716837,
+          "longitude": -38.6552574,
+          "visitDurationMinutes": 102,
+          "frequency": 1,
+          "travelTimeMinutes": 9,
+          "travelDistanceKm": 4,
+          "arrivalTime": "14:25:00",
+          "departureTime": "16:07:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 70,
+      "totalVisitTimeMinutes": 427,
+      "totalTimeMinutes": 497,
+      "totalTravelDistanceKm": 31
+    },
+    {
+      "day": "Terça-feira",
+      "promoterId": "ROTA_4",
+      "routeNumber": 4,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "1967",
+          "clientName": "SAO FRANCISCO - FILIAL LJ 02",
+          "latitude": -3.7865804,
+          "longitude": -38.5979579,
+          "visitDurationMinutes": 46,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "08:56:00"
+        },
+        {
+          "order": 2,
+          "clientId": "898",
+          "clientName": "SANTA EDWIGES - JD GUANABARA - LJ 01",
+          "latitude": -3.7249377,
+          "longitude": -38.5890115,
+          "visitDurationMinutes": 178,
+          "frequency": 1,
+          "travelTimeMinutes": 14,
+          "travelDistanceKm": 6.2,
+          "arrivalTime": "09:10:00",
+          "departureTime": "12:08:00"
+        },
+        {
+          "order": 3,
+          "clientId": "10978",
+          "clientName": "SUPER PORTUGAL - JOAQUIM TAVORA",
+          "latitude": -3.74863598,
+          "longitude": -38.51500582,
+          "visitDurationMinutes": 39,
+          "frequency": 2,
+          "travelTimeMinutes": 19,
+          "travelDistanceKm": 8.4,
+          "arrivalTime": "12:27:00",
+          "departureTime": "13:06:00"
+        },
+        {
+          "order": 4,
+          "clientId": "3078",
+          "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 01",
+          "latitude": -3.8169208,
+          "longitude": -38.5316105,
+          "visitDurationMinutes": 34,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "13:21:00",
+          "departureTime": "13:55:00"
+        },
+        {
+          "order": 5,
+          "clientId": "2415",
+          "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 02",
+          "latitude": -3.84607,
+          "longitude": -38.516918,
+          "visitDurationMinutes": 34,
+          "frequency": 2,
+          "travelTimeMinutes": 8,
+          "travelDistanceKm": 3.6,
+          "arrivalTime": "14:03:00",
+          "departureTime": "14:37:00"
+        },
+        {
+          "order": 6,
+          "clientId": "9295",
+          "clientName": "PARA TY - ICARAI",
+          "latitude": -3.67554656,
+          "longitude": -38.66738313,
+          "visitDurationMinutes": 53,
+          "frequency": 1,
+          "travelTimeMinutes": 36,
+          "travelDistanceKm": 16,
+          "arrivalTime": "15:13:00",
+          "departureTime": "16:06:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 112,
+      "totalVisitTimeMinutes": 384,
+      "totalTimeMinutes": 496,
+      "totalTravelDistanceKm": 49.699999999999996
+    },
+    {
+      "day": "Quarta-feira",
+      "promoterId": "ROTA_4",
+      "routeNumber": 4,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "884",
+          "clientName": "SUPER PORTUGAL - CIDADE DOS FUNC",
+          "latitude": -3.7899059,
+          "longitude": -38.495258,
+          "visitDurationMinutes": 46,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "08:56:00"
+        },
+        {
+          "order": 2,
+          "clientId": "5192",
+          "clientName": "R CENTER - PAUPINA",
+          "latitude": -3.83829143,
+          "longitude": -38.48757653,
+          "visitDurationMinutes": 79,
+          "frequency": 1,
+          "travelTimeMinutes": 13,
+          "travelDistanceKm": 5.8,
+          "arrivalTime": "09:09:00",
+          "departureTime": "10:28:00"
+        },
+        {
+          "order": 3,
+          "clientId": "3584",
+          "clientName": "SANTA EDWIGES - JD GUANABARA - LJ 02",
+          "latitude": -3.726481,
+          "longitude": -38.5888279,
+          "visitDurationMinutes": 76,
+          "frequency": 1,
+          "travelTimeMinutes": 31,
+          "travelDistanceKm": 13.8,
+          "arrivalTime": "10:59:00",
+          "departureTime": "12:15:00"
+        },
+        {
+          "order": 4,
+          "clientId": "719",
+          "clientName": "EXITO - PRQ ALBANO",
+          "latitude": -3.7594355,
+          "longitude": -38.6163545,
+          "visitDurationMinutes": 84,
+          "frequency": 1,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "12:26:00",
+          "departureTime": "13:50:00"
+        },
+        {
+          "order": 5,
+          "clientId": "1450",
+          "clientName": "SUPERMERCADO MAR & SOL",
+          "latitude": -3.67349324,
+          "longitude": -38.66970537,
+          "visitDurationMinutes": 68,
+          "frequency": 1,
+          "travelTimeMinutes": 18,
+          "travelDistanceKm": 8,
+          "arrivalTime": "14:08:00",
+          "departureTime": "15:16:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 93,
+      "totalVisitTimeMinutes": 353,
+      "totalTimeMinutes": 446,
+      "totalTravelDistanceKm": 41.3
+    },
+    {
+      "day": "Quinta-feira",
+      "promoterId": "ROTA_4",
+      "routeNumber": 4,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "1967",
+          "clientName": "SAO FRANCISCO - FILIAL LJ 02",
+          "latitude": -3.7865804,
+          "longitude": -38.5979579,
+          "visitDurationMinutes": 46,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "08:56:00"
+        },
+        {
+          "order": 2,
+          "clientId": "317",
+          "clientName": "EXITO - PRQ POTIRA II",
+          "latitude": -3.75701496,
+          "longitude": -38.63685327,
+          "visitDurationMinutes": 67,
+          "frequency": 1,
+          "travelTimeMinutes": 14,
+          "travelDistanceKm": 6.2,
+          "arrivalTime": "09:10:00",
+          "departureTime": "10:17:00"
+        },
+        {
+          "order": 3,
+          "clientId": "9597",
+          "clientName": "VITORIANO - E F LUNA",
+          "latitude": -3.7603291,
+          "longitude": -38.5423981,
+          "visitDurationMinutes": 66,
+          "frequency": 1,
+          "travelTimeMinutes": 19,
+          "travelDistanceKm": 8.4,
+          "arrivalTime": "10:36:00",
+          "departureTime": "11:42:00"
+        },
+        {
+          "order": 4,
+          "clientId": "10978",
+          "clientName": "SUPER PORTUGAL - JOAQUIM TAVORA",
+          "latitude": -3.74863598,
+          "longitude": -38.51500582,
+          "visitDurationMinutes": 39,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "11:52:00",
+          "departureTime": "12:31:00"
+        },
+        {
+          "order": 5,
+          "clientId": "3078",
+          "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 01",
+          "latitude": -3.8169208,
+          "longitude": -38.5316105,
+          "visitDurationMinutes": 34,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "12:46:00",
+          "departureTime": "13:20:00"
+        },
+        {
+          "order": 6,
+          "clientId": "2415",
+          "clientName": "SUPERMERCADO IRMAO GEMEOS - LJ 02",
+          "latitude": -3.84607,
+          "longitude": -38.516918,
+          "visitDurationMinutes": 34,
+          "frequency": 2,
+          "travelTimeMinutes": 8,
+          "travelDistanceKm": 3.6,
+          "arrivalTime": "13:28:00",
+          "departureTime": "14:02:00"
+        },
+        {
+          "order": 7,
+          "clientId": "4028",
+          "clientName": "LAREDO - MESSEJANA",
+          "latitude": -3.8298139,
+          "longitude": -38.4907932,
+          "visitDurationMinutes": 75,
+          "frequency": 1,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "14:13:00",
+          "departureTime": "15:28:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 97,
+      "totalVisitTimeMinutes": 361,
+      "totalTimeMinutes": 458,
+      "totalTravelDistanceKm": 42.99999999999999
+    },
+    {
+      "day": "Sexta-feira",
+      "promoterId": "ROTA_4",
+      "routeNumber": 4,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "715",
+          "clientName": "EXITO - PRQ POTIRA III",
+          "latitude": -3.767533,
+          "longitude": -38.6248232,
+          "visitDurationMinutes": 64,
+          "frequency": 1,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:14:00"
+        },
+        {
+          "order": 2,
+          "clientId": "1142",
+          "clientName": "SUPERMERCADO CRISOSTOMO - LJ 01",
+          "latitude": -3.846401,
+          "longitude": -38.656205,
+          "visitDurationMinutes": 56,
+          "frequency": 1,
+          "travelTimeMinutes": 17,
+          "travelDistanceKm": 7.6,
+          "arrivalTime": "09:31:00",
+          "departureTime": "10:27:00"
+        },
+        {
+          "order": 3,
+          "clientId": "3771",
+          "clientName": "SUPER MOBYDICK",
+          "latitude": -3.6736142,
+          "longitude": -38.6696458,
+          "visitDurationMinutes": 49,
+          "frequency": 1,
+          "travelTimeMinutes": 25,
+          "travelDistanceKm": 11.1,
+          "arrivalTime": "10:52:00",
+          "departureTime": "11:41:00"
+        },
+        {
+          "order": 4,
+          "clientId": "9296",
+          "clientName": "SUPER CUMBUCO - CAUCAIA - LJ 02",
+          "latitude": -3.64063684,
+          "longitude": -38.70421562,
+          "visitDurationMinutes": 58,
+          "frequency": 1,
+          "travelTimeMinutes": 7,
+          "travelDistanceKm": 3.1,
+          "arrivalTime": "11:48:00",
+          "departureTime": "12:46:00"
+        },
+        {
+          "order": 5,
+          "clientId": "3968",
+          "clientName": "LAREDO - CENTRO",
+          "latitude": -3.7309369,
+          "longitude": -38.5376384,
+          "visitDurationMinutes": 49,
+          "frequency": 1,
+          "travelTimeMinutes": 34,
+          "travelDistanceKm": 15.1,
+          "arrivalTime": "13:20:00",
+          "departureTime": "14:09:00"
+        },
+        {
+          "order": 6,
+          "clientId": "10749",
+          "clientName": "SUPER LUA - PROF MURILO",
+          "latitude": -3.7242051,
+          "longitude": -38.4636954,
+          "visitDurationMinutes": 55,
+          "frequency": 1,
+          "travelTimeMinutes": 18,
+          "travelDistanceKm": 8,
+          "arrivalTime": "14:27:00",
+          "departureTime": "15:22:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 121,
+      "totalVisitTimeMinutes": 331,
+      "totalTimeMinutes": 452,
+      "totalTravelDistanceKm": 53.7
+    },
+    {
+      "day": "Sábado",
+      "promoterId": "ROTA_4",
+      "routeNumber": 4,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "3776",
+          "clientName": "OFERTASSO - CONJ PALMEIRAS",
+          "latitude": -3.8471524,
+          "longitude": -38.5283154,
+          "visitDurationMinutes": 49,
+          "frequency": 1,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "08:59:00"
+        },
+        {
+          "order": 2,
+          "clientId": "1708",
+          "clientName": "NOSSA SRA DE FATIMA",
+          "latitude": -3.8359504,
+          "longitude": -38.5950891,
+          "visitDurationMinutes": 48,
+          "frequency": 1,
+          "travelTimeMinutes": 14,
+          "travelDistanceKm": 6.2,
+          "arrivalTime": "09:13:00",
+          "departureTime": "10:01:00"
+        },
+        {
+          "order": 3,
+          "clientId": "762",
+          "clientName": "R CENTER - PRQ SANTA ROSA",
+          "latitude": -3.8119541,
+          "longitude": -38.5972122,
+          "visitDurationMinutes": 43,
+          "frequency": 1,
+          "travelTimeMinutes": 6,
+          "travelDistanceKm": 2.7,
+          "arrivalTime": "10:07:00",
+          "departureTime": "10:50:00"
+        },
+        {
+          "order": 4,
+          "clientId": "2365",
+          "clientName": "SUPERMERCADO SUPER DIKA",
+          "latitude": -3.741646,
+          "longitude": -38.659527,
+          "visitDurationMinutes": 48,
+          "frequency": 1,
+          "travelTimeMinutes": 17,
+          "travelDistanceKm": 7.6,
+          "arrivalTime": "11:07:00",
+          "departureTime": "11:55:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 57,
+      "totalVisitTimeMinutes": 188,
+      "totalTimeMinutes": 245,
+      "totalTravelDistanceKm": 25.299999999999997
+    },
+    {
+      "day": "Segunda-feira",
+      "promoterId": "ROTA_5",
+      "routeNumber": 5,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "595",
+          "clientName": "MERCADINHO JALS",
+          "latitude": -3.7691711,
+          "longitude": -38.6569162,
+          "visitDurationMinutes": 45,
+          "frequency": 1,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "08:55:00"
+        },
+        {
+          "order": 2,
+          "clientId": "2368",
+          "clientName": "MARBOX SUPER - ARATURI",
+          "latitude": -3.7658197,
+          "longitude": -38.6401005,
+          "visitDurationMinutes": 39,
+          "frequency": 1,
+          "travelTimeMinutes": 5,
+          "travelDistanceKm": 2.2,
+          "arrivalTime": "09:00:00",
+          "departureTime": "09:39:00"
+        },
+        {
+          "order": 3,
+          "clientId": "803",
+          "clientName": "LAREDO - GENIBAU",
+          "latitude": -3.7567884,
+          "longitude": -38.6017086,
+          "visitDurationMinutes": 41,
+          "frequency": 1,
+          "travelTimeMinutes": 11,
+          "travelDistanceKm": 4.9,
+          "arrivalTime": "09:50:00",
+          "departureTime": "10:31:00"
+        },
+        {
+          "order": 4,
+          "clientId": "4888",
+          "clientName": "CLAECK SUPERMERCADO - JARDIM FLUMINENSE",
+          "latitude": -3.81534018,
+          "longitude": -38.60506827,
+          "visitDurationMinutes": 91,
+          "frequency": 2,
+          "travelTimeMinutes": 13,
+          "travelDistanceKm": 5.8,
+          "arrivalTime": "10:44:00",
+          "departureTime": "12:15:00"
+        },
+        {
+          "order": 5,
+          "clientId": "3249",
+          "clientName": "KALBIR ATACAREJO - LJ 01",
+          "latitude": -3.8496108,
+          "longitude": -38.5809081,
+          "visitDurationMinutes": 25,
+          "frequency": 1,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "12:25:00",
+          "departureTime": "12:50:00"
+        },
+        {
+          "order": 6,
+          "clientId": "1998",
+          "clientName": "SUPERMERCADO PROGRESSO",
+          "latitude": -3.8775392,
+          "longitude": -38.6087159,
+          "visitDurationMinutes": 94,
+          "frequency": 3,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "13:00:00",
+          "departureTime": "14:34:00"
+        },
+        {
+          "order": 7,
+          "clientId": "2240",
+          "clientName": "SUPER CUMBUCO - CUMBUCO - LJ 01",
+          "latitude": -3.625908,
+          "longitude": -38.7283622,
+          "visitDurationMinutes": 31,
+          "frequency": 1,
+          "travelTimeMinutes": 44,
+          "travelDistanceKm": 19.6,
+          "arrivalTime": "15:18:00",
+          "departureTime": "15:49:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 113,
+      "totalVisitTimeMinutes": 366,
+      "totalTimeMinutes": 479,
+      "totalTravelDistanceKm": 50.1
+    },
+    {
+      "day": "Terça-feira",
+      "promoterId": "ROTA_5",
+      "routeNumber": 5,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "11037",
+          "clientName": "SUPERMERCADO CRISOSTOMO - LJ 02",
+          "latitude": -3.77769483,
+          "longitude": -38.60700068,
+          "visitDurationMinutes": 47,
+          "frequency": 1,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "08:57:00"
+        },
+        {
+          "order": 2,
+          "clientId": "830",
+          "clientName": "SUPER DA BARRA - JACARECANGA",
+          "latitude": -3.706271,
+          "longitude": -38.574687,
+          "visitDurationMinutes": 46,
+          "frequency": 1,
+          "travelTimeMinutes": 18,
+          "travelDistanceKm": 8,
+          "arrivalTime": "09:15:00",
+          "departureTime": "10:01:00"
+        },
+        {
+          "order": 3,
+          "clientId": "12604",
+          "clientName": "CANTINHO DAS FRUTAS - CAUCAIA",
+          "latitude": -3.69547409,
+          "longitude": -38.5977858,
+          "visitDurationMinutes": 43,
+          "frequency": 1,
+          "travelTimeMinutes": 5,
+          "travelDistanceKm": 2.2,
+          "arrivalTime": "10:06:00",
+          "departureTime": "10:49:00"
+        },
+        {
+          "order": 4,
+          "clientId": "840",
+          "clientName": "CANTINHO DAS FRUTAS - PIRAMBU",
+          "latitude": -3.7128686,
+          "longitude": -38.5486857,
+          "visitDurationMinutes": 43,
+          "frequency": 1,
+          "travelTimeMinutes": 12,
+          "travelDistanceKm": 5.3,
+          "arrivalTime": "11:01:00",
+          "departureTime": "11:44:00"
+        },
+        {
+          "order": 5,
+          "clientId": "11912",
+          "clientName": "SUPER BENFICA- JOSE BONIFACIO",
+          "latitude": -3.73839532,
+          "longitude": -38.53222215,
+          "visitDurationMinutes": 45,
+          "frequency": 1,
+          "travelTimeMinutes": 9,
+          "travelDistanceKm": 4,
+          "arrivalTime": "11:53:00",
+          "departureTime": "12:38:00"
+        },
+        {
+          "order": 6,
+          "clientId": "11219",
+          "clientName": "MAE RAINHA - ITAITINGA",
+          "latitude": -3.97234558,
+          "longitude": -38.52976029,
+          "visitDurationMinutes": 124,
+          "frequency": 2,
+          "travelTimeMinutes": 37,
+          "travelDistanceKm": 16.4,
+          "arrivalTime": "13:15:00",
+          "departureTime": "15:19:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 101,
+      "totalVisitTimeMinutes": 348,
+      "totalTimeMinutes": 449,
+      "totalTravelDistanceKm": 44.699999999999996
+    },
+    {
+      "day": "Quarta-feira",
+      "promoterId": "ROTA_5",
+      "routeNumber": 5,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "718",
+          "clientName": "COMPREMAX - JUREMA",
+          "latitude": -3.77334061,
+          "longitude": -38.62707738,
+          "visitDurationMinutes": 114,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "10:04:00"
+        },
+        {
+          "order": 2,
+          "clientId": "348",
+          "clientName": "COMPREMAX - SGT HERMINIO",
+          "latitude": -3.730491,
+          "longitude": -38.5771848,
+          "visitDurationMinutes": 142,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "10:19:00",
+          "departureTime": "12:41:00"
+        },
+        {
+          "order": 3,
+          "clientId": "1998",
+          "clientName": "SUPERMERCADO PROGRESSO",
+          "latitude": -3.8775392,
+          "longitude": -38.6087159,
+          "visitDurationMinutes": 94,
+          "frequency": 3,
+          "travelTimeMinutes": 28,
+          "travelDistanceKm": 12.4,
+          "arrivalTime": "13:09:00",
+          "departureTime": "14:43:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 63,
+      "totalVisitTimeMinutes": 350,
+      "totalTimeMinutes": 413,
+      "totalTravelDistanceKm": 27.9
+    },
+    {
+      "day": "Quinta-feira",
+      "promoterId": "ROTA_5",
+      "routeNumber": 5,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "4888",
+          "clientName": "CLAECK SUPERMERCADO - JARDIM FLUMINENSE",
+          "latitude": -3.81534018,
+          "longitude": -38.60506827,
+          "visitDurationMinutes": 91,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:41:00"
+        },
+        {
+          "order": 2,
+          "clientId": "151",
+          "clientName": "COMPREMAX - MISTER HULL",
+          "latitude": -3.7392121,
+          "longitude": -38.5924565,
+          "visitDurationMinutes": 174,
+          "frequency": 2,
+          "travelTimeMinutes": 16,
+          "travelDistanceKm": 7.1,
+          "arrivalTime": "09:57:00",
+          "departureTime": "12:51:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 36,
+      "totalVisitTimeMinutes": 265,
+      "totalTimeMinutes": 301,
+      "totalTravelDistanceKm": 15.9
+    },
+    {
+      "day": "Sexta-feira",
+      "promoterId": "ROTA_5",
+      "routeNumber": 5,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "718",
+          "clientName": "COMPREMAX - JUREMA",
+          "latitude": -3.77334061,
+          "longitude": -38.62707738,
+          "visitDurationMinutes": 114,
+          "frequency": 2,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "10:04:00"
+        },
+        {
+          "order": 2,
+          "clientId": "348",
+          "clientName": "COMPREMAX - SGT HERMINIO",
+          "latitude": -3.730491,
+          "longitude": -38.5771848,
+          "visitDurationMinutes": 142,
+          "frequency": 2,
+          "travelTimeMinutes": 15,
+          "travelDistanceKm": 6.7,
+          "arrivalTime": "10:19:00",
+          "departureTime": "12:41:00"
+        },
+        {
+          "order": 3,
+          "clientId": "11219",
+          "clientName": "MAE RAINHA - ITAITINGA",
+          "latitude": -3.97234558,
+          "longitude": -38.52976029,
+          "visitDurationMinutes": 124,
+          "frequency": 2,
+          "travelTimeMinutes": 44,
+          "travelDistanceKm": 19.6,
+          "arrivalTime": "13:25:00",
+          "departureTime": "15:29:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 79,
+      "totalVisitTimeMinutes": 380,
+      "totalTimeMinutes": 459,
+      "totalTravelDistanceKm": 35.1
+    },
+    {
+      "day": "Sábado",
+      "promoterId": "ROTA_5",
+      "routeNumber": 5,
+      "stops": [
+        {
+          "order": 1,
+          "clientId": "1998",
+          "clientName": "SUPERMERCADO PROGRESSO",
+          "latitude": -3.8775392,
+          "longitude": -38.6087159,
+          "visitDurationMinutes": 94,
+          "frequency": 3,
+          "travelTimeMinutes": 10,
+          "travelDistanceKm": 4.4,
+          "arrivalTime": "08:10:00",
+          "departureTime": "09:44:00"
+        }
+      ],
+      "totalTravelTimeMinutes": 20,
+      "totalVisitTimeMinutes": 94,
+      "totalTimeMinutes": 114,
+      "totalTravelDistanceKm": 8.8
+    }
+  ],
+  "clients": [
+    {
+      "id": "151",
+      "name": "COMPREMAX - MISTER HULL",
+      "latitude": -3.7392121,
+      "longitude": -38.5924565,
+      "visitDurationMinutes": 174,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11455",
+      "name": "SUPER BENFICA - BENFICA",
+      "latitude": -3.7451759,
+      "longitude": -38.5402234,
+      "visitDurationMinutes": 69,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3968",
+      "name": "LAREDO - CENTRO",
+      "latitude": -3.7309369,
+      "longitude": -38.5376384,
+      "visitDurationMinutes": 49,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3584",
+      "name": "SANTA EDWIGES - JD GUANABARA - LJ 02",
+      "latitude": -3.726481,
+      "longitude": -38.5888279,
+      "visitDurationMinutes": 76,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "10978",
+      "name": "SUPER PORTUGAL - JOAQUIM TAVORA",
+      "latitude": -3.74863598,
+      "longitude": -38.51500582,
+      "visitDurationMinutes": 39,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11912",
+      "name": "SUPER BENFICA- JOSE BONIFACIO",
+      "latitude": -3.73839532,
+      "longitude": -38.53222215,
+      "visitDurationMinutes": 45,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "348",
+      "name": "COMPREMAX - SGT HERMINIO",
+      "latitude": -3.730491,
+      "longitude": -38.5771848,
+      "visitDurationMinutes": 142,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "840",
+      "name": "CANTINHO DAS FRUTAS - PIRAMBU",
+      "latitude": -3.7128686,
+      "longitude": -38.5486857,
+      "visitDurationMinutes": 43,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "193",
+      "name": "EXITO - MONTE CASTELO",
+      "latitude": -3.7211932,
+      "longitude": -38.5583364,
+      "visitDurationMinutes": 135,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "898",
+      "name": "SANTA EDWIGES - JD GUANABARA - LJ 01",
+      "latitude": -3.7249377,
+      "longitude": -38.5890115,
+      "visitDurationMinutes": 178,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "658",
+      "name": "BRASILEIRO - RODOLFO TEOFILO",
+      "latitude": -3.7466444,
+      "longitude": -38.5504395,
+      "visitDurationMinutes": 103,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "368",
+      "name": "SUPER PORTUGAL - TAUAPE",
+      "latitude": -3.7560405,
+      "longitude": -38.5114051,
+      "visitDurationMinutes": 52,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11219",
+      "name": "MAE RAINHA - ITAITINGA",
+      "latitude": -3.97234558,
+      "longitude": -38.52976029,
+      "visitDurationMinutes": 124,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3249",
+      "name": "KALBIR ATACAREJO - LJ 01",
+      "latitude": -3.8496108,
+      "longitude": -38.5809081,
+      "visitDurationMinutes": 25,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "1142",
+      "name": "SUPERMERCADO CRISOSTOMO - LJ 01",
+      "latitude": -3.846401,
+      "longitude": -38.656205,
+      "visitDurationMinutes": 56,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3765",
+      "name": "MAIS LUZ - (KALBIR LJ 02)",
+      "latitude": -3.8548937,
+      "longitude": -38.5789869,
+      "visitDurationMinutes": 64,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11220",
+      "name": "MAE RAINHA - MARACANAU",
+      "latitude": -3.85564449,
+      "longitude": -38.5796747,
+      "visitDurationMinutes": 174,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "1998",
+      "name": "SUPERMERCADO PROGRESSO",
+      "latitude": -3.8775392,
+      "longitude": -38.6087159,
+      "visitDurationMinutes": 94,
+      "frequency": 3,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "284",
+      "name": "SAO FRANCISCO - MATRIZ LJ 01",
+      "latitude": -3.7966519,
+      "longitude": -38.6007377,
+      "visitDurationMinutes": 58,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "1967",
+      "name": "SAO FRANCISCO - FILIAL LJ 02",
+      "latitude": -3.7865804,
+      "longitude": -38.5979579,
+      "visitDurationMinutes": 46,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "803",
+      "name": "LAREDO - GENIBAU",
+      "latitude": -3.7567884,
+      "longitude": -38.6017086,
+      "visitDurationMinutes": 41,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "9318",
+      "name": "SAO FRANCISCO - FILIAL LJ 03",
+      "latitude": -3.7881221,
+      "longitude": -38.6107546,
+      "visitDurationMinutes": 51,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11037",
+      "name": "SUPERMERCADO CRISOSTOMO - LJ 02",
+      "latitude": -3.77769483,
+      "longitude": -38.60700068,
+      "visitDurationMinutes": 47,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "153",
+      "name": "SUPER PORTUGAL - BRAGANCA",
+      "latitude": -3.7807845,
+      "longitude": -38.5966783,
+      "visitDurationMinutes": 48,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "9319",
+      "name": "SUPER PORTUGAL - GRANJA PORTUGAL",
+      "latitude": -3.777836,
+      "longitude": -38.597821,
+      "visitDurationMinutes": 69,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "12796",
+      "name": "NOVO SIQUEIRA - LJ1",
+      "latitude": -3.80892581,
+      "longitude": -38.62755341,
+      "visitDurationMinutes": 75,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "611",
+      "name": "SUPER PORTUGAL - MARAPONGA",
+      "latitude": -3.7842908,
+      "longitude": -38.5691114,
+      "visitDurationMinutes": 47,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "762",
+      "name": "R CENTER - PRQ SANTA ROSA",
+      "latitude": -3.8119541,
+      "longitude": -38.5972122,
+      "visitDurationMinutes": 43,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "10752",
+      "name": "POPULAR ATACADISTA - PLANALTO AYRTON SENNA",
+      "latitude": -3.8361488,
+      "longitude": -38.5733762,
+      "visitDurationMinutes": 201,
+      "frequency": 5,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "620",
+      "name": "SUPER PORTUGAL - VILA PERI",
+      "latitude": -3.7802372,
+      "longitude": -38.5784333,
+      "visitDurationMinutes": 62,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "884",
+      "name": "SUPER PORTUGAL - CIDADE DOS FUNC",
+      "latitude": -3.7899059,
+      "longitude": -38.495258,
+      "visitDurationMinutes": 46,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": true,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4891",
+      "name": "BRASILEIRO - MARAPONGA",
+      "latitude": -3.80487293,
+      "longitude": -38.56576242,
+      "visitDurationMinutes": 73,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "9597",
+      "name": "VITORIANO - E F LUNA",
+      "latitude": -3.7603291,
+      "longitude": -38.5423981,
+      "visitDurationMinutes": 66,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "5158",
+      "name": "SUPERMERCADO IRMAO GEMEOS - LJ 03",
+      "latitude": -3.8090825,
+      "longitude": -38.524932,
+      "visitDurationMinutes": 84,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3078",
+      "name": "SUPERMERCADO IRMAO GEMEOS - LJ 01",
+      "latitude": -3.8169208,
+      "longitude": -38.5316105,
+      "visitDurationMinutes": 34,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11743",
+      "name": "SUPER PORTUGAL- SAPIRANGA",
+      "latitude": -3.79508034,
+      "longitude": -38.47443215,
+      "visitDurationMinutes": 81,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": true,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "2807",
+      "name": "SUPER PORTUGAL - SERRINHA",
+      "latitude": -3.7872948,
+      "longitude": -38.5439698,
+      "visitDurationMinutes": 58,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": true,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "2368",
+      "name": "MARBOX SUPER - ARATURI",
+      "latitude": -3.7658197,
+      "longitude": -38.6401005,
+      "visitDurationMinutes": 39,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4089",
+      "name": "COMPREMAX - METROPOLE",
+      "latitude": -3.7666193,
+      "longitude": -38.6538536,
+      "visitDurationMinutes": 61,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4381",
+      "name": "COMPREMAX - OFERTAO MAX",
+      "latitude": -3.72905976,
+      "longitude": -38.65588134,
+      "visitDurationMinutes": 91,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "239",
+      "name": "SUPER CAUCAIA - LJ 02",
+      "latitude": -3.7342526,
+      "longitude": -38.65836087,
+      "visitDurationMinutes": 107,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11268",
+      "name": "PASSAKI - CAUCAIA",
+      "latitude": -3.73335329,
+      "longitude": -38.6569974,
+      "visitDurationMinutes": 89,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "181",
+      "name": "SUPER CAUCAIA - LJ 01",
+      "latitude": -3.73546304,
+      "longitude": -38.65846975,
+      "visitDurationMinutes": 63,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "2240",
+      "name": "SUPER CUMBUCO - CUMBUCO - LJ 01",
+      "latitude": -3.625908,
+      "longitude": -38.7283622,
+      "visitDurationMinutes": 31,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3771",
+      "name": "SUPER MOBYDICK",
+      "latitude": -3.6736142,
+      "longitude": -38.6696458,
+      "visitDurationMinutes": 49,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "9295",
+      "name": "PARA TY - ICARAI",
+      "latitude": -3.67554656,
+      "longitude": -38.66738313,
+      "visitDurationMinutes": 53,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "1450",
+      "name": "SUPERMERCADO MAR & SOL",
+      "latitude": -3.67349324,
+      "longitude": -38.66970537,
+      "visitDurationMinutes": 68,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11163",
+      "name": "COMPREMAX - ICARAI",
+      "latitude": -3.67322246,
+      "longitude": -38.67026304,
+      "visitDurationMinutes": 151,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "931",
+      "name": "MERCADINHO RAIMUNDINHO",
+      "latitude": -3.766361,
+      "longitude": -38.6211393,
+      "visitDurationMinutes": 85,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "11844",
+      "name": "COMPREMAX - NOVA METROPOLE",
+      "latitude": -3.76944093,
+      "longitude": -38.65433696,
+      "visitDurationMinutes": 104,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "1230",
+      "name": "VITORIA REAL",
+      "latitude": -3.7716837,
+      "longitude": -38.6552574,
+      "visitDurationMinutes": 102,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "718",
+      "name": "COMPREMAX - JUREMA",
+      "latitude": -3.77334061,
+      "longitude": -38.62707738,
+      "visitDurationMinutes": 114,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "719",
+      "name": "EXITO - PRQ ALBANO",
+      "latitude": -3.7594355,
+      "longitude": -38.6163545,
+      "visitDurationMinutes": 84,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "317",
+      "name": "EXITO - PRQ POTIRA II",
+      "latitude": -3.75701496,
+      "longitude": -38.63685327,
+      "visitDurationMinutes": 67,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "715",
+      "name": "EXITO - PRQ POTIRA III",
+      "latitude": -3.767533,
+      "longitude": -38.6248232,
+      "visitDurationMinutes": 64,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "2279",
+      "name": "EXITO - ACAPULCO",
+      "latitude": -3.758694,
+      "longitude": -38.625415,
+      "visitDurationMinutes": 59,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "12604",
+      "name": "CANTINHO DAS FRUTAS - CAUCAIA",
+      "latitude": -3.69547409,
+      "longitude": -38.5977858,
+      "visitDurationMinutes": 43,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "9296",
+      "name": "SUPER CUMBUCO - CAUCAIA - LJ 02",
+      "latitude": -3.64063684,
+      "longitude": -38.70421562,
+      "visitDurationMinutes": 58,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3776",
+      "name": "OFERTASSO - CONJ PALMEIRAS",
+      "latitude": -3.8471524,
+      "longitude": -38.5283154,
+      "visitDurationMinutes": 49,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4028",
+      "name": "LAREDO - MESSEJANA",
+      "latitude": -3.8298139,
+      "longitude": -38.4907932,
+      "visitDurationMinutes": 75,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "5192",
+      "name": "R CENTER - PAUPINA",
+      "latitude": -3.83829143,
+      "longitude": -38.48757653,
+      "visitDurationMinutes": 79,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "12643",
+      "name": "POPULAR ATACADISTA - JOSE WALTER",
+      "latitude": -3.83328621,
+      "longitude": -38.55279781,
+      "visitDurationMinutes": 124,
+      "frequency": 3,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4793",
+      "name": "SUPER TELEFRANGO - LJ 01",
+      "latitude": -3.7760576,
+      "longitude": -38.60597,
+      "visitDurationMinutes": 53,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4828",
+      "name": "SUPER TELEFRANGO - LJ 03",
+      "latitude": -3.8298712,
+      "longitude": -38.4916118,
+      "visitDurationMinutes": 64,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4832",
+      "name": "SUPER TELEFRANGO - LJ 02",
+      "latitude": -3.7734318,
+      "longitude": -38.5835181,
+      "visitDurationMinutes": 50,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": true,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "9593",
+      "name": "SUPER TELEFRANGO - LJ 04",
+      "latitude": -3.8034992,
+      "longitude": -38.5341911,
+      "visitDurationMinutes": 78,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "12706",
+      "name": "SUPER TELEFRANGO - LJ 07",
+      "latitude": -3.80072549,
+      "longitude": -38.53008014,
+      "visitDurationMinutes": 74,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "830",
+      "name": "SUPER DA BARRA - JACARECANGA",
+      "latitude": -3.706271,
+      "longitude": -38.574687,
+      "visitDurationMinutes": 46,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "10749",
+      "name": "SUPER LUA - PROF MURILO",
+      "latitude": -3.7242051,
+      "longitude": -38.4636954,
+      "visitDurationMinutes": 55,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "2365",
+      "name": "SUPERMERCADO SUPER DIKA",
+      "latitude": -3.741646,
+      "longitude": -38.659527,
+      "visitDurationMinutes": 48,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "595",
+      "name": "MERCADINHO JALS",
+      "latitude": -3.7691711,
+      "longitude": -38.6569162,
+      "visitDurationMinutes": 45,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "1708",
+      "name": "NOSSA SRA DE FATIMA",
+      "latitude": -3.8359504,
+      "longitude": -38.5950891,
+      "visitDurationMinutes": 48,
+      "frequency": 1,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": true,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "12237",
+      "name": "NOVO SIQUEIRA - LJ02",
+      "latitude": -3.80683521,
+      "longitude": -38.62994815,
+      "visitDurationMinutes": 75,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": true,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "9630",
+      "name": "CLAECK SUPERMERCADO - ARACAPE",
+      "latitude": -3.8317798,
+      "longitude": -38.58973,
+      "visitDurationMinutes": 48,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "4888",
+      "name": "CLAECK SUPERMERCADO - JARDIM FLUMINENSE",
+      "latitude": -3.81534018,
+      "longitude": -38.60506827,
+      "visitDurationMinutes": 91,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "3643",
+      "name": "CLAECK SUPERMERCADO - PRQ JERUSALEM",
+      "latitude": -3.806077,
+      "longitude": -38.5966382,
+      "visitDurationMinutes": 103,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "2292",
+      "name": "CLAECK SUPERMERCADO - PRQ SANTANA",
+      "latitude": -3.8142935,
+      "longitude": -38.5831318,
+      "visitDurationMinutes": 51,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": false,
+        "tuesday": false,
+        "wednesday": true,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "12843",
+      "name": "SUPER PORTUGAL- CONJUNTO CEARA",
+      "latitude": -3.76400599,
+      "longitude": -38.60235407,
+      "visitDurationMinutes": 58,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    },
+    {
+      "id": "2415",
+      "name": "SUPERMERCADO IRMAO GEMEOS - LJ 02",
+      "latitude": -3.84607,
+      "longitude": -38.516918,
+      "visitDurationMinutes": 34,
+      "frequency": 2,
+      "visitorDays": {
+        "monday": true,
+        "tuesday": true,
+        "wednesday": true,
+        "thursday": true,
+        "friday": true,
+        "saturday": true
+      },
+      "promoterBlockedDays": {
+        "monday": true,
+        "tuesday": false,
+        "wednesday": false,
+        "thursday": false,
+        "friday": false,
+        "saturday": false
+      },
+      "promoterId": "DEFAULT"
+    }
+  ],
+  "promoters": [],
+  "routeAssignments": {},
+  "summary": {
+    "totalPromotores": 5,
+    "totalClientsAssigned": 79,
+    "averageUtilization": 85.25,
+    "warnings": [
+      "Total de promotores criados: 5",
+      "Clientes alocados: 79/79",
+      "⚠️ ROTA 1 - Segunda-feira: Carga ociosa (Apenas 5h 34m alocadas de 8h 0m disponíveis)",
+      "⚠️ ROTA 1 - Terça-feira: Carga ociosa (Apenas 3h 57m alocadas de 8h 0m disponíveis)",
+      "⚠️ ROTA 1 - Quarta-feira: Carga ociosa (Apenas 3h 41m alocadas de 8h 0m disponíveis)",
+      "⚠️ ROTA 1 - Quinta-feira: Carga ociosa (Apenas 2h 18m alocadas de 8h 0m disponíveis)",
+      "⚠️ ROTA 1 - Sexta-feira: Carga ociosa (Apenas 3h 41m alocadas de 8h 0m disponíveis)",
+      "⚠️ ROTA 5 - Quinta-feira: Carga ociosa (Apenas 4h 41m alocadas de 8h 0m disponíveis)",
+      "⚠️ ROTA 5 - Sábado: Carga ociosa (Apenas 1h 34m alocadas de 4h 0m disponíveis)"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+CÓD,NOME FANTASIA,LATITUDE,LONGITUDE,TEMPO MÉDIO DE VISITA,FREQUÊNCIA,SEG,TER,QUA,QUI,SEX,SAB
+1,Cliente A - Seg Ter,−3.73,−38.52,00:30:00,2,,,X,X,X,X
+2,Cliente B - Ter Qua,−3.72,−38.51,00:30:00,2,,,,X,X,X
+3,Cliente C - Seg Qua Sex,−3.71,−38.53,00:30:00,3,,X,,X,,X
+4,Cliente D - Qua Sex,−3.74,−38.54,00:30:00,2,,X,X,X,X,X
+5,Cliente E - Seg Sex,−3.75,−38.50,00:30:00,2,,X,X,X,,X
+6,Cliente F - Ter Qui,−3.76,−38.55,00:30:00,2,,X,,,,X
+7,Cliente G - Ter Qui Sex,−3.77,−38.56,00:30:00,3,,X,X,,X,X
+8,Cliente H - Seg Ter Qua,−3.78,−38.57,00:30:00,3,X,X,X,,X,X
+9,Cliente I - Qui Sex,−3.79,−38.58,00:30:00,2,,,,,,X
+10,Cliente J - Seg Qui,−3.80,−38.49,00:30:00,2,X,X,X,X,X,X

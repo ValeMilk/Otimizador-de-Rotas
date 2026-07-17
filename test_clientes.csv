@@ -1,0 +1,11 @@
+CÓD,NOME FANTASIA,LATITUDE,LONGITUDE,TEMPO MÉDIO DE VISITA,FREQUÊNCIA,SEG,TER,QUA,QUI,SEX,SAB
+1,Teste Freq 2 Dias Consecutivos,-3.7,-38.5,01:00:00,2,X,X,,,,
+2,Teste Freq 2 Dias Espaçados,-3.7,-38.5,01:00:00,2,X,,X,,,
+3,Teste Freq 3 Dias Múltiplos,-3.7,-38.5,01:00:00,3,X,X,X,,,
+4,Teste Freq 2 Quinta e Sábado,-3.7,-38.5,01:00:00,2,,,,,X,X
+5,Teste Freq 3 Segunda Quarta Sexta,-3.7,-38.5,01:00:00,3,X,,X,,X,
+6,Teste Freq 1 Terça,-3.7,-38.5,01:00:00,1,,X,,,,
+7,Teste Freq 2 Segunda Sexta,-3.7,-38.5,01:00:00,2,X,,,,X,
+8,Teste Freq 4 Todos Dias,-3.7,-38.5,01:00:00,4,X,X,X,X,X,X
+9,Teste Freq 2 Terça Quinta,-3.7,-38.5,01:00:00,2,,X,,X,,
+10,Teste Freq 3 Segunda Terça Quarta,-3.7,-38.5,01:00:00,3,X,X,X,,,
