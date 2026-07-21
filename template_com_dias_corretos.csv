@@ -1,3 +1,0 @@
-CÓD,NOME FANTASIA,LATITUDE,LONGITUDE,TEMPO MÉDIO DE VISITA,FREQUÊNCIA,SEG (Dias do Cliente),TER (Dias do Cliente),QUA (Dias do Cliente),QUI (Dias do Cliente),SEX (Dias do Cliente),SAB (Dias do Cliente),SEG (Dias do Vendedor),TER (Dias do Vendedor),QUA (Dias do Vendedor),QUI (Dias do Vendedor),SEX (Dias do Vendedor),SAB (Dias do Vendedor),ROTAS
-1,EXEMPLO - CLIENTE 1,-3.73,-38.53,00:30:00,2,,,,,,,,,,,,,DEFAULT
-2,EXEMPLO - CLIENTE 2 (BLOQUEADO QUA),-3.74,-38.54,00:45:00,1,,,,,,,,,X,,,DEFAULT

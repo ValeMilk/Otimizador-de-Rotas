@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Promoter } from '@/types';
-import { Trash2, MapPin, Loader, Check, AlertCircle } from 'lucide-react';
+import { Trash2, MapPin, Loader, Check, AlertCircle, Upload, FileText } from 'lucide-react';
 
 interface PromotersConfigurationProps {
   promoters: Promoter[];
@@ -17,6 +17,9 @@ export const PromotersConfiguration: React.FC<PromotersConfigurationProps> = ({
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [geocodingError, setGeocodingError] = useState('');
+  const [csvLoading, setCsvLoading] = useState(false);
+  const [csvProgress, setCsvProgress] = useState<{ current: number; total: number; name: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const geocodeAddress = async (addressText: string): Promise<{ lat: number; lng: number } | null> => {
     try {
@@ -49,6 +52,112 @@ export const PromotersConfiguration: React.FC<PromotersConfigurationProps> = ({
       return null;
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Geocoding sem side effects (usado no upload em massa)
+  const geocodeSilent = async (addressText: string): Promise<{ lat: number; lng: number } | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addressText)}&format=json&limit=1&countrycodes=br`,
+        {
+          headers: {
+            'User-Agent': 'OtimizadorRotas/1.0',
+          },
+        }
+      );
+      const results = await response.json();
+      if (!results || results.length === 0) return null;
+      return {
+        lat: parseFloat(results[0].lat),
+        lng: parseFloat(results[0].lon),
+      };
+    } catch (error) {
+      console.error('Erro ao geocodificar:', error);
+      return null;
+    }
+  };
+
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const handleCSVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setCsvLoading(true);
+    setGeocodingError('');
+
+    try {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter(line => line.trim());
+      
+      // Detecta separador (`;` ou `,`)
+      const separator = lines[0].includes(';') ? ';' : ',';
+      
+      // Remove cabeçalho
+      const dataLines = lines.slice(1);
+      
+      console.log(`📄 CSV: ${dataLines.length} promotor(es) para processar (separador: "${separator}")`);
+      
+      const novosPromoters: Promoter[] = [];
+      const erros: string[] = [];
+
+      for (let i = 0; i < dataLines.length; i++) {
+        const linha = dataLines[i];
+        const partes = linha.split(separator).map(p => p.trim().replace(/^"|"$/g, ''));
+        
+        if (partes.length < 2) {
+          erros.push(`Linha ${i + 2}: formato inválido`);
+          continue;
+        }
+
+        const nomePromotor = partes[0];
+        const enderecoPromotor = partes[1];
+
+        if (!nomePromotor || !enderecoPromotor) {
+          erros.push(`Linha ${i + 2}: nome ou endereço vazio`);
+          continue;
+        }
+
+        setCsvProgress({ current: i + 1, total: dataLines.length, name: nomePromotor });
+        console.log(`🔍 [${i + 1}/${dataLines.length}] Buscando: ${nomePromotor} - ${enderecoPromotor}`);
+
+        const coords = await geocodeSilent(enderecoPromotor);
+        
+        if (coords) {
+          novosPromoters.push({
+            id: `promoter_${Date.now()}_${i}`,
+            name: nomePromotor,
+            address: enderecoPromotor,
+            latitude: coords.lat,
+            longitude: coords.lng,
+          });
+          console.log(`  ✅ ${nomePromotor}: [${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}]`);
+        } else {
+          erros.push(`${nomePromotor}: endereço não encontrado`);
+          console.warn(`  ❌ ${nomePromotor}: endereço não encontrado`);
+        }
+
+        // Delay obrigatório do Nominatim (1 req/seg)
+        await delay(1100);
+      }
+
+      onPromotersChange([...promoters, ...novosPromoters]);
+      setCsvProgress(null);
+      
+      if (erros.length > 0) {
+        setGeocodingError(`Importados ${novosPromoters.length} de ${dataLines.length}. Erros: ${erros.slice(0, 3).join('; ')}${erros.length > 3 ? '...' : ''}`);
+      } else {
+        console.log(`✅ ${novosPromoters.length} promotor(es) importado(s) com sucesso!`);
+      }
+    } catch (error) {
+      console.error('Erro ao processar CSV:', error);
+      setGeocodingError('Erro ao ler o arquivo CSV.');
+    } finally {
+      setCsvLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -86,6 +195,76 @@ export const PromotersConfiguration: React.FC<PromotersConfigurationProps> = ({
       <div className="flex items-center gap-3 mb-6">
         <MapPin className="w-6 h-6 text-blue-600" />
         <h2 className="text-2xl font-bold text-gray-900">Configurar Promotores</h2>
+      </div>
+
+      {/* Upload em massa via CSV */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start gap-3 mb-3">
+          <FileText className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 mb-1">Upload em Massa (CSV)</h3>
+            <p className="text-sm text-gray-600">
+              Importe múltiplos promotores de uma vez via arquivo CSV. 
+              Formato: <code className="bg-white px-2 py-0.5 rounded text-xs">NOME;ENDEREÇO</code> (separador <code className="bg-white px-2 py-0.5 rounded text-xs">;</code>)
+            </p>
+          </div>
+        </div>
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleCSVUpload}
+          disabled={csvLoading}
+          className="hidden"
+          id="csv-promoters-upload"
+        />
+        <label
+          htmlFor="csv-promoters-upload"
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white cursor-pointer transition-colors ${
+            csvLoading 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+        >
+          {csvLoading ? (
+            <>
+              <Loader className="w-4 h-4 animate-spin" />
+              Importando...
+            </>
+          ) : (
+            <>
+              <Upload className="w-4 h-4" />
+              Selecionar CSV de Promotores
+            </>
+          )}
+        </label>
+        
+        {/* Barra de progresso */}
+        {csvProgress && (
+          <div className="mt-3">
+            <div className="flex justify-between text-xs text-gray-700 mb-1">
+              <span className="font-medium">Processando: {csvProgress.name}</span>
+              <span>{csvProgress.current}/{csvProgress.total}</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${(csvProgress.current / csvProgress.total) * 100}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              ⏱️ Nominatim exige 1 segundo entre requisições
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Divider */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="text-sm text-gray-500">ou adicione manualmente</span>
+        <div className="flex-1 h-px bg-gray-200" />
       </div>
 
       {/* Form para adicionar promotor */}

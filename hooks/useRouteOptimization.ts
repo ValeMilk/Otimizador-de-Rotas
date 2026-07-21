@@ -31,18 +31,6 @@ export const useRouteOptimization = (): UseRouteOptimizationReturn => {
       console.log('[Hook] Rotas:', optimizationResult.routes.length);
       console.log('[Hook] Clientes alocados:', optimizationResult.summary.totalClientsAssigned);
       
-      // Debug: enviar dados para arquivo
-      try {
-        await fetch('/api/debug-export', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(optimizationResult)
-        });
-        console.log('[Hook] Debug export enviado com sucesso!');
-      } catch (debugErr) {
-        console.warn('[Hook] Erro ao enviar debug export:', debugErr);
-      }
-      
       setResult(optimizationResult);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erro durante a otimização';
