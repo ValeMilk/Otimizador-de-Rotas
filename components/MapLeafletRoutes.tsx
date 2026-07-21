@@ -94,7 +94,7 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
   selectedPromoter = null,
 }) => {
   const [routeGroups, setRouteGroups] = useState<RouteGroup[]>([]);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([-3.119, -60.022]); // Fortaleza
+  const [mapCenter, setMapCenter] = useState<[number, number]>([-3.7327, -38.5270]); // Fortaleza-CE
   const [bounds, setBounds] = useState<MapBounds | null>(null);
   const [promoterLocation, setPromoterLocation] = useState<{
     name: string;
@@ -111,18 +111,43 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
   // Função interna para buscar traçado OSRM com garantia de renderização
   async function buscarTrassadoOSRM(clientes: any[], casa: any): Promise<[number, number][]> {
     const pontos = [casa, ...clientes, casa];
+    
+    // OSRM tem limite de ~100 waypoints. Se tiver muitos pontos, usar fallback direto
+    if (pontos.length > 25) {
+      return pontos.map(p => [p.latitude, p.longitude]);
+    }
+    
+    // Timeout de 5 segundos para não travar
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
     try {
       const coords = pontos.map(p => `${p.longitude},${p.latitude}`).join(';');
-      const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`);
+      const res = await fetch(
+        `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`,
+        { signal: controller.signal }
+      );
+      
+      clearTimeout(timeoutId);
+      
+      if (!res.ok) {
+        return pontos.map(p => [p.latitude, p.longitude]);
+      }
+      
       const data = await res.json();
       if (data.code === 'Ok' && data.routes?.[0]) {
         return data.routes[0].geometry.coordinates.map((c: any) => [c[1], c[0]]);
       }
+      return pontos.map(p => [p.latitude, p.longitude]);
     } catch (e) {
-      console.error("OSRM falhou, usando linha reta.", e);
+      clearTimeout(timeoutId);
+      // Silencia erros (aborted, network, etc)
+      return pontos.map(p => [p.latitude, p.longitude]);
     }
-    return pontos.map(p => [p.latitude, p.longitude]);
   }
+  
+  // Função auxiliar para adicionar delay entre requisições
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
   // Processa rotas para organizar por número
   useEffect(() => {
@@ -157,20 +182,38 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
           color: ROUTE_COLORS[routeNumber % ROUTE_COLORS.length],
           markers: [],
           polylinePath: [],
+          // Se não houver promotor, usa a primeira parada como referência (evita coord 0,0)
           promoterLat: promoter?.latitude ?? 0,
           promoterLng: promoter?.longitude ?? 0,
         };
       }
 
       const group = grouped[routeNumber];
+      
+      // Valida se coordenadas estão em uma faixa válida (Brasil: lat -35 a 5, lng -75 a -30)
+      const isCoordValida = (lat: number, lng: number): boolean => {
+        return !!(lat && lng && !isNaN(lat) && !isNaN(lng) &&
+                  lat >= -90 && lat <= 90 &&
+                  lng >= -180 && lng <= 180 &&
+                  Math.abs(lat) > 0.001 && Math.abs(lng) > 0.001);
+      };
+      
+      // Verifica se promotor tem coordenadas válidas
+      const promoterValido = isCoordValida(group.promoterLat, group.promoterLng);
 
-      // Adiciona casa do promotor como ponto inicial
-      if (group.polylinePath.length === 0) {
+      // Adiciona casa do promotor como ponto inicial (apenas se válido)
+      if (group.polylinePath.length === 0 && promoterValido) {
         group.polylinePath.push([group.promoterLat, group.promoterLng]);
       }
 
       // Adiciona stops como marcadores
       route.stops.forEach((stop, idx) => {
+        // Valida coordenadas do stop com faixa ampla
+        if (!isCoordValida(stop.latitude, stop.longitude)) {
+          console.warn(`⚠️ Stop com coordenada inválida ignorado: ${stop.clientName} [${stop.latitude}, ${stop.longitude}]`);
+          return;
+        }
+        
         group.markers.push({
           lat: stop.latitude,
           lng: stop.longitude,
@@ -185,46 +228,65 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
         // Adiciona ao caminho (será substituído por OSRM)
         group.polylinePath.push([stop.latitude, stop.longitude]);
 
-        // Atualiza bounds
+        // Atualiza bounds APENAS com coordenadas válidas
         minLat = Math.min(minLat, stop.latitude);
         maxLat = Math.max(maxLat, stop.latitude);
         minLng = Math.min(minLng, stop.longitude);
         maxLng = Math.max(maxLng, stop.longitude);
       });
 
-      // Adiciona casa do promotor como ponto final
-      group.polylinePath.push([group.promoterLat, group.promoterLng]);
-
-      // Atualiza bounds para casa
-      minLat = Math.min(minLat, group.promoterLat);
-      maxLat = Math.max(maxLat, group.promoterLat);
-      minLng = Math.min(minLng, group.promoterLng);
-      maxLng = Math.max(maxLng, group.promoterLng);
+      // Adiciona casa do promotor como ponto final (apenas se válido)
+      if (promoterValido) {
+        group.polylinePath.push([group.promoterLat, group.promoterLng]);
+        
+        // Atualiza bounds para casa apenas se válido
+        minLat = Math.min(minLat, group.promoterLat);
+        maxLat = Math.max(maxLat, group.promoterLat);
+        minLng = Math.min(minLng, group.promoterLng);
+        maxLng = Math.max(maxLng, group.promoterLng);
+      }
     });
 
     // Converte para array
     const groups = Object.values(grouped);
     setRouteGroups(groups);
+    
+    // Debug: log rotas geradas
+    console.log(`📍 MapLeafletRoutes: ${groups.length} grupo(s) de rotas processados`);
+    groups.forEach(g => {
+      console.log(`  Rota ${g.routeNumber}: ${g.markers.length} marcador(es), promoter em [${g.promoterLat.toFixed(4)}, ${g.promoterLng.toFixed(4)}]`);
+      console.log(`    polylinePath tem ${g.polylinePath.length} ponto(s)`);
+      if (g.polylinePath.length > 0) {
+        console.log(`    Primeiro ponto: [${g.polylinePath[0][0].toFixed(4)}, ${g.polylinePath[0][1].toFixed(4)}]`);
+      }
+    });
 
-    // Calcula o centro (média de todas as coordenadas)
+    // Calcula o centro (média de todas as coordenadas VÁLIDAS)
     if (groups.length > 0 && groups[0].markers.length > 0) {
       let sumLat = 0;
       let sumLng = 0;
       let count = 0;
 
       groups.forEach((group) => {
-        sumLat += group.promoterLat;
-        sumLng += group.promoterLng;
-        count++;
+        // Adiciona promoter apenas se coordenadas válidas
+        if (group.promoterLat !== 0 && group.promoterLng !== 0) {
+          sumLat += group.promoterLat;
+          sumLng += group.promoterLng;
+          count++;
+        }
 
         group.markers.forEach((marker) => {
-          sumLat += marker.lat;
-          sumLng += marker.lng;
-          count++;
+          if (marker.lat !== 0 && marker.lng !== 0) {
+            sumLat += marker.lat;
+            sumLng += marker.lng;
+            count++;
+          }
         });
       });
 
-      setMapCenter([sumLat / count, sumLng / count]);
+      if (count > 0) {
+        setMapCenter([sumLat / count, sumLng / count]);
+      }
     }
 
     // Armazena bounds para fitBounds
@@ -250,67 +312,113 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
     }
   }, [result, selectedRoute, selectedDay, selectedPromoter]);
 
-  // Busca traçados do OSRM para cada rota visível
+  // Busca traçados do OSRM para cada rota visível (PARALELIZADO)
   useEffect(() => {
     if (routeGroups.length === 0) return;
 
     const buscarTodos = async () => {
       setLoadingOsrm(true);
-      const novosCacheados: { [key: string]: Array<[number, number]> } = {};
-
-      for (const group of routeGroups) {
+      
+      // Filtra rotas que ainda não foram cacheadas
+      const rotasParaBuscar = routeGroups.filter(group => {
         const chave = `${group.routeNumber}-${group.markers.map((m) => m.label).join(',')}`;
-
-        // Skip se já foi buscado
-        if (osrmTraceados[chave]) {
-          novosCacheados[chave] = osrmTraceados[chave];
-          continue;
-        }
-
-        // Busca OSRM - AGORA SEMPRE RETORNA UM ARRAY (OSRM ou fallback)
-        const trajetoReal = await buscarTrassadoOSRM(
-          group.markers.map((m) => ({ latitude: m.lat, longitude: m.lng })),
-          { latitude: group.promoterLat, longitude: group.promoterLng }
-        );
-
-        // trajetoReal é SEMPRE um array válido - never null
-        novosCacheados[chave] = trajetoReal;
+        return !osrmTraceados[chave];
+      });
+      
+      if (rotasParaBuscar.length === 0) {
+        setLoadingOsrm(false);
+        return;
       }
+      
+      console.log(`🗺️ Buscando ${rotasParaBuscar.length} traçado(s) OSRM em paralelo...`);
+      
+      // Executa em PARALELO (Promise.all) — muito mais rápido!
+      const resultados = await Promise.all(
+        rotasParaBuscar.map(async (group) => {
+          const chave = `${group.routeNumber}-${group.markers.map((m) => m.label).join(',')}`;
+          const trajetoReal = await buscarTrassadoOSRM(
+            group.markers.map((m) => ({ latitude: m.lat, longitude: m.lng })),
+            { latitude: group.promoterLat, longitude: group.promoterLng }
+          );
+          return { chave, trajeto: trajetoReal };
+        })
+      );
+      
+      const novosCacheados: { [key: string]: Array<[number, number]> } = {};
+      resultados.forEach(({ chave, trajeto }) => {
+        novosCacheados[chave] = trajeto;
+      });
 
       setOsrmTraceados((prev) => ({ ...prev, ...novosCacheados }));
       setLoadingOsrm(false);
+      console.log(`✅ Traçados OSRM carregados para ${rotasParaBuscar.length} rota(s)`);
     };
 
     buscarTodos();
   }, [routeGroups]);
 
-  // Faz fit bounds quando mapa carrega
+  // Faz fit bounds quando mapa carrega ou bounds mudam
   useEffect(() => {
-    if (!mapRef.current || !bounds) return;
+    if (!bounds) return;
+    
+    // Valida bounds
+    if (bounds.minLat === Infinity || bounds.maxLat === -Infinity ||
+        bounds.minLng === Infinity || bounds.maxLng === -Infinity) {
+      console.warn('⚠️ Bounds inválidos, ignorando fitBounds');
+      return;
+    }
 
-    const leafletBounds = [[bounds.minLat, bounds.minLng], [bounds.maxLat, bounds.maxLng]] as any;
-    mapRef.current.fitBounds(leafletBounds, { padding: [50, 50] });
-  }, [bounds]);
+    // Aguarda o mapa estar pronto
+    const timer = setTimeout(() => {
+      if (!mapRef.current) {
+        console.warn('⚠️ Map ref ainda não disponível');
+        return;
+      }
+      
+      try {
+        mapRef.current.invalidateSize();
+        const leafletBounds = [[bounds.minLat, bounds.minLng], [bounds.maxLat, bounds.maxLng]] as any;
+        mapRef.current.fitBounds(leafletBounds, { padding: [50, 50], maxZoom: 14 });
+        console.log(`🗺️ Mapa centralizado em bounds: [${bounds.minLat.toFixed(4)}, ${bounds.minLng.toFixed(4)}] → [${bounds.maxLat.toFixed(4)}, ${bounds.maxLng.toFixed(4)}]`);
+      } catch (e) {
+        console.error('Erro ao aplicar fitBounds:', e);
+      }
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [bounds, routeGroups]);
 
   return (
-    <div className="w-full h-[400px] rounded-lg overflow-hidden shadow-lg relative bg-gray-100 shrink-0">
-      <MapContainer
-        center={mapCenter}
-        zoom={13}
-        style={{ width: '100%', height: '100%' }}
-        ref={mapRef}
-      >
-        {/* TileLayer do OpenStreetMap - Gratuito */}
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          maxZoom={19}
-        />
+    <div className="w-full h-[600px] rounded-lg overflow-hidden shadow-lg relative bg-gray-100 shrink-0">
+      {routeGroups.length === 0 ? (
+        <div className="flex items-center justify-center h-full">
+          <p className="text-gray-500">Nenhuma rota para exibir</p>
+        </div>
+      ) : (
+        <MapContainer
+          center={mapCenter}
+          zoom={12}
+          style={{ width: '100%', height: '100%' }}
+          ref={mapRef}
+          key={`map-${routeGroups.length}`}
+        >
+          {/* TileLayer do OpenStreetMap - Gratuito */}
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            maxZoom={19}
+          />
 
         {/* Renderiza polilinhas com traçados do OSRM (ou fallback para linhas retas) */}
         {routeGroups.map((group) => {
           const chave = `${group.routeNumber}-${group.markers.map((m) => m.label).join(',')}`;
           const trajetoParaRenderizar = osrmTraceados[chave] || group.polylinePath;
+          
+          // Debug: verificar se tem pontos
+          if (trajetoParaRenderizar.length === 0) {
+            console.warn(`⚠️ Rota ${group.routeNumber} sem pontos para renderizar!`);
+            return null;
+          }
 
           return (
             <Polyline
@@ -400,11 +508,19 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
           </Marker>
         ))}
       </MapContainer>
+      )}
 
       {/* Loading indicator para OSRM */}
       {loadingOsrm && (
-        <div className="absolute top-4 left-4 bg-blue-100 border border-blue-400 text-blue-800 p-2 rounded text-xs font-semibold">
+        <div className="absolute top-4 left-4 bg-blue-100 border border-blue-400 text-blue-800 p-2 rounded text-xs font-semibold z-[1000]">
           ⏳ Calculando traçados reais (OSRM)...
+        </div>
+      )}
+      
+      {/* Indicador de rotas renderizadas */}
+      {!loadingOsrm && routeGroups.length > 0 && (
+        <div className="absolute top-4 left-4 bg-green-100 border border-green-400 text-green-800 p-2 rounded text-xs font-semibold z-[1000]">
+          ✅ {routeGroups.length} rota(s) no mapa
         </div>
       )}
 

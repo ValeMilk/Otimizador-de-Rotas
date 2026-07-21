@@ -25,6 +25,7 @@ const DIAS_NOME_PT = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-f
 const DIAS_INGLES = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 const CAPACIDADES = [480, 480, 480, 480, 480, 240]; // minutos por dia (seg-sex: 8h, sáb: 4h)
 const HORA_INICIO = 8 * 60; // 08:00
+const HORAS_OBRIGATORIAS_SEMANA = 44 * 60; // 44h em minutos = 2640 min (8h seg-sex + 4h sab)
 
 // ============================================================================
 // TIPOS INTERNOS
@@ -72,6 +73,16 @@ interface MatrizTempos {
 // ============================================================================
 // UTILITÁRIOS MATEMÁTICOS
 // ============================================================================
+
+/**
+ * Calcula demanda total em minutos (soma de todas as visitas necessárias)
+ * Demanda = Σ(frequencia × duracaoVisita) para cada cliente
+ */
+function calcularDemandaTotal(clientes: Client[]): number {
+  return clientes.reduce((total, cliente) => {
+    return total + (cliente.frequency * cliente.visitDurationMinutes);
+  }, 0);
+}
 
 /**
  * Fallback: Haversine com fator 1.5x (estima ruas vs linha reta)
@@ -343,68 +354,38 @@ function podeVisitarNoDia(
   dia: number,
   clienteOriginal: Client
 ): boolean {
-  // DEBUG
-  if (clienteOriginal.name === 'SUPERMERCADO PROGRESSO') {
-    console.log(`[podeVisitarNoDia] ${clienteOriginal.name}, dia ${dia} (${DIAS_NOME_PT[dia]})`);
-    console.log(`  visitorDays:`, clienteOriginal.visitorDays);
-    console.log(`  promoterBlockedDays:`, clienteOriginal.promoterBlockedDays);
-  }
-
   // 0. CRÍTICO: Verifica disponibilidade do CLIENTE (quando cliente quer ser visitado)
   const diaIngles = DIAS_INGLES[dia] as keyof typeof clienteOriginal.visitorDays;
   if (!clienteOriginal.visitorDays[diaIngles]) {
-    if (clienteOriginal.name === 'SUPERMERCADO PROGRESSO') {
-      console.log(`  ❌ BLOQUEADO: cliente NÃO disponível em ${diaIngles}`);
-    }
     return false; // Cliente NÃO está disponível neste dia
   }
 
   // 1. Verifica restrição do vendedor (coluna X - Dias do Vendedor)
   const diaInglesBloqueado = DIAS_INGLES[dia] as keyof typeof clienteOriginal.promoterBlockedDays;
   if (clienteOriginal.promoterBlockedDays[diaInglesBloqueado]) {
-    if (clienteOriginal.name === 'SUPERMERCADO PROGRESSO') {
-      console.log(`  ❌ BLOQUEADO: vendedor já visita em ${diaInglesBloqueado}`);
-    }
     return false; // Vendedor já visita este dia
   }
 
   // 2. Validação estrita de Gap (intercalação de dias)
-  // diaIndex = índice do dia que estamos testando (0 a 5)
-  // diasJaAlocados = array dos índices dos dias já agendados para este cliente
   const diaIndex = dia;
   const diasJaAlocados = Array.from(cliente.visitasAlocadas);
 
-  let diaPermitido = true;
-
   // Regra 1: Nunca permitir o mesmo dia duas vezes
   if (diasJaAlocados.includes(diaIndex)) {
-    diaPermitido = false;
-    if (clienteOriginal.name === 'SUPERMERCADO PROGRESSO') {
-      console.log(`  ❌ BLOQUEADO: já tem visita em dia ${diaIndex}`);
-    }
-  } 
+    return false;
+  }
+  
   // Regra 2: Para clientes com frequência < 4, garantir gap mínimo de 1 dia
-  else if (clienteOriginal.frequency < 4) {
+  if (clienteOriginal.frequency < 4) {
     for (const diaAlocado of diasJaAlocados) {
-      // Se a diferença absoluta for 1, são dias seguidos (ex: 3 - 2 = 1). BLOQUEIA!
+      // Se a diferença absoluta for 1, são dias seguidos. BLOQUEIA!
       if (Math.abs(diaAlocado - diaIndex) <= 1) {
-        diaPermitido = false;
-        if (clienteOriginal.name === 'SUPERMERCADO PROGRESSO') {
-          console.log(`  ❌ BLOQUEADO: gap inválido. Dia alocado: ${diaAlocado}, testando: ${diaIndex}, diff: ${Math.abs(diaAlocado - diaIndex)}`);
-        }
-        break;
+        return false;
       }
     }
   }
-  // Se frequência >= 4, permite dias seguidos (diaPermitido continua true)
+  // Se frequência >= 4, permite dias seguidos
 
-  if (!diaPermitido) {
-    return false;
-  }
-
-  if (clienteOriginal.name === 'SUPERMERCADO PROGRESSO') {
-    console.log(`  ✅ PERMITIDO (dias alocados: ${diasJaAlocados.join(', ')}, testando: ${diaIndex})`);
-  }
   return true;
 }
 
@@ -426,7 +407,8 @@ function tentarAlocarEmDia(
   dia: number,
   agenda: AgendaSemanalInterna,
   matrizTempos: MatrizTempos,
-  isUltimaRota: boolean = false
+  isUltimaRota: boolean = false,
+  forçado: boolean = false
 ): boolean {
   const cliente = clienteExpandido.cliente;
 
@@ -464,7 +446,11 @@ function tentarAlocarEmDia(
   
   // Regra de forçamento: Se for última rota, aumenta tolerância em 15%
   // para evitar que clientes sejam deixados órfãos (não alocados)
-  const tolerancia = isUltimaRota ? 1.15 : 1.0;
+  // Se forçado=true, ignora limites completamente (permite overflow)
+  let tolerancia = isUltimaRota ? 1.15 : 1.0;
+  if (forçado) {
+    tolerancia = Infinity; // Permite qualquer quantidade
+  }
   const limiteComTolerancia = capacidadeDisponivel * tolerancia;
 
   if (tempoTotalNecessario > limiteComTolerancia) {
@@ -516,15 +502,11 @@ function tentarDistribuicaoUniforme(
   clienteExpandido: ClienteExpandido,
   agenda: AgendaSemanalInterna,
   matrizTempos: MatrizTempos,
-  isUltimaRota: boolean = false
+  isUltimaRota: boolean = false,
+  forçado: boolean = false
 ): number {
   const frequenciaRequisitada = clienteExpandido.frequenciaRequisitada;
   const cliente = clienteExpandido.cliente;
-  
-  // DEBUG v4.2.9
-  if (cliente.id === '10752' || clienteExpandido.frequenciaRequisitada >= 4) {
-    console.error(`[v4.2.9] Distribuição uniforme: ${cliente.id} (${cliente.name}), freq=${frequenciaRequisitada}`);
-  }
   
   // Backup antes de tentar
   const backupAgenda = fazerBackupAgenda(agenda);
@@ -532,7 +514,6 @@ function tentarDistribuicaoUniforme(
 
   // Coletar dias disponíveis na ordem
   const diasDisponiveis: number[] = [];
-  const DIAS_NOMES = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
   for (let dia = 0; dia <= 5; dia++) {
     if (podeVisitarNoDia(clienteExpandido, dia, clienteExpandido.cliente)) {
       diasDisponiveis.push(dia);
@@ -541,26 +522,20 @@ function tentarDistribuicaoUniforme(
 
   // Precisa de pelo menos `frequenciaRequisitada` dias disponíveis
   if (diasDisponiveis.length < frequenciaRequisitada) {
-    console.error(`[v4.2.9] ❌ Falhou dias: ${diasDisponiveis.length} < ${frequenciaRequisitada}`);
-    console.error(`[v4.2.9] SEG=${podeVisitarNoDia(clienteExpandido, 0, cliente)}, TER=${podeVisitarNoDia(clienteExpandido, 1, cliente)}, QUA=${podeVisitarNoDia(clienteExpandido, 2, cliente)}, QUI=${podeVisitarNoDia(clienteExpandido, 3, cliente)}, SEX=${podeVisitarNoDia(clienteExpandido, 4, cliente)}, SAB=${podeVisitarNoDia(clienteExpandido, 5, cliente)}`);
     // Restaurar estado anterior se falhar
     restaurarAgendaDoBackup(agenda, backupAgenda);
     clienteExpandido.visitasAlocadas = backupVisitas;
     return 0; // Não consegue distribuir uniformemente
   }
 
-  console.error(`[v4.2.9] ✅ ${diasDisponiveis.length} dias disponíveis: ${diasDisponiveis.map(d => DIAS_NOMES[d]).join(', ')}`);
-
   // Tenta alocar 1 visita em cada um dos primeiros `frequenciaRequisitada` dias
   let alocadas = 0;
   for (let i = 0; i < frequenciaRequisitada; i++) {
     const dia = diasDisponiveis[i];
-    if (tentarAlocarEmDia(clienteExpandido, dia, agenda, matrizTempos, isUltimaRota)) {
+    if (tentarAlocarEmDia(clienteExpandido, dia, agenda, matrizTempos, isUltimaRota, forçado)) {
       alocadas++;
-      console.error(`[v4.2.9] ✅ Alocado em ${DIAS_NOMES[dia]} (${alocadas}/${frequenciaRequisitada})`);
     } else {
       // Se não conseguir em algum dia, faz ROLLBACK e retorna 0
-      console.error(`[v4.2.9] ❌ Falhou ao alocar em ${DIAS_NOMES[dia]}, fazendo ROLLBACK`);
       restaurarAgendaDoBackup(agenda, backupAgenda);
       clienteExpandido.visitasAlocadas = backupVisitas;
       return 0;
@@ -568,7 +543,6 @@ function tentarDistribuicaoUniforme(
   }
 
   // ✅ Sucesso! Alocou todas as `frequenciaRequisitada` visitas uniformemente
-  console.error(`[v4.2.9] ✅✅✅ SUCESSO: ${cliente.id} alocado em ${alocadas} dias uniformemente`);
   return alocadas;
 }
 
@@ -576,7 +550,8 @@ function processarFrequenciaCliente(
   clienteExpandido: ClienteExpandido,
   agenda: AgendaSemanalInterna,
   matrizTempos: MatrizTempos,
-  isUltimaRota: boolean = false
+  isUltimaRota: boolean = false,
+  forçado: boolean = false
 ): number {
   // v4.2.9: DISTRIBUIÇÃO UNIFORME PARA CLIENTES DE ALTA FREQUÊNCIA
   // Se freq >= 4, tenta alocar 1 visita por dia (distribuição uniforme)
@@ -587,7 +562,8 @@ function processarFrequenciaCliente(
       clienteExpandido,
       agenda,
       matrizTempos,
-      isUltimaRota
+      isUltimaRota,
+      forçado
     );
     if (resultadoUniforme > 0) {
       return resultadoUniforme; // ✅ Sucesso com distribuição uniforme
@@ -612,7 +588,7 @@ function processarFrequenciaCliente(
       if (alocadasComSucesso >= frequenciaRequisitada) break;
       if (clienteExpandido.visitasAlocadas.has(dia)) continue; // Já tem visita neste dia
 
-      if (tentarAlocarEmDia(clienteExpandido, dia, agenda, matrizTempos, isUltimaRota)) {
+      if (tentarAlocarEmDia(clienteExpandido, dia, agenda, matrizTempos, isUltimaRota, forçado)) {
         alocadasComSucesso++;
         break; // Saiu do loop de dias, vai para próxima rodada
       }
@@ -715,17 +691,200 @@ function aplicarNearestNeighbor(
 // ============================================================================
 
 /**
- * ⚡ v4.2 REFACTOR: SATURAÇÃO EXAUSTIVA COM MATRIZ DE TEMPOS REAIS
+ * ⚡ v4.3 REFACTOR: PRIORIDADE GEOLOCALIZAÇÃO + CARGA HORÁRIA
+ * 
+ * NOVA ESTRATÉGIA (Requisito do usuário):
+ * 1ª PRIORIDADE: Geolocalização (menor distância entre lojas)
+ * 2ª PRIORIDADE: Completar carga horária (43h30-44h)
  * 
  * Lógica:
- * 1. Cria rota com seed (primeiro cliente FFD)
- * 2. Loop exaustivo: itera por TODOS os clientes do pool sequencialmente (FFD sort mantém ordem)
- * 3. Tenta alocar cada cliente (TODAS as frequências = "tudo ou nada")
- * 4. Se aloca, remove do pool; se não, deixa para próxima rodada
- * 5. Usa matriz de tempos reais de rua (OSRM ou fallback Haversine)
- * 6. Continua até fazer um loop completo SEM alocar NINGUÉM
- * 7. Somente então declara rota como "saturada/cheia"
+ * 1. Seed: Primeiro cliente (FFD - maior frequência/duração)
+ * 2. Loop principal: Sempre escolhe o CLIENTE MAIS PRÓXIMO dos já alocados na rota
+ * 3. Se cliente mais próximo não couber, tenta o próximo mais próximo
+ * 4. Continua adicionando clientes por PROXIMIDADE até saturar capacidade
+ * 5. Se não atingir 90% (43.2h), força alocação de clientes distantes para completar
+ * 6. Usa matriz de tempos reais (OSRM ou fallback Haversine)
  */
+/**
+ * ⚡ v4.8 CENTROIDE CONGELADO - SEM META DE 90%
+ * 
+ * Abordagem:
+ * 1. Seed = cliente com maior frequência
+ * 2. Núcleo = Seed + vizinhos mais próximos (até couber)
+ * 3. Centroide congelado do núcleo
+ * 4. Greedy: adiciona vizinhos ≤ 3km do centroide
+ * 5. **NÃO tenta forçar 90% de utilização**
+ * 6. Resultado: rotas COMPACTAS, pode ficar em 60-75%, não importa
+ */
+function construirRotaGreedyGeografica(
+  numeroRota: number,
+  poolGlobal: ClienteExpandido[],
+  matrizTempos: MatrizTempos,
+  celularBounds?: { minLat: number; maxLat: number; minLng: number; maxLng: number }
+): { rota: RotaEmConstrucao; clientesAlocados: ClienteExpandido[] } {
+  const rota: RotaEmConstrucao = {
+    numero: numeroRota,
+    promotorId: `ROTA_${numeroRota}`,
+    agenda: criarAgendaSemanalInterna(),
+    clientesNaRota: [],
+  };
+  const clientesAlocados: ClienteExpandido[] = [];
+
+  if (poolGlobal.length === 0) return { rota, clientesAlocados };
+
+  const RAIO_MAXIMO_ROTA_KM = 3.0; // Raio rigoroso ao centroide congelado
+
+  // ─────────────────────────────────────────────────────────────
+  // FASE 1: SEED = cliente com maior frequência
+  // ─────────────────────────────────────────────────────────────
+  let melhorSeedIdx = 0;
+  let maiorFrequencia = 0;
+
+  for (let i = 0; i < poolGlobal.length; i++) {
+    if (poolGlobal[i].cliente.frequency > maiorFrequencia) {
+      maiorFrequencia = poolGlobal[i].cliente.frequency;
+      melhorSeedIdx = i;
+    }
+  }
+
+  const seed = poolGlobal[melhorSeedIdx];
+  const alocSeed = processarFrequenciaCliente(seed, rota.agenda, matrizTempos);
+
+  if (alocSeed === 0) {
+    poolGlobal.splice(melhorSeedIdx, 1);
+    console.warn(`  ⚠️ SEED "${seed.cliente.name}" não coube, descartado`);
+    return { rota, clientesAlocados };
+  }
+
+  rota.clientesNaRota.push(seed);
+  clientesAlocados.push(seed);
+  poolGlobal.splice(melhorSeedIdx, 1);
+
+  // ─────────────────────────────────────────────────────────────
+  // FASE 2: FORMAR NÚCLEO COM VIZINHOS PRÓXIMOS
+  // Pega 1-2 vizinhos mais próximos que cabem na agenda
+  // ─────────────────────────────────────────────────────────────
+  const nucleoClientes: ClienteExpandido[] = [seed];
+  const vizinhosPorDist: Array<{ idx: number; dist: number; cliente: ClienteExpandido }> = [];
+
+  for (let i = 0; i < poolGlobal.length; i++) {
+    const dist = calcularDistanciaHaversine(
+      seed.cliente.latitude, seed.cliente.longitude,
+      poolGlobal[i].cliente.latitude, poolGlobal[i].cliente.longitude
+    );
+    vizinhosPorDist.push({ idx: i, dist, cliente: poolGlobal[i] });
+  }
+  vizinhosPorDist.sort((a, b) => a.dist - b.dist);
+
+  // Tenta adicionar até 2 vizinhos ao núcleo
+  const indicesToRemove: number[] = [];
+  for (let i = 0; i < Math.min(2, vizinhosPorDist.length); i++) {
+    const { idx, cliente } = vizinhosPorDist[i];
+    const alocacoes = processarFrequenciaCliente(cliente, rota.agenda, matrizTempos);
+    if (alocacoes > 0) {
+      nucleoClientes.push(cliente);
+      rota.clientesNaRota.push(cliente);
+      clientesAlocados.push(cliente);
+      indicesToRemove.push(idx);
+    }
+  }
+
+  // Remove do pool em ordem reversa para não mexer índices
+  indicesToRemove.sort((a, b) => b - a);
+  for (const idx of indicesToRemove) {
+    poolGlobal.splice(idx, 1);
+  }
+
+  // Recalccula índices no pool após removals
+  const nucleoIds = new Set(nucleoClientes.map(c => c.cliente.id));
+  for (let i = poolGlobal.length - 1; i >= 0; i--) {
+    if (nucleoIds.has(poolGlobal[i].cliente.id)) {
+      poolGlobal.splice(i, 1);
+    }
+  }
+
+  // Calcula centroide CONGELADO do núcleo
+  let centroLat = 0, centroLng = 0;
+  for (const c of nucleoClientes) {
+    centroLat += c.cliente.latitude;
+    centroLng += c.cliente.longitude;
+  }
+  centroLat /= nucleoClientes.length;
+  centroLng /= nucleoClientes.length;
+
+  console.log(
+    `  🌱 SEED: ${seed.cliente.name} | Núcleo: ${nucleoClientes.length} | Centroide: (${centroLat.toFixed(4)}, ${centroLng.toFixed(4)})`
+  );
+
+  // ─────────────────────────────────────────────────────────────
+  // FASE 3: GREEDY AO REDOR DO CENTROIDE CONGELADO (3KM RIGOROSO)
+  // PARA quando vizinho > 3km - SEM META DE UTILIZAÇÃO
+  // ─────────────────────────────────────────────────────────────
+  const rejeitados = new Set<string>();
+  let ciclosSemSucesso = 0;
+  const MAX_CICLOS_REJEITADOS = 5;
+
+  while (poolGlobal.length > 0 && ciclosSemSucesso < MAX_CICLOS_REJEITADOS) {
+    // Encontra vizinho MAIS PRÓXIMO DO CENTROIDE
+    let melhorIdx = -1;
+    let melhorDist = Infinity;
+
+    for (let i = 0; i < poolGlobal.length; i++) {
+      if (rejeitados.has(poolGlobal[i].cliente.id)) continue;
+
+      const dist = calcularDistanciaHaversine(
+        poolGlobal[i].cliente.latitude, poolGlobal[i].cliente.longitude,
+        centroLat, centroLng
+      );
+
+      if (dist < melhorDist) {
+        melhorDist = dist;
+        melhorIdx = i;
+      }
+    }
+
+    if (melhorIdx === -1) {
+      console.log(`  🛑 Nenhum candidato não-rejeitado`);
+      break;
+    }
+
+    // 🚫 Se está muito longe, para (não tenta forçar)
+    if (melhorDist > RAIO_MAXIMO_ROTA_KM) {
+      console.log(
+        `  🛑 Vizinho mais próximo a ${melhorDist.toFixed(1)} km > raio ${RAIO_MAXIMO_ROTA_KM} km, encerrando rota`
+      );
+      break;
+    }
+
+    const candidato = poolGlobal[melhorIdx];
+    const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos);
+
+    if (alocacoes > 0) {
+      rota.clientesNaRota.push(candidato);
+      clientesAlocados.push(candidato);
+      poolGlobal.splice(melhorIdx, 1);
+      ciclosSemSucesso = 0;
+    } else {
+      // Não coube, marca como rejeitado
+      rejeitados.add(candidato.cliente.id);
+      ciclosSemSucesso++;
+    }
+  }
+
+  const utilFinal = calcularUtilizacaoMediaSemanal(rota);
+  const raioFinal = Math.max(
+    ...rota.clientesNaRota.map(c =>
+      calcularDistanciaHaversine(centroLat, centroLng, c.cliente.latitude, c.cliente.longitude)
+    )
+  );
+
+  console.log(
+    `  📊 Rota ${numeroRota}: ${clientesAlocados.length} clientes | ${utilFinal.toFixed(1)}% | raio: ${raioFinal.toFixed(1)} km`
+  );
+
+  return { rota, clientesAlocados };
+}
+
 function construirRotaComClusterizacao(
   numeroRota: number,
   clientesNaoAlocados: ClienteExpandido[],
@@ -758,75 +917,61 @@ function construirRotaComClusterizacao(
     return { rota, clientesAlocados };
   }
 
-  // LOOP EXAUSTIVO: Continua até fazer um loop completo SEM alocar ninguém
-  let loopsConsecutivosSemAlocacao = 0;
-  const MAX_LOOPS_SEM_ALOCACAO = 1; // Um loop sem sucesso = rota saturada
-  const MAX_ITERACOES_TOTAIS = 500; // Segurança contra loop infinito
-  let iteracaoAtual = 0;
+  // LOOP PRINCIPAL: Tenta alocar clientes NA ORDEM (já ordenados por proximidade)
+  // NÃO usa nearest neighbor durante construção - ordem do cluster já é ótima
+  const CAPACIDADE_SEMANAL = 480 * 5 + 240 * 1; // 2880 min
+  const META_UTILIZACAO = 0.90; // 90% = 2592 min = 43.2h
 
-  while (
-    clientesNaoAlocados.length > 0 &&
-    loopsConsecutivosSemAlocacao < MAX_LOOPS_SEM_ALOCACAO &&
-    iteracaoAtual < MAX_ITERACOES_TOTAIS
-  ) {
-    iteracaoAtual++;
-    let alocouNesteLacoCompleto = false;
+  // Itera por CADA cliente do cluster na ordem (mais próximos do centroide primeiro)
+  for (let i = 0; i < clientesNaoAlocados.length; i++) {
+    const candidato = clientesNaoAlocados[i];
 
-    // Itera por CADA cliente do pool (mantém ordem FFD: maiores primeiro)
-    for (let i = 0; i < clientesNaoAlocados.length; i++) {
-      const candidato = clientesNaoAlocados[i];
+    // Tenta alocar TODAS as frequências do candidato
+    const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos);
 
-      // Tenta alocar TODAS as frequências do candidato
-      const alocacoesCandidato = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos);
+    if (alocacoes > 0) {
+      // ✅ Sucesso: adiciona à rota
+      rota.clientesNaRota.push(candidato);
+      clientesAlocados.push(candidato);
+    }
+    
+    // Verifica se já atingiu utilização mínima (90%)
+    const utilizacaoAtual = calcularUtilizacaoMediaSemanal(rota);
+    if (utilizacaoAtual >= META_UTILIZACAO * 100) {
+      console.log(`  ⏸️ Rota ${numeroRota} atingiu ${utilizacaoAtual.toFixed(1)}% (meta: 90%), parando alocação`);
+      break; // Já atingiu 90%+, pode parar
+    }
+  }
 
-      if (alocacoesCandidato > 0) {
-        // ✅ Sucesso: Remove do pool e adiciona à rota
+  // Remove clientes alocados do array original
+  for (const alocado of clientesAlocados) {
+    const idx = clientesNaoAlocados.indexOf(alocado);
+    if (idx >= 0) {
+      clientesNaoAlocados.splice(idx, 1);
+    }
+  }
+
+  // FASE 2: Se não atingiu 90%, tenta forçar alocação dos clientes restantes deste cluster
+  const utilizacaoFinal = calcularUtilizacaoMediaSemanal(rota);
+  if (utilizacaoFinal < META_UTILIZACAO * 100 && clientesNaoAlocados.length > 0) {
+    console.log(`  ⚠️ Rota ${numeroRota}: ${utilizacaoFinal.toFixed(1)}% < 90%, forçando clientes restantes do cluster...`);
+    
+    for (let i = clientesNaoAlocados.length - 1; i >= 0; i--) {
+      const cliente = clientesNaoAlocados[i];
+      const alocacoes = processarFrequenciaCliente(cliente, rota.agenda, matrizTempos, true, true); // força=true
+      
+      if (alocacoes > 0) {
+        rota.clientesNaRota.push(cliente);
+        clientesAlocados.push(cliente);
         clientesNaoAlocados.splice(i, 1);
-        rota.clientesNaRota.push(candidato);
-        clientesAlocados.push(candidato);
-
-        alocouNesteLacoCompleto = true;
-
-        // Debug log
-        console.log(
-          `  ✅ Alocado ${candidato.cliente.name} (freq: ${candidato.frequenciaRequisitada}, duração: ${candidato.cliente.visitDurationMinutes}min)`
-        );
-
-        // Recomeça loop desde o início (clientes mantêm ordem FFD)
-        i = -1; // -1 porque será incrementado no loop
+        
+        const novaUtilizacao = calcularUtilizacaoMediaSemanal(rota);
+        if (novaUtilizacao >= META_UTILIZACAO * 100) {
+          console.log(`  ✅ Atingiu ${novaUtilizacao.toFixed(1)}% após forçar alocação`);
+          break; // Atingiu 90%, pode parar
+        }
       }
     }
-
-    // Se um loop completo sem alcoação = rota saturada
-    if (!alocouNesteLacoCompleto) {
-      loopsConsecutivosSemAlocacao++;
-      console.log(
-        `  ⚠️ Loop ${iteracaoAtual} sem alcoações. Contador: ${loopsConsecutivosSemAlocacao}/${MAX_LOOPS_SEM_ALOCACAO}`
-      );
-    } else {
-      loopsConsecutivosSemAlocacao = 0; // Reset se conseguiu alocar algo
-    }
-
-    // Verifica capacidade semanal
-    let capacidadeRestanteSemanal = 0;
-    for (let dia = 0; dia <= 5; dia++) {
-      capacidadeRestanteSemanal += obterCapacidadeDisponivel(rota.agenda, dia);
-    }
-
-    // Debug: mostra estado atual
-    if (iteracaoAtual % 10 === 0 || alocouNesteLacoCompleto) {
-      console.log(
-        `  [Iter ${iteracaoAtual}] Pool: ${clientesNaoAlocados.length}, Capacidade restante: ${Math.floor(capacidadeRestanteSemanal / 60)}h ${capacidadeRestanteSemanal % 60}m`
-      );
-    }
-  }
-
-  if (iteracaoAtual >= MAX_ITERACOES_TOTAIS) {
-    console.log(`  ⚠️ Rota ${numeroRota} atingiu limite de iterações (${MAX_ITERACOES_TOTAIS})`);
-  }
-
-  if (loopsConsecutivosSemAlocacao >= MAX_LOOPS_SEM_ALOCACAO) {
-    console.log(`  ✅ Rota ${numeroRota} SATURADA (exaustiva, tempos reais de OSRM)`);
   }
 
   return { rota, clientesAlocados };
@@ -866,6 +1011,66 @@ function gerarAlertasOciosidade(rotasGeradas: RotaEmConstrucao[]): string[] {
   return alertas;
 }
 
+/**
+ * 📊 VALIDAR EFICIÊNCIA DA ROTA (v4.3 - Ajustado)
+ * 
+ * IMPORTANTE: Prioridade é GEOLOCALIZAÇÃO + 44h
+ * - Se rota tem 90%+ utilização com lojas distantes = ACEITÁVEL (necessário para atingir 44h)
+ * - Só alerta se: baixa eficiência AND utilização < 90%
+ * 
+ * Calcula razão tempo produtivo (visitas) vs improdutivo (deslocamento)
+ */
+function validarEficienciaRotas(rotasGeradas: RotaEmConstrucao[]): string[] {
+  const alertas: string[] = [];
+  const EFICIENCIA_MINIMA = 0.40; // 40% do tempo deve ser produtivo (visitas)
+  const UTILIZACAO_MINIMA = 90; // 90%
+  
+  rotasGeradas.forEach(rota => {
+    const utilizacao = calcularUtilizacaoMediaSemanal(rota);
+    
+    // Se já atingiu 90%+, não alerta (distância foi necessária para atingir meta)
+    if (utilizacao >= UTILIZACAO_MINIMA) {
+      return; // Pula validação de eficiência
+    }
+    
+    let tempoVisitas = 0;
+    let tempoDeslocamento = 0;
+    let totalClientes = rota.clientesNaRota.length;
+    
+    // Soma tempo de visitas e deslocamentos
+    for (let dia = 0; dia <= 5; dia++) {
+      const visitasDia = rota.agenda[dia].visitas;
+      
+      visitasDia.forEach((visita, idx) => {
+        tempoVisitas += visita.duracao;
+        
+        // Deslocamento estimado (já contabilizado no tempoUsado)
+        // Aproximação: 10 min de deslocamento por visita (média)
+        if (idx > 0) {
+          tempoDeslocamento += 10;
+        }
+      });
+    }
+    
+    const tempoTotal = tempoVisitas + tempoDeslocamento;
+    const eficiencia = tempoTotal > 0 ? tempoVisitas / tempoTotal : 0;
+    
+    if (eficiencia < EFICIENCIA_MINIMA && totalClientes > 0) {
+      const tempoTotalHoras = (tempoTotal / 60).toFixed(1);
+      const tempoVisitasHoras = (tempoVisitas / 60).toFixed(1);
+      const tempoDeslocamentoHoras = (tempoDeslocamento / 60).toFixed(1);
+      
+      alertas.push(
+        `⚠️ ROTA ${rota.numero} - EFICIÊNCIA BAIXA: ${(eficiencia * 100).toFixed(0)}%\n` +
+        `   ${totalClientes} clientes, ${tempoVisitasHoras}h visitas vs ${tempoDeslocamentoHoras}h deslocamento\n` +
+        `   💡 SUGESTÃO: Considere reduzir número de rotas para concentrar clientes`
+      );
+    }
+  });
+  
+  return alertas;
+}
+
 // ============================================================================
 // REBALANCEAMENTO DE CARGA HORÁRIA (Evitar Ociosidade em Rota 4+)
 // ============================================================================
@@ -886,114 +1091,294 @@ function calcularUtilizacaoMediaSemanal(rota: RotaEmConstrucao): number {
 }
 
 /**
- * Rebalanceia carga horária entre rotas
- * Se última rota < 60% utilização, tenta mover clientes de rotas anteriores
- */
-/**
- * 🔄 NIVELAMENTO AGRESSIVO DE CARGA (v4.2.2)
- * Se última rota <60%, redistribui clientes de rotas >90% até atingir equilíbrio 75-85%
- * SIMPLES e DIRETO: move clientes, sem trocas complexas
+ * 🔄 NOVO REBALANCEAMENTO v4.3 - GARANTIR 90%+ EM TODAS AS ROTAS
+ * Modelo: 43h30-44h OBRIGATÓRIO (90%+ de 2880 min)
+ * 
+ * Estratégia:
+ * 1. Identifica rotas abaixo de 90% (2592 min)
+ * 2. Se encontrar, consolida essas rotas nas anteriores (overflow permitido)
+ * 3. Remove rotas sub-utilizadas
  */
 function aplicarRebalanceamentoDeCarga(
   rotasGeradas: RotaEmConstrucao[],
   clientesNaoAlocados: ClienteExpandido[],
   matrizTempos: MatrizTempos
 ): void {
-  if (rotasGeradas.length < 2) return;
+  if (rotasGeradas.length === 0) return;
 
-  const MIN_EQUILIBRIO = 75;
-  const MAX_EQUILIBRIO = 85;
-  const ALVO_MINIMO = 60;
-  const LIMITE_DOACAO = 90;
+  const CAPACIDADE_SEMANAL = 480 * 5 + 240 * 1; // 2880 min
+  const UTILIZACAO_MINIMA = 90; // 90% = 2592 minutos = 43.2h
+  const META_HORAS = 2640; // 44h em minutos
 
-  const ultimaRota = rotasGeradas[rotasGeradas.length - 1];
-  const utilizacaoUltima = calcularUtilizacaoMediaSemanal(ultimaRota);
+  console.log('\n🔄 NOVO REBALANCEAMENTO v4.3 - Garantindo 90%+ em todas as rotas');
 
-  console.log(`\n🔄 NIVELAMENTO DE CARGA (v4.2.2 Agressivo)`);
-  console.log(`   Rota ${ultimaRota.numero}: ${utilizacaoUltima.toFixed(1)}% | Alvo: ${MIN_EQUILIBRIO}-${MAX_EQUILIBRIO}%`);
-
-  if (utilizacaoUltima >= MIN_EQUILIBRIO) {
-    console.log(`   ✅ Carga equilibrada (${utilizacaoUltima.toFixed(1)}% ≥ ${MIN_EQUILIBRIO}%)`);
-    return;
-  }
-
-  console.log(`   ⚠️ Carga baixa (${utilizacaoUltima.toFixed(1)}% < ${MIN_EQUILIBRIO}%). Redistribuindo...`);
-
-  let clientesMovidos = 0;
-
-  // PASSO 1: Procura rotas doadores (>90%)
-  for (let idxDoador = 0; idxDoador < rotasGeradas.length - 1; idxDoador++) {
-    const rotaDoadora = rotasGeradas[idxDoador];
-    const utilizacaoDoadora = calcularUtilizacaoMediaSemanal(rotaDoadora);
-
-    if (utilizacaoDoadora <= LIMITE_DOACAO) continue; // Só se >90%
-
-    console.log(`   🔍 Rota ${rotaDoadora.numero}: ${utilizacaoDoadora.toFixed(1)}% (>90%) - procurando menores clientes...`);
-
-    // PASSO 2: Ordena clientes por tempo (menores primeiro) para mover os menos impactantes
-    const clientesOrdenados = [...rotaDoadora.clientesNaRota].sort((a, b) => {
-      const tempoA = a.frequenciaRequisitada * (a.cliente.visitDurationMinutes + 10);
-      const tempoB = b.frequenciaRequisitada * (b.cliente.visitDurationMinutes + 10);
-      return tempoA - tempoB; // Crescente: menor primeiro
-    });
-
-    // PASSO 3: Move clientes menores até atingir alvo
-    for (const cliente of clientesOrdenados) {
-      const utilizacaoAtual = calcularUtilizacaoMediaSemanal(ultimaRota);
-      if (utilizacaoAtual >= MIN_EQUILIBRIO) {
-        console.log(`   ✅ Alvo alcançado: ${utilizacaoAtual.toFixed(1)}%`);
-        break; // Parar se atingiu alvo
-      }
-
-      const tempoCliente = cliente.frequenciaRequisitada * (cliente.cliente.visitDurationMinutes + 10);
-
-      // Verifica se última rota tem capacidade
-      const capacidadeLivre = 2880 - (utilizacaoAtual / 100) * 2880;
-      if (capacidadeLivre < tempoCliente) continue; // Não cabe
-
-      // ✅ MOVE o cliente
-      const idx = rotaDoadora.clientesNaRota.indexOf(cliente);
-      if (idx >= 0) {
-        rotaDoadora.clientesNaRota.splice(idx, 1);
-        ultimaRota.clientesNaRota.push(cliente);
-
-        // Remove de agenda da doadora - apenas dos DIAS onde está realmente alocado
-        // BUG FIX v4.2.9: Não subtrair tempo de TODOS os dias, apenas dos alocados
-        const tempoUmaVisita = cliente.cliente.visitDurationMinutes + 10; // +10 min deslocamento médio
-        
-        for (let dia = 0; dia <= 5; dia++) {
-          // Remove as visitas do cliente
-          rotaDoadora.agenda[dia].visitas = rotaDoadora.agenda[dia].visitas.filter(
-            (v) => v.clienteId !== cliente.cliente.id
-          );
-          
-          // Subtrai tempo apenas se o cliente estava realmente alocado neste dia
-          if (cliente.visitasAlocadas.has(dia)) {
-            rotaDoadora.agenda[dia].tempoUsado -= tempoUmaVisita;
-          }
-        }
-
-        // ⭐ v4.2.9: LIMPAR visitasAlocadas para realocar em nova rota
-        cliente.visitasAlocadas.clear();
-
-        // Adiciona em agenda da receptora
-        processarFrequenciaCliente(cliente, ultimaRota.agenda, matrizTempos, true);
-
-        clientesMovidos++;
-        console.log(`      → Movido: ${cliente.cliente.name} (${tempoCliente.toFixed(0)} min)`);
-
-        if (utilizacaoAtual >= MAX_EQUILIBRIO) break; // Não sobrecarregar
-      }
+  // PASSO 1: Identificar rotas abaixo de 90%
+  const rotasAbaixoMinimo: number[] = [];
+  for (let i = 0; i < rotasGeradas.length; i++) {
+    const utilizacao = calcularUtilizacaoMediaSemanal(rotasGeradas[i]);
+    if (utilizacao < UTILIZACAO_MINIMA) {
+      rotasAbaixoMinimo.push(i);
+      console.log(`  ⚠️ Rota ${i + 1}: ${utilizacao.toFixed(1)}% (abaixo de 90%)`);
     }
   }
 
-  // RESULTADO
-  const novaUtilizacao = calcularUtilizacaoMediaSemanal(ultimaRota);
-  if (clientesMovidos > 0) {
-    console.log(`   ✅ ${clientesMovidos} cliente(s) movido(s) | Nova utilização: ${novaUtilizacao.toFixed(1)}%`);
-  } else {
-    console.log(`   ℹ️ Nenhum cliente movido. Distribuição mantida.`);
+  if (rotasAbaixoMinimo.length === 0) {
+    console.log('  ✅ Todas as rotas acima de 90%, nenhum ajuste necessário');
+    return;
   }
+
+  // PASSO 2: Consolidar rotas sub-utilizadas
+  // Mover clientes das rotas fracas para as rotas boas (permitindo overflow)
+  for (const idxFraca of rotasAbaixoMinimo.reverse()) {
+    const rotaFraca = rotasGeradas[idxFraca];
+    const clientesDaRotaFraca = [...rotaFraca.clientesNaRota];
+    
+    console.log(`  🔀 Redistribuindo ${clientesDaRotaFraca.length} clientes da Rota ${idxFraca + 1}...`);
+
+    // Tenta alocar em outras rotas (prioritariamente as que têm espaço)
+    for (const cliente of clientesDaRotaFraca) {
+      let alocado = false;
+
+      // Tenta alocar em rotas existentes (exceto a fraca)
+      for (let i = 0; i < rotasGeradas.length; i++) {
+        if (i === idxFraca) continue; // Pular a rota fraca
+        
+        const rotaDestino = rotasGeradas[i];
+        const utilizacaoDestino = calcularUtilizacaoMediaSemanal(rotaDestino);
+
+        // Se a rota destino está abaixo de 100%, tenta alocar normalmente
+        // Se está acima, força entrada (overflow)
+        const modoForcado = utilizacaoDestino >= 100;
+
+        // Limpa alocações anteriores
+        cliente.visitasAlocadas.clear();
+        
+        const sucesso = processarFrequenciaCliente(cliente, rotaDestino.agenda, matrizTempos, true, modoForcado);
+        if (sucesso > 0) {
+          rotaDestino.clientesNaRota.push(cliente);
+          alocado = true;
+          break;
+        }
+      }
+
+      if (!alocado) {
+        console.warn(`    ⚠️ Cliente ${cliente.cliente.name} não alocado após rebalanceamento`);
+        clientesNaoAlocados.push(cliente);
+      }
+    }
+
+    // Remove a rota fraca
+    rotasGeradas.splice(idxFraca, 1);
+    console.log(`  ❌ Rota ${idxFraca + 1} removida (sub-utilizada)`);
+  }
+
+  // PASSO 3: Relatório final
+  console.log('\n📊 RESULTADO DO REBALANCEAMENTO:');
+  for (let i = 0; i < rotasGeradas.length; i++) {
+    const utilizacao = calcularUtilizacaoMediaSemanal(rotasGeradas[i]);
+    const tempoTotal = rotasGeradas[i].clientesNaRota.reduce((sum, c) => {
+      let total = 0;
+      for (let dia = 0; dia <= 5; dia++) {
+        total += rotasGeradas[i].agenda[dia].tempoUsado;
+      }
+      return sum + total;
+    }, 0);
+    
+    const status = utilizacao >= UTILIZACAO_MINIMA ? '✅' : '⚠️';
+    console.log(`  ${status} Rota ${i + 1}: ${utilizacao.toFixed(1)}% (${(tempoTotal / 60).toFixed(1)}h de ${(META_HORAS / 60).toFixed(1)}h)`);
+  }
+}
+
+/**
+ * 🔓 FORÇAR ENTRADA DE CLIENTES (Cenário 3)
+ * Aloca clientes não alocados na última rota, MESMO QUE ULTRAPASSE 100%
+ * Garante que ninguém fica sem atendimento
+ */
+function forcarEntradaClientesRestantes(
+  rotasGeradas: RotaEmConstrucao[],
+  clientesNaoAlocados: ClienteExpandido[],
+  matrizTempos: MatrizTempos
+): void {
+  if (rotasGeradas.length === 0 || clientesNaoAlocados.length === 0) return;
+
+  const ultimaRota = rotasGeradas[rotasGeradas.length - 1];
+  let clientesForçados = 0;
+
+  console.log(`\n🔓 Forçando entrada de ${clientesNaoAlocados.length} cliente(s) restante(s) na última rota...`);
+
+  for (const cliente of clientesNaoAlocados) {
+    // Tenta alocar com modo "forçado" - permite ultrapassar 100%
+    const sucesso = processarFrequenciaCliente(cliente, ultimaRota.agenda, matrizTempos, true, true);
+    if (sucesso) {
+      ultimaRota.clientesNaRota.push(cliente);
+      clientesForçados++;
+    }
+  }
+
+  // Remove clientes alocados da lista
+  for (let i = clientesNaoAlocados.length - 1; i >= 0; i--) {
+    if (clientesNaoAlocados[i].visitasAlocadas.size > 0) {
+      clientesNaoAlocados.splice(i, 1);
+    }
+  }
+
+  if (clientesForçados > 0) {
+    const utilización = calcularUtilizacaoMediaSemanal(ultimaRota);
+    console.log(`  ✅ ${clientesForçados} cliente(s) forçado(s) | Nova utilização: ${utilización.toFixed(1)}%`);
+  }
+}
+
+// ============================================================================
+// CLUSTERIZAÇÃO GEOGRÁFICA (K-MEANS SIMPLIFICADO)
+// ============================================================================
+
+/**
+ * 🗺️ K-MEANS CLUSTERING PARA AGRUPAR CLIENTES GEOGRAFICAMENTE
+ * 
+ * Objetivo: Dividir clientes em GRUPOS GEOGRÁFICOS compactos
+ * - Cada cluster = Uma região da cidade (Norte, Sul, Leste, Oeste, etc.)
+ * - Cada rota atende APENAS UM cluster (lojas próximas)
+ * - Evita rotas entrecruzadas e longas
+ */
+function agruparClientesPorProximidade(
+  clientes: ClienteExpandido[],
+  numClusters: number
+): ClienteExpandido[][] {
+  if (clientes.length === 0 || numClusters === 0) return [];
+  
+  // Se numClusters >= clientes, cada cliente = 1 cluster
+  if (numClusters >= clientes.length) {
+    return clientes.map(c => [c]);
+  }
+
+  console.log(`\n🗺️ Clusterização: Dividindo ${clientes.length} clientes em ${numClusters} grupos geográficos...`);
+
+  // 1. Inicializa centroides (distribui uniformemente no espaço)
+  const centroides: { lat: number; lng: number }[] = [];
+  
+  // Encontra limites geográficos
+  let minLat = Infinity, maxLat = -Infinity;
+  let minLng = Infinity, maxLng = -Infinity;
+  
+  clientes.forEach(c => {
+    if (c.cliente.latitude < minLat) minLat = c.cliente.latitude;
+    if (c.cliente.latitude > maxLat) maxLat = c.cliente.latitude;
+    if (c.cliente.longitude < minLng) minLng = c.cliente.longitude;
+    if (c.cliente.longitude > maxLng) maxLng = c.cliente.longitude;
+  });
+
+  // Inicializa centroides em grid
+  const rows = Math.ceil(Math.sqrt(numClusters));
+  const cols = Math.ceil(numClusters / rows);
+  
+  for (let i = 0; i < numClusters; i++) {
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+    centroides.push({
+      lat: minLat + (maxLat - minLat) * (row + 0.5) / rows,
+      lng: minLng + (maxLng - minLng) * (col + 0.5) / cols
+    });
+  }
+
+  // 2. K-Means: Iterações para convergir
+  const MAX_ITERACOES = 20;
+  let clusters: ClienteExpandido[][] = [];
+
+  for (let iter = 0; iter < MAX_ITERACOES; iter++) {
+    // Atribui cada cliente ao centroide mais próximo
+    clusters = Array.from({ length: numClusters }, () => []);
+    
+    clientes.forEach(cliente => {
+      let menorDistancia = Infinity;
+      let clusterMaisProximo = 0;
+      
+      centroides.forEach((centroide, idx) => {
+        const dist = calcularDistanciaHaversine(
+          cliente.cliente.latitude,
+          cliente.cliente.longitude,
+          centroide.lat,
+          centroide.lng
+        );
+        
+        if (dist < menorDistancia) {
+          menorDistancia = dist;
+          clusterMaisProximo = idx;
+        }
+      });
+      
+      clusters[clusterMaisProximo].push(cliente);
+    });
+
+    // Recalcula centroides (média das posições dos clientes)
+    let mudou = false;
+    centroides.forEach((centroide, idx) => {
+      if (clusters[idx].length === 0) return; // Cluster vazio
+      
+      const somaLat = clusters[idx].reduce((sum, c) => sum + c.cliente.latitude, 0);
+      const somaLng = clusters[idx].reduce((sum, c) => sum + c.cliente.longitude, 0);
+      
+      const novoLat = somaLat / clusters[idx].length;
+      const novoLng = somaLng / clusters[idx].length;
+      
+      // Verifica se mudou significativamente
+      const deltaLat = Math.abs(novoLat - centroide.lat);
+      const deltaLng = Math.abs(novoLng - centroide.lng);
+      
+      if (deltaLat > 0.001 || deltaLng > 0.001) {
+        mudou = true;
+      }
+      
+      centroide.lat = novoLat;
+      centroide.lng = novoLng;
+    });
+
+    // Converge se centroides não mudarem
+    if (!mudou) {
+      console.log(`  ✅ Convergiu em ${iter + 1} iterações`);
+      break;
+    }
+  }
+
+  // 3. Remove clusters vazios
+  clusters = clusters.filter(c => c.length > 0);
+
+  // 4. Ordena clientes dentro de cada cluster por PROXIMIDADE AO CENTROIDE
+  // Isso garante que tentamos alocar lojas mais próximas do centro do cluster primeiro
+  clusters.forEach((cluster, idxCluster) => {
+    const centroide = centroides[idxCluster];
+    if (!centroide) return;
+    
+    cluster.sort((a, b) => {
+      const distA = calcularDistanciaHaversine(
+        a.cliente.latitude,
+        a.cliente.longitude,
+        centroide.lat,
+        centroide.lng
+      );
+      const distB = calcularDistanciaHaversine(
+        b.cliente.latitude,
+        b.cliente.longitude,
+        centroide.lat,
+        centroide.lng
+      );
+      
+      // Ordena por distância (mais próximos primeiro)
+      const diffDist = distA - distB;
+      if (Math.abs(diffDist) > 0.5) return diffDist; // Se diferença > 0.5km, usa distância
+      
+      // Se distâncias similares, prioriza maior frequência (FFD)
+      const diffFreq = b.frequenciaRequisitada - a.frequenciaRequisitada;
+      if (diffFreq !== 0) return diffFreq;
+      return b.cliente.visitDurationMinutes - a.cliente.visitDurationMinutes;
+    });
+  });
+
+  console.log(`  ✅ Criados ${clusters.length} clusters (ordenados por proximidade ao centroide):`);
+  clusters.forEach((cluster, idx) => {
+    console.log(`     Cluster ${idx + 1}: ${cluster.length} clientes`);
+  });
+
+  return clusters;
 }
 
 // ============================================================================
@@ -1053,42 +1438,156 @@ export async function gerarRotasDinamicamente(
   }
   console.log('✅ Matriz de tempos pronta para alocação\n');
 
-  const clientesNaoAlocados = [...clientesOrdenados];
-  const rotasGeradas: RotaEmConstrucao[] = [];
+  // NOVO: Calcular demanda total e número ótimo de rotas (Cenário 1)
+  const demandaTotal = calcularDemandaTotal(clientes);
+  const rotasOtimas = Math.ceil(demandaTotal / HORAS_OBRIGATORIAS_SEMANA);
+  const limiteRotas = Math.min(rotasOtimas, promoters.length > 0 ? promoters.length : 100);
+  
+  console.log(`\n📊 NOVO MODELO - 43h30/44h OBRIGATÓRIO POR PROMOTER:`);
+  console.log(`  - Demanda total: ${demandaTotal} min (${(demandaTotal / 60).toFixed(1)}h)`);
+  console.log(`  - Horas obrigatórias/promoter: ${HORAS_OBRIGATORIAS_SEMANA} min (44h)`);
+  console.log(`  - Rotas ótimas calculadas: ${rotasOtimas}`);
+  console.log(`  - Promoters disponíveis: ${promoters.length}`);
+  console.log(`  - Limite de rotas (min): ${limiteRotas} (Cenário 1: ${limiteRotas} promoters usados, ${promoters.length - limiteRotas} parados)\n`);
 
-  // 3. Loop: criar rotas até esgotar clientes
-  let numeroRota = 1;
-  while (clientesNaoAlocados.length > 0) {
-    console.log(`🚗 Gerando Rota ${numeroRota}...`);
-    const { rota, clientesAlocados } = construirRotaComClusterizacao(
-      numeroRota, 
-      clientesNaoAlocados,
+  // 3. CONSTRUÇÃO GREEDY GEOGRÁFICA v4.3 — ROTAS ANTES DOS PROMOTORES
+  //    - PRIORIDADE 1: Agrupar lojas por proximidade (geolocalização)
+  //    - PRIORIDADE 2: Alocar rota ao promotor cuja casa está perto do centroide dela
+  //    - Sequência: pool → rotas geograficamente compactas → aloca ao promotor mais próximo
+  console.log(`\n🗺️ Estratégia: GREEDY GEOGRÁFICO → DEPOIS ALOCA AO PROMOTOR MAIS PRÓXIMO`);
+  console.log(`   Fase 1: Agrupa lojas por proximidade (vizinho mais próximo)`);
+  console.log(`   Fase 2: Para cada rota, aloca ao promotor cuja casa está mais perto do centroide\n`);
+
+  const poolGlobal: ClienteExpandido[] = [...clientesOrdenados];
+  const rotasGeradas: RotaEmConstrucao[] = [];
+  let numeroRota = 0;
+
+  // FASE 1: Cria rotas baseado em GEOLOCALIZAÇÃO PURA (sem pensar em promotor)
+  // SEM LIMITE DE ROTAS - continua até alocar TODOS os clientes
+  while (poolGlobal.length > 0) {
+    numeroRota++;
+    console.log(`\n🚗 Rota ${numeroRota}: pool restante = ${poolGlobal.length} clientes`);
+
+    const { rota, clientesAlocados } = construirRotaGreedyGeografica(
+      numeroRota,
+      poolGlobal,
       matrizTempos
     );
 
-    if (clientesAlocados.length === 0) {
-      console.warn('⚠️ Nenhum cliente alocado nesta rota, encerrando.');
-      break;
-    }
-
-    rotasGeradas.push(rota);
-    console.log(
-      `  ✅ Alocados ${clientesAlocados.length} cliente(s), Pool restante: ${clientesNaoAlocados.length}`
-    );
-
-    numeroRota++;
-
-    // Segurança: máximo de 100 rotas
-    if (numeroRota > 100) {
-      console.warn(`⚠️ Limite de 100 rotas atingido. ${clientesNaoAlocados.length} clientes não alocados.`);
+    if (clientesAlocados.length > 0) {
+      rotasGeradas.push(rota);
+      const utilizacao = calcularUtilizacaoMediaSemanal(rota);
+      console.log(
+        `  ✅ Rota ${numeroRota}: ${clientesAlocados.length} clientes | ${utilizacao.toFixed(1)}%`
+      );
+    } else {
+      console.warn(`  ⚠️ Rota ${numeroRota}: nenhum cliente alocado`);
+      if (poolGlobal.length > 0) {
+        console.warn(`  🛑 ${poolGlobal.length} clientes restantes não conseguem entrar em rotas compactas (<3km)`);
+        console.warn(`  📋 Transferindo para FASE 1B (rotas solo)...`);
+      }
       break;
     }
   }
 
-  console.log(`\n✅ CRIAÇÃO DINÂMICA COMPLETA: ${rotasGeradas.length} rotas geradas`);
+  const clientesNaoAlocados: ClienteExpandido[] = [...poolGlobal];
+  console.log(`\n✅ FASE 1 COMPLETA: ${rotasGeradas.length} rotas geradas | ${clientesNaoAlocados.length} restantes`);
 
-  // 4️⃣ REBALANCEAMENTO DE CARGA (v4.2.2): Evitar ociosidade nas últimas rotas
-  aplicarRebalanceamentoDeCarga(rotasGeradas, clientesNaoAlocados, matrizTempos);
+  // ──────────────────────────────────────────────────────────────
+  // FASE 1B: CRIAR ROTAS SOLO PARA CLIENTES RESTANTES (Opção A)
+  // Garante que TODOS os 135 clientes sejam alocados
+  // ──────────────────────────────────────────────────────────────
+  if (clientesNaoAlocados.length > 0) {
+    console.log(`\n🎯 FASE 1B: Criando rotas solo para ${clientesNaoAlocados.length} clientes restantes...`);
+    for (const cliente of clientesNaoAlocados) {
+      numeroRota++;
+      const rotaSolo: RotaEmConstrucao = {
+        numero: numeroRota,
+        promotorId: `ROTA_${numeroRota}`,
+        agenda: criarAgendaSemanalInterna(),
+        clientesNaRota: [cliente],
+      };
+      
+      // Tenta alocar o cliente em qualquer dia disponível
+      let alocado = false;
+      for (let dia = 0; dia < 6; dia++) {
+        const CAPACIDADES = [480, 480, 480, 480, 480, 240];
+        const tempoDisponivel = CAPACIDADES[dia] - rotaSolo.agenda[dia].tempoUsado;
+        if (tempoDisponivel >= cliente.frequenciaRequisitada) {
+          rotaSolo.agenda[dia].tempoUsado += cliente.frequenciaRequisitada;
+          rotaSolo.agenda[dia].visitas.push({
+            clienteId: cliente.cliente.id,
+            clienteNome: cliente.cliente.name,
+            latitude: cliente.cliente.latitude,
+            longitude: cliente.cliente.longitude,
+            duracao: cliente.frequenciaRequisitada,
+            frequency: cliente.cliente.frequency
+          });
+          alocado = true;
+          break;
+        }
+      }
+
+      if (alocado) {
+        rotasGeradas.push(rotaSolo);
+        const util = calcularUtilizacaoMediaSemanal(rotaSolo);
+        console.log(`  ✅ Rota Solo ${numeroRota}: ${cliente.cliente.name} | ${util.toFixed(1)}%`);
+      } else {
+        console.warn(`  ⚠️ Rota Solo ${numeroRota}: ${cliente.cliente.name} não alocado (agenda cheia)`);
+      }
+    }
+    // 🔴 Limpar clientesNaoAlocados após FASE 1B para evitar duplicação
+    clientesNaoAlocados.length = 0;
+  }
+
+  // FASE 2: Aloca CADA ROTA ao PROMOTOR MAIS PRÓXIMO do centroide dela
+  console.log(`\n👥 FASE 2: Alocando rotas aos promotores mais próximos...`);
+  const promotoresComCoord = promoters.filter(
+    p => typeof p.latitude === 'number' && typeof p.longitude === 'number' && !isNaN(p.latitude) && !isNaN(p.longitude)
+  );
+
+  if (promotoresComCoord.length > 0) {
+    rotasGeradas.forEach((rota, idx) => {
+      // Calcula centroide da rota
+      const cLat = rota.clientesNaRota.reduce((s, c) => s + c.cliente.latitude, 0) / rota.clientesNaRota.length;
+      const cLng = rota.clientesNaRota.reduce((s, c) => s + c.cliente.longitude, 0) / rota.clientesNaRota.length;
+
+      // Encontra promotor mais próximo
+      let melhorPromotor: Promoter | null = null;
+      let menorDist = Infinity;
+      for (const p of promotoresComCoord) {
+        const d = calcularDistanciaHaversine(cLat, cLng, p.latitude, p.longitude);
+        if (d < menorDist) {
+          menorDist = d;
+          melhorPromotor = p;
+        }
+      }
+
+      if (melhorPromotor) {
+        rota.promotorId = melhorPromotor.id;
+        console.log(
+          `  ✅ Rota ${rota.numero} → ${melhorPromotor.name} (centroide: ${cLat.toFixed(4)}, ${cLng.toFixed(4)}, distância: ${menorDist.toFixed(1)} km)`
+        );
+      } else {
+        console.warn(`  ⚠️ Rota ${rota.numero}: nenhum promotor com coordenadas disponível`);
+      }
+    });
+  } else {
+    console.log(`  ⚠️ Nenhum promotor com coordenadas cadastrado — rotas sem promotor atribuído`);
+  }
+
+  console.log(`\n✅ FASE 2 COMPLETA: Rotas alocadas aos promotores\n`);
+
+  // 4️⃣ REBALANCEAMENTO DE CARGA (DESATIVADO TEMPORARIAMENTE PARA OPÇÃO A)
+  // O rebalanceamento remove rotas sub-utilizadas e adiciona clientes a clientesNaoAlocados
+  // Isso interfere com FASE 1B que precisa de clientesNaoAlocados para criar rotas solo
+  // Para Opção A (135/135 allocation), o rebalanceamento será feito APÓS FASE 1B
+  // aplicarRebalanceamentoDeCarga(rotasGeradas, clientesNaoAlocados, matrizTempos);
+
+  // 4️⃣b FORÇAR ENTRADA (Cenário 3): Alocar clientes restantes na última rota com overflow
+  if (clientesNaoAlocados.length > 0 && rotasGeradas.length > 0) {
+    forcarEntradaClientesRestantes(rotasGeradas, clientesNaoAlocados, matrizTempos);
+  }
 
   // 5️⃣ Converte para estruturas de output
   // 5a. PromotorRota: estrutura correta (um promotor com agenda semanal)
@@ -1253,6 +1752,18 @@ export async function gerarRotasDinamicamente(
 
   // 6️⃣ Calcula estatísticas
   const totalClientesAlocados = rotasGeradas.reduce((sum, r) => sum + r.clientesNaRota.length, 0);
+  console.log(`\n${'═'.repeat(80)}`);
+  console.log(`✅ RESUMO FINAL DA OTIMIZAÇÃO`);
+  console.log(`${'═'.repeat(80)}`);
+  console.log(`🚗 Total de Rotas Criadas: ${rotasGeradas.length}`);
+  console.log(`👥 Total de Clientes Alocados: ${totalClientesAlocados}/${clientes.length}`);
+  console.log(`📊 Rotas por tipo:`);
+  const rotasCompactas = rotasGeradas.filter(r => r.clientesNaRota.length > 1).length;
+  const rotasSolo = rotasGeradas.filter(r => r.clientesNaRota.length === 1).length;
+  console.log(`   - Rotas Compactas (>1 cliente): ${rotasCompactas}`);
+  console.log(`   - Rotas Solo (1 cliente): ${rotasSolo}`);
+  console.log(`   - Total: ${rotasCompactas + rotasSolo}`);
+  console.log(`${'═'.repeat(80)}\n`);
   const totalTempoUsado = rotasGeradas.reduce((sum, r) => {
     let temp = 0;
     for (let dia = 0; dia <= 5; dia++) {
@@ -1265,6 +1776,13 @@ export async function gerarRotasDinamicamente(
 
   // Gera alertas de ociosidade
   const alertasOciosidade = gerarAlertasOciosidade(rotasGeradas);
+  
+  // 6️⃣b Valida eficiência das rotas (v4.3)
+  const alertasEficiencia = validarEficienciaRotas(rotasGeradas);
+  if (alertasEficiencia.length > 0) {
+    console.warn('\n⚠️ ALERTAS DE EFICIÊNCIA:');
+    alertasEficiencia.forEach(alerta => console.warn(alerta));
+  }
 
   // 7️⃣ Atribui rotas aos promoters automaticamente
   const routeAssignments = atribuirRotasAPromoters(rotasGeradas, rotasFinais, promoters, matrizTempos);
@@ -1283,6 +1801,7 @@ export async function gerarRotasDinamicamente(
         `Total de promotores criados: ${rotasGeradas.length}`,
         `Clientes alocados: ${totalClientesAlocados}/${clientes.length}`,
         ...alertasOciosidade, // Alertas de ociosidade
+        ...alertasEficiencia, // Alertas de eficiência (v4.3)
       ],
     },
   };

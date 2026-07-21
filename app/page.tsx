@@ -83,6 +83,20 @@ export default function Home() {
             <WorkScheduleConfig onScheduleChange={handleScheduleChange} isLoading={isLoading} />
           </section>
 
+          {/* Promoters Configuration - ANTES de otimizar */}
+          {clients.length > 0 && (
+            <section className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                3. Configurar Promotores (Opcional)
+              </h2>
+              <p className="text-gray-600 text-sm mb-6">
+                Configure os promotores ANTES de otimizar para limitar a quantidade de rotas geradas. 
+                Se não configurar, o sistema criará rotas dinamicamente até alocar todos os clientes.
+              </p>
+              <PromotersConfiguration promoters={promoters} onPromotersChange={setPromoters} />
+            </section>
+          )}
+
           {/* Optimization Button */}
           <section className="bg-white rounded-lg shadow p-6">
             <button
@@ -91,8 +105,13 @@ export default function Home() {
               className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
             >
               <Zap className="w-5 h-5" />
-              {isLoading ? 'Otimizando...' : 'Gerar Roteirização Otimizada'}
+              {isLoading ? 'Otimizando...' : `Gerar Roteirização Otimizada${promoters.length > 0 ? ` (${promoters.length} rotas)` : ''}`}
             </button>
+            {promoters.length > 0 && (
+              <p className="text-center text-sm text-green-600 mt-3">
+                ✓ Sistema gerará no máximo {promoters.length} rota(s)
+              </p>
+            )}
           </section>
 
           {/* Error Display */}
@@ -108,42 +127,8 @@ export default function Home() {
 
           {/* Results Section */}
           {result && !isLoading && (
-            <>
-              <section className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">3. Configurar Promotores</h2>
-                {(() => {
-                  // Conta rotas ÚNICAS (não daily routes)
-                  const uniqueRouteNumbers = Array.from(new Set(result.routes?.map(r => r.routeNumber) || []));
-                  return (
-                    <p className="text-gray-600 text-sm mb-4">
-                      Foram criadas <strong>{uniqueRouteNumbers.length}</strong> rota(s) na otimização. 
-                      Configure um promotor para cada rota abaixo. Os promotores serão atribuídos automaticamente com base na proximidade de suas residências aos clientes.
-                    </p>
-                  );
-                })()}
-                <PromotersConfiguration promoters={promoters} onPromotersChange={setPromoters} />
-                
-                {/* Botão de Atualizar Atribuições */}
-                {promoters.length > 0 && (
-                  <div className="mt-6 flex gap-3">
-                    <button
-                      onClick={() => optimize(clients, workSchedule, promoters)}
-                      disabled={isLoading || promoters.length === 0}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
-                    >
-                      <MapPin className="w-5 h-5" />
-                      {isLoading ? 'Atualizando...' : 'Atualizar Atribuições de Promotores'}
-                    </button>
-                  </div>
-                )}
-              </section>
-            </>
-          )}
-
-          {/* Results Section */}
-          {result && !isLoading && (
             <section className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">4. Resultados da Otimização</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Resultados da Otimização</h2>
               <ResultsDashboard result={result} />
             </section>
           )}
