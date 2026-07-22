@@ -11,7 +11,7 @@ export const exportRoutesToExcelNew = (result: OptimizationResult) => {
 
   // ===== PLANILHA 1: CLIENTES COM ROTAS E DIAS =====
   const clientsData: any[] = [
-    ['CÓD', 'NOME FANTASIA', 'ROTA', 'FREQUÊNCIA', 'TEMPO MÉDIO DE VISITA', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'],
+    ['CÓD', 'NOME FANTASIA', 'ROTA', 'PROMOTOR', 'FREQUÊNCIA', 'TEMPO MÉDIO DE VISITA', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'],
   ];
 
   // Mapa: cliente -> { rotaId, dias }
@@ -75,10 +75,15 @@ export const exportRoutesToExcelNew = (result: OptimizationResult) => {
       const hasSex = routeData.dias.has('Sexta-feira');
       const hasSab = routeData.dias.has('Sábado');
       
+      // Busca o nome do promotor da rota
+      const rota = result.rotas?.find(r => r.id === routeData.rotaId);
+      const promoterName = rota ? rota.nome : 'N/A';
+      
       const row: any[] = [
         client.id,
         client.name,
         `ROTA ${routeData.rotaId}`,
+        promoterName,
         client.frequency,
         minutesToTimeString(client.visitDurationMinutes),
         hasSeg ? 'X' : '',
@@ -100,6 +105,7 @@ export const exportRoutesToExcelNew = (result: OptimizationResult) => {
     { wch: 12 }, // CÓD
     { wch: 30 }, // NOME FANTASIA
     { wch: 12 }, // ROTA
+    { wch: 25 }, // PROMOTOR
     { wch: 12 }, // FREQUÊNCIA
     { wch: 18 }, // TEMPO MÉDIO DE VISITA
     { wch: 8 },  // SEG
@@ -111,7 +117,7 @@ export const exportRoutesToExcelNew = (result: OptimizationResult) => {
   ];
 
   // Formatar header
-  for (let i = 0; i < 11; i++) {
+  for (let i = 0; i < 12; i++) {
     const cell = clientsSheet[XLSX.utils.encode_cell({ r: 0, c: i })];
     if (cell) {
       cell.s = {
