@@ -105,7 +105,7 @@ function calcularDistanciaHaversine(lat1: number, lon1: number, lat2: number, lo
 function calcularTempoFallback(lat1: number, lon1: number, lat2: number, lon2: number): number {
   // Haversine + fator 1.5x (compensação por trajetos reais de rua)
   const distanciaKm = calcularDistanciaHaversine(lat1, lon1, lat2, lon2);
-  const velocidadeMedia = 40; // km/h
+  const velocidadeMedia = 25; // km/h (realista para tráfego urbano Fortaleza com congestionamento)
   const tempoMinutos = (distanciaKm / velocidadeMedia) * 60 * 1.5;
   return Math.ceil(tempoMinutos);
 }
@@ -113,11 +113,11 @@ function calcularTempoFallback(lat1: number, lon1: number, lat2: number, lon2: n
 /**
  * Converte tempo de viagem em km
  * Inverso de calcularTempoFallback: tempo → distância
- * Considera: velocidade média de 40 km/h e fator 1.5x para ruas reais
+ * Considera: velocidade média de 25 km/h e fator 1.5x para ruas reais
  * Fórmula: distância = (tempo em minutos / 60) * velocidade / 1.5
  */
 function calcularDistanciaDeTempoMinutos(tempoMinutos: number): number {
-  const velocidadeMedia = 40; // km/h
+  const velocidadeMedia = 25; // km/h (deve ser igual ao usado em calcularTempoFallback)
   const distanciaKm = (tempoMinutos / 60) * velocidadeMedia / 1.5;
   return Math.round(distanciaKm * 10) / 10; // Arredonda para 1 casa decimal
 }
@@ -1677,14 +1677,15 @@ export async function gerarRotasDinamicamente(
       const stops: RouteStop[] = [];
 
       // Calcula tempo de deslocamento: casa do promoter → primeiro cliente
+      // Aplica fator 1.3x por ser horário de pico (início do expediente)
       const tempoDeslocamentoInicial =
         visitasOrdenadas.length > 0
-          ? calcularTempoFallback(
+          ? Math.ceil(calcularTempoFallback(
               promoterLatitude,
               promoterLongitude,
               visitasOrdenadas[0].latitude,
               visitasOrdenadas[0].longitude
-            )
+            ) * 1.3) // Fator de pico matinal
           : 0;
 
       tempoAtual += tempoDeslocamentoInicial;
@@ -1727,14 +1728,15 @@ export async function gerarRotasDinamicamente(
       }
 
       // Calcula tempo de deslocamento: último cliente → casa do promoter
+      // Aplica fator 1.3x por ser horário de pico (fim do expediente)
       const tempoDeslocamentoFinal =
         visitasOrdenadas.length > 0
-          ? calcularTempoFallback(
+          ? Math.ceil(calcularTempoFallback(
               visitasOrdenadas[visitasOrdenadas.length - 1].latitude,
               visitasOrdenadas[visitasOrdenadas.length - 1].longitude,
               promoterLatitude,
               promoterLongitude
-            )
+            ) * 1.3) // Fator de pico noturno
           : 0;
 
       // Calcula distância final
