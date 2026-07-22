@@ -289,72 +289,100 @@ function atribuirRotasAPromoters(
 
   if (promoters.length === 0 || rotasGeradas.length === 0) return assignments;
 
-  // Rastreia quais promotores já têm rota atribuída (1 rota por promotor)
-  const promotoresAtribuidos = new Set<string>();
+  const CAPACIDADE_SEMANAL = 480 * 5 + 240 * 1; // 2880 minutos = 44h
+  const UTILIZACAO_ALVO = 0.90; // 90% = ~43.2h (mínimo desejado)
+  const CAPACIDADE_MINIMA = CAPACIDADE_SEMANAL * UTILIZACAO_ALVO; // 2592 min
 
-  // Cria um mapa de tempos: rota -> promotor -> tempo total
-  const temposMapaRoutas: { [rotaNum: number]: { [promoterId: string]: number } } = {};
-
-  rotasGeradas.forEach((rota) => {
-    temposMapaRoutas[rota.numero] = {};
-
-    promoters.forEach((promoter) => {
-      let tempoTotal = 0;
-
-      // Procura todas as visitas desta rota
-      rotasFinais.forEach((dailyRoute) => {
-        if (dailyRoute.routeNumber === rota.numero) {
-          dailyRoute.stops.forEach((stop) => {
-            // Usa Haversine + 1.5x como estimativa de tempo de ida/volta da casa do promotor
-            const tempo = calcularTempoFallback(
-              promoter.latitude,
-              promoter.longitude,
-              stop.latitude,
-              stop.longitude
-            );
-            tempoTotal += tempo;
-          });
-        }
-      });
-
-      temposMapaRoutas[rota.numero][promoter.id] = tempoTotal;
-    });
+  // Rastreia carga horária atual de cada promotor
+  const cargaPromoter: { [promoterId: string]: number } = {};
+  const rotasPromoter: { [promoterId: string]: number[] } = {};
+  
+  promoters.forEach(p => {
+    cargaPromoter[p.id] = 0;
+    rotasPromoter[p.id] = [];
   });
 
-  // Ordena rotas por número de clientes (descendente) para priorizar rotas maiores
-  const rotasOrdenadas = [...rotasGeradas].sort(
-    (a, b) => {
-      const clientesA = rotasFinais.filter(r => r.routeNumber === a.numero).length || 0;
-      const clientesB = rotasFinais.filter(r => r.routeNumber === b.numero).length || 0;
-      return clientesB - clientesA;
+  // Calcula carga horária de cada rota (tempo de trabalho total)
+  const cargaRota: { [routeNumber: number]: number } = {};
+  rotasGeradas.forEach(rota => {
+    let tempoTotal = 0;
+    for (let dia = 0; dia <= 5; dia++) {
+      tempoTotal += rota.agenda[dia].tempoUsado;
     }
+    cargaRota[rota.numero] = tempoTotal;
+  });
+
+  // Calcula centroide de cada rota (para calcular proximidade com promotores)
+  const centroideRota: { [routeNumber: number]: { lat: number; lng: number } } = {};
+  rotasGeradas.forEach(rota => {
+    let somaLat = 0, somaLng = 0, count = 0;
+    rota.clientesNaRota.forEach(cliente => {
+      somaLat += cliente.cliente.latitude;
+      somaLng += cliente.cliente.longitude;
+      count++;
+    });
+    centroideRota[rota.numero] = {
+      lat: count > 0 ? somaLat / count : 0,
+      lng: count > 0 ? somaLng / count : 0
+    };
+  });
+
+  // Ordena rotas por carga horária (descendente) - aloca rotas grandes primeiro
+  const rotasOrdenadas = [...rotasGeradas].sort(
+    (a, b) => cargaRota[b.numero] - cargaRota[a.numero]
   );
 
-  // Atribui cada rota a um promotor (máx 1 rota por promotor)
-  rotasOrdenadas.forEach((rota) => {
-    // Ordena promotores disponíveis por tempo de viagem (menor primeiro)
-    const promotoresDisponiveis = promoters
-      .filter(p => !promotoresAtribuidos.has(p.id))
-      .sort((a, b) => {
-        const tempoA = temposMapaRoutas[rota.numero][a.id];
-        const tempoB = temposMapaRoutas[rota.numero][b.id];
-        return tempoA - tempoB;
-      });
+  console.log(`\n📊 Atribuindo ${rotasGeradas.length} rotas a ${promoters.length} promotores (meta: ${UTILIZACAO_ALVO * 100}% = ${Math.floor(CAPACIDADE_MINIMA / 60)}h ${CAPACIDADE_MINIMA % 60}m)`);
 
-    if (promotoresDisponiveis.length > 0) {
-      // Atribui ao promotor disponível com menor tempo de viagem
-      const promoterEscolhido = promotoresDisponiveis[0];
-      assignments[rota.numero] = promoterEscolhido.id;
-      promotoresAtribuidos.add(promoterEscolhido.id);
-    } else {
-      // Fallback: se todos estiverem atribuídos, usa o com menor tempo
-      const melhorPromoter = promoters.reduce((prev, curr) => {
-        const tempoPrev = temposMapaRoutas[rota.numero][prev.id];
-        const tempoCurr = temposMapaRoutas[rota.numero][curr.id];
-        return tempoCurr < tempoPrev ? curr : prev;
-      });
-      assignments[rota.numero] = melhorPromoter.id;
-    }
+  // ESTRATÉGIA: Aloca rotas aos promotores balanceando carga e proximidade
+  rotasOrdenadas.forEach(rota => {
+    const cargaDaRota = cargaRota[rota.numero];
+    const centroide = centroideRota[rota.numero];
+
+    // Ordena promotores por: 1) carga atual (menor primeiro), 2) proximidade
+    const promotoresOrdenados = [...promoters].sort((a, b) => {
+      const cargaA = cargaPromoter[a.id];
+      const cargaB = cargaPromoter[b.id];
+      
+      // Se um promotor está abaixo da capacidade mínima e o outro não, prioriza o abaixo
+      const abaixoA = cargaA < CAPACIDADE_MINIMA;
+      const abaixoB = cargaB < CAPACIDADE_MINIMA;
+      
+      if (abaixoA && !abaixoB) return -1;
+      if (!abaixoA && abaixoB) return 1;
+      
+      // Se ambos estão na mesma situação, ordena por carga atual
+      if (Math.abs(cargaA - cargaB) > 60) { // Diferença > 1h
+        return cargaA - cargaB;
+      }
+      
+      // Se carga similar, usa proximidade geográfica como desempate
+      const distA = calcularDistanciaHaversine(a.latitude, a.longitude, centroide.lat, centroide.lng);
+      const distB = calcularDistanciaHaversine(b.latitude, b.longitude, centroide.lat, centroide.lng);
+      return distA - distB;
+    });
+
+    // Atribui ao melhor promotor (menor carga atual ou mais próximo se cargas similares)
+    const promoterEscolhido = promotoresOrdenados[0];
+    assignments[rota.numero] = promoterEscolhido.id;
+    cargaPromoter[promoterEscolhido.id] += cargaDaRota;
+    rotasPromoter[promoterEscolhido.id].push(rota.numero);
+
+    const horasCarga = Math.floor(cargaPromoter[promoterEscolhido.id] / 60);
+    const minsCarga = cargaPromoter[promoterEscolhido.id] % 60;
+    console.log(`  ✓ Rota ${rota.numero} (${Math.floor(cargaDaRota / 60)}h ${cargaDaRota % 60}m) → ${promoterEscolhido.name} (total: ${horasCarga}h ${minsCarga}m)`);
+  });
+
+  // Relatório final de balanceamento
+  console.log(`\n📋 Resultado do balanceamento:`);
+  promoters.forEach(p => {
+    const carga = cargaPromoter[p.id];
+    const rotas = rotasPromoter[p.id];
+    const horas = Math.floor(carga / 60);
+    const mins = carga % 60;
+    const percentual = ((carga / CAPACIDADE_SEMANAL) * 100).toFixed(1);
+    const status = carga >= CAPACIDADE_MINIMA ? '✅' : '⚠️';
+    console.log(`  ${status} ${p.name}: ${horas}h ${mins}m (${percentual}%) - ${rotas.length} rota(s)`);
   });
 
   return assignments;
