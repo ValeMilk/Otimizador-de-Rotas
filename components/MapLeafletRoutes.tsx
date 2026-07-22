@@ -112,17 +112,23 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
   async function buscarTrassadoOSRM(clientes: any[], casa: any): Promise<[number, number][]> {
     const pontos = [casa, ...clientes, casa];
     
-    // OSRM tem limite de ~100 waypoints. Se tiver muitos pontos, usar fallback direto
-    if (pontos.length > 25) {
-      return pontos.map(p => [p.latitude, p.longitude]);
+    // OSRM Route API tem limite de 100 coordenadas
+    // Para rotas muito longas, simplifica pegando pontos chave
+    let pontosSimplificados = pontos;
+    if (pontos.length > 50) {
+      // Mantém casa inicial, casa final, e pontos espaçados uniformemente
+      const step = Math.ceil(clientes.length / 48);
+      const clientesSelecionados = clientes.filter((_, i) => i % step === 0);
+      pontosSimplificados = [casa, ...clientesSelecionados, casa];
+      console.log(`🗺️ Rota simplificada: ${pontos.length} → ${pontosSimplificados.length} pontos`);
     }
     
-    // Timeout de 5 segundos para não travar
+    // Timeout de 15 segundos (OSRM pode demorar com rotas longas)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     
     try {
-      const coords = pontos.map(p => `${p.longitude},${p.latitude}`).join(';');
+      const coords = pontosSimplificados.map(p => `${p.longitude},${p.latitude}`).join(';');
       const res = await fetch(
         `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`,
         { signal: controller.signal }
@@ -131,17 +137,28 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
       clearTimeout(timeoutId);
       
       if (!res.ok) {
+        console.warn(`⚠️ OSRM Route API retornou ${res.status} para rota com ${pontosSimplificados.length} pontos`);
         return pontos.map(p => [p.latitude, p.longitude]);
       }
       
       const data = await res.json();
       if (data.code === 'Ok' && data.routes?.[0]) {
-        return data.routes[0].geometry.coordinates.map((c: any) => [c[1], c[0]]);
+        const geometry = data.routes[0].geometry.coordinates.map((c: any) => [c[1], c[0]]);
+        console.log(`✅ OSRM traçou rota com ${geometry.length} pontos (${pontosSimplificados.length} waypoints)`);
+        return geometry;
       }
+      
+      console.warn(`⚠️ OSRM retornou código: ${data.code} - usando fallback`);
       return pontos.map(p => [p.latitude, p.longitude]);
-    } catch (e) {
+    } catch (e: any) {
       clearTimeout(timeoutId);
-      // Silencia erros (aborted, network, etc)
+      
+      if (e.name === 'AbortError') {
+        console.warn(`⏱️ OSRM Route API timeout (>15s) para ${pontosSimplificados.length} pontos`);
+      } else {
+        console.warn(`⚠️ Erro OSRM Route API: ${e.message}`);
+      }
+      
       return pontos.map(p => [p.latitude, p.longitude]);
     }
   }
