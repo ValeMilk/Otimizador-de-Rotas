@@ -181,6 +181,7 @@ async function obterMatrizTemposOSRM(
 
     // Construir matriz: matrizTempos[idOrigem][idDestino]
     const matrizTempos: MatrizTempos = {};
+    let nullCount = 0;
 
     for (let i = 0; i < clientes.length; i++) {
       const idOrigem = clientes[i].cliente.id;
@@ -188,13 +189,35 @@ async function obterMatrizTemposOSRM(
 
       for (let j = 0; j < clientes.length; j++) {
         const idDestino = clientes[j].cliente.id;
-        const tempoSegundos = data.durations[i][j] || 0; // OSRM devolve em segundos
-        const tempoMinutos = Math.ceil(tempoSegundos / 60);
-        matrizTempos[idOrigem][idDestino] = tempoMinutos;
+        const tempoSegundos = data.durations[i][j];
+        
+        // Se OSRM retornar null (rota impossível/muito longa), usa fallback Haversine
+        if (tempoSegundos === null || tempoSegundos === undefined) {
+          nullCount++;
+          const clienteA = clientes[i].cliente;
+          const clienteB = clientes[j].cliente;
+          const tempoMinutos = calcularTempoFallback(
+            clienteA.latitude,
+            clienteA.longitude,
+            clienteB.latitude,
+            clienteB.longitude
+          );
+          matrizTempos[idOrigem][idDestino] = tempoMinutos;
+        } else {
+          const tempoMinutos = Math.ceil(tempoSegundos / 60);
+          matrizTempos[idOrigem][idDestino] = tempoMinutos;
+        }
       }
     }
 
-    console.log(`✅ Matriz OSRM calculada com sucesso (${clientes.length}x${clientes.length})`);
+    const totalPares = clientes.length * clientes.length;
+    const percentualFallback = ((nullCount / totalPares) * 100).toFixed(1);
+    console.log(`✅ Matriz OSRM: ${clientes.length}x${clientes.length} | ${nullCount}/${totalPares} pares usaram fallback (${percentualFallback}%)`);
+    
+    if (nullCount > totalPares * 0.5) {
+      console.warn(`⚠️ Mais de 50% dos pares usaram fallback. Considere usar matriz Haversine completa.`);
+    }
+
     return matrizTempos;
   } catch (erro) {
     console.warn(`⚠️ Erro ao chamar OSRM: ${erro}. Usando fallback Haversine.`);
