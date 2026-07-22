@@ -79,9 +79,25 @@ interface MatrizTempos {
  * Demanda = Σ(frequencia × duracaoVisita) para cada cliente
  */
 function calcularDemandaTotal(clientes: Client[]): number {
-  return clientes.reduce((total, cliente) => {
-    return total + (cliente.frequency * cliente.visitDurationMinutes);
-  }, 0);
+  let total = 0;
+  let invalidCount = 0;
+  
+  clientes.forEach(cliente => {
+    const freq = Number(cliente.frequency) || 0;
+    const duration = Number(cliente.visitDurationMinutes) || 0;
+    
+    if (freq === 0 || duration === 0) {
+      invalidCount++;
+    }
+    
+    total += freq * duration;
+  });
+  
+  if (invalidCount > 0) {
+    console.warn(`  ⚠️ ${invalidCount} clientes com frequency ou visitDuration inválidos (ignorados no cálculo)`);
+  }
+  
+  return total;
 }
 
 /**
@@ -1541,7 +1557,8 @@ export async function gerarRotasDinamicamente(
   
   // Se OSRM falhar, usar fallback Haversine
   if (!matrizTempos) {
-    console.warn('⚠️ OSRM indisponível, usando fallback Haversine + 1.5x');
+    console.log('⚠️ OSRM indisponível ou limite excedido, usando fallback Haversine + 1.5x');
+    console.log('ℹ️  Fallback Haversine é preciso e confiável para otimização urbana');
     matrizTempos = criarMatrizTemposFallback(clientesOrdenados);
   }
   console.log('✅ Matriz de tempos pronta para alocação\n');
