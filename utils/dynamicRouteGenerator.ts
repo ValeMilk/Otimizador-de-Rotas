@@ -802,8 +802,8 @@ function construirRotaGreedyGeografica(
 
   if (poolGlobal.length === 0) return { rota, clientesAlocados };
 
-  const RAIO_MAXIMO_ROTA_KM = 3.0; // Raio rigoroso ao centroide congelado
-  const DIAMETRO_MAXIMO_ROTA_KM = 5.0; // Distância máxima entre quaisquer 2 clientes da rota
+  const RAIO_MAXIMO_ROTA_KM = 4.0; // Raio ao centroide (aumentado de 3.0 para 4.0)
+  const DIAMETRO_MAXIMO_ROTA_KM = 8.0; // Distância máxima entre quaisquer 2 clientes (aumentado de 5.0 para 8.0)
 
   // ─────────────────────────────────────────────────────────────
   // FASE 1: SEED = cliente com maior frequência
