@@ -803,6 +803,7 @@ function construirRotaGreedyGeografica(
   if (poolGlobal.length === 0) return { rota, clientesAlocados };
 
   const RAIO_MAXIMO_ROTA_KM = 3.0; // Raio rigoroso ao centroide congelado
+  const DIAMETRO_MAXIMO_ROTA_KM = 5.0; // Distância máxima entre quaisquer 2 clientes da rota
 
   // ─────────────────────────────────────────────────────────────
   // FASE 1: SEED = cliente com maior frequência
@@ -927,6 +928,29 @@ function construirRotaGreedyGeografica(
     }
 
     const candidato = poolGlobal[melhorIdx];
+    
+    // 🔍 VERIFICAÇÃO ADICIONAL: Calcula diâmetro da rota se adicionarmos este candidato
+    let diametroMax = 0;
+    for (const c1 of rota.clientesNaRota) {
+      const distToCandidato = calcularDistanciaHaversine(
+        c1.cliente.latitude, c1.cliente.longitude,
+        candidato.cliente.latitude, candidato.cliente.longitude
+      );
+      if (distToCandidato > diametroMax) {
+        diametroMax = distToCandidato;
+      }
+    }
+
+    // 🚫 Rejeita se o diâmetro ultrapassar o limite (mesmo que esteja dentro do raio do centroide)
+    if (diametroMax > DIAMETRO_MAXIMO_ROTA_KM) {
+      console.log(
+        `  ⚠️ Cliente "${candidato.cliente.name}" rejeitado: diâmetro seria ${diametroMax.toFixed(1)} km > ${DIAMETRO_MAXIMO_ROTA_KM} km`
+      );
+      rejeitados.add(candidato.cliente.id);
+      ciclosSemSucesso++;
+      continue;
+    }
+
     const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos);
 
     if (alocacoes > 0) {
@@ -948,8 +972,22 @@ function construirRotaGreedyGeografica(
     )
   );
 
+  // Calcula diâmetro REAL da rota (maior distância entre quaisquer 2 clientes)
+  let diametroFinal = 0;
+  for (let i = 0; i < rota.clientesNaRota.length; i++) {
+    for (let j = i + 1; j < rota.clientesNaRota.length; j++) {
+      const dist = calcularDistanciaHaversine(
+        rota.clientesNaRota[i].cliente.latitude, rota.clientesNaRota[i].cliente.longitude,
+        rota.clientesNaRota[j].cliente.latitude, rota.clientesNaRota[j].cliente.longitude
+      );
+      if (dist > diametroFinal) {
+        diametroFinal = dist;
+      }
+    }
+  }
+
   console.log(
-    `  📊 Rota ${numeroRota}: ${clientesAlocados.length} clientes | ${utilFinal.toFixed(1)}% | raio: ${raioFinal.toFixed(1)} km`
+    `  📊 Rota ${numeroRota}: ${clientesAlocados.length} clientes | ${utilFinal.toFixed(1)}% | raio: ${raioFinal.toFixed(1)} km | diâmetro: ${diametroFinal.toFixed(1)} km`
   );
 
   return { rota, clientesAlocados };
