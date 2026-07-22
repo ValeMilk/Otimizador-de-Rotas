@@ -157,27 +157,36 @@ async function obterMatrizTemposOSRM(
 
     // Requisição à API pública OSRM
     // GET /table/v1/driving/lon1,lat1;lon2,lat2;...
-    const url = `http://router.project-osrm.org/table/v1/driving/${coordenadosStr}`;
+    // HTTPS obrigatório para evitar Mixed Content em GitHub Pages
+    const url = `https://router.project-osrm.org/table/v1/driving/${coordenadosStr}`;
 
-    console.log(`🌐 Chamando OSRM com ${clientes.length} coordenadas...`);
+    console.log(`🌐 Chamando OSRM (HTTPS) com ${clientes.length} coordenadas...`);
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-    });
+    // Adiciona timeout de 30 segundos
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    if (!response.ok) {
-      console.warn(`⚠️ OSRM retornou ${response.status}. Usando fallback.`);
-      return null;
-    }
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
 
-    const data = await response.json();
+      clearTimeout(timeoutId);
 
-    // Verificar se OSRM retornou matriz de tempos (em segundos)
-    if (!data.durations || !Array.isArray(data.durations)) {
-      console.warn('⚠️ OSRM retornou estrutura inválida. Usando fallback.');
-      return null;
-    }
+      if (!response.ok) {
+        console.warn(`⚠️ OSRM retornou ${response.status}. Usando fallback.`);
+        return null;
+      }
+
+      const data = await response.json();
+
+      // Verificar se OSRM retornou matriz de tempos (em segundos)
+      if (!data.durations || !Array.isArray(data.durations)) {
+        console.warn('⚠️ OSRM retornou estrutura inválida. Usando fallback.');
+        return null;
+      }
 
     // Construir matriz: matrizTempos[idOrigem][idDestino]
     const matrizTempos: MatrizTempos = {};
@@ -219,8 +228,18 @@ async function obterMatrizTemposOSRM(
     }
 
     return matrizTempos;
-  } catch (erro) {
-    console.warn(`⚠️ Erro ao chamar OSRM: ${erro}. Usando fallback Haversine.`);
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      
+      if (fetchError.name === 'AbortError') {
+        console.warn(`⏱️ OSRM timeout (>30s). Usando fallback Haversine.`);
+      } else {
+        console.warn(`⚠️ Erro ao chamar OSRM: ${fetchError.message}. Usando fallback Haversine.`);
+      }
+      return null;
+    }
+  } catch (erro: any) {
+    console.warn(`⚠️ Erro geral ao processar OSRM: ${erro.message}. Usando fallback Haversine.`);
     return null;
   }
 }
