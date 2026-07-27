@@ -1751,8 +1751,50 @@ export async function gerarRotasDinamicamente(
     forcarEntradaClientesRestantes(rotasGeradas, clientesNaoAlocados, matrizTempos);
   }
 
-  // 5️⃣ Converte para estruturas de output
-  // 5b. DailyRoute: compatibilidade com exportação (view por dia)
+  // 5️⃣a. Cria estrutura PromotorRota (será populada com stops depois)
+  const promotorRotas: PromotorRota[] = rotasGeradas.map(rotaInterna => {
+    const agenda: PromotorRota['agenda'] = {
+      'Segunda-feira': {
+        limit: CAPACIDADES[0],
+        timeUsed: rotaInterna.agenda[0].tempoUsado,
+        stops: [],
+      },
+      'Terça-feira': {
+        limit: CAPACIDADES[1],
+        timeUsed: rotaInterna.agenda[1].tempoUsado,
+        stops: [],
+      },
+      'Quarta-feira': {
+        limit: CAPACIDADES[2],
+        timeUsed: rotaInterna.agenda[2].tempoUsado,
+        stops: [],
+      },
+      'Quinta-feira': {
+        limit: CAPACIDADES[3],
+        timeUsed: rotaInterna.agenda[3].tempoUsado,
+        stops: [],
+      },
+      'Sexta-feira': {
+        limit: CAPACIDADES[4],
+        timeUsed: rotaInterna.agenda[4].tempoUsado,
+        stops: [],
+      },
+      'Sábado': {
+        limit: CAPACIDADES[5],
+        timeUsed: rotaInterna.agenda[5].tempoUsado,
+        stops: [],
+      },
+    };
+
+    return {
+      id: rotaInterna.numero,
+      nome: `ROTA ${rotaInterna.numero}`,
+      promoterId: rotaInterna.promotorId,
+      agenda,
+    };
+  });
+
+  // 5️⃣b. DailyRoute: compatibilidade com exportação (view por dia)
   const rotasFinais: DailyRoute[] = [];
 
   for (const rotaEmConstrucao of rotasGeradas) {
@@ -1909,54 +1951,12 @@ export async function gerarRotasDinamicamente(
   // Esta é a atribuição FINAL e DEFINITIVA que considera proximidade + balanceamento
   const routeAssignments = atribuirRotasAPromoters(rotasGeradas, rotasFinais, promoters, matrizTempos);
   
-  // Atualiza promotorId nas rotas com a atribuição balanceada final
-  rotasGeradas.forEach(rota => {
+  // Atualiza promotorId nas rotas e promotorRotas com a atribuição balanceada final
+  rotasGeradas.forEach((rota, idx) => {
     if (routeAssignments[rota.numero]) {
       rota.promotorId = routeAssignments[rota.numero];
+      promotorRotas[idx].promoterId = routeAssignments[rota.numero];
     }
-  });
-
-  // Reconstrói promotorRotas com as atribuições corretas
-  const promotorRotas: PromotorRota[] = rotasGeradas.map(rotaInterna => {
-    const agenda: PromotorRota['agenda'] = {
-      'Segunda-feira': {
-        limit: CAPACIDADES[0],
-        timeUsed: rotaInterna.agenda[0].tempoUsado,
-        stops: [],
-      },
-      'Terça-feira': {
-        limit: CAPACIDADES[1],
-        timeUsed: rotaInterna.agenda[1].tempoUsado,
-        stops: [],
-      },
-      'Quarta-feira': {
-        limit: CAPACIDADES[2],
-        timeUsed: rotaInterna.agenda[2].tempoUsado,
-        stops: [],
-      },
-      'Quinta-feira': {
-        limit: CAPACIDADES[3],
-        timeUsed: rotaInterna.agenda[3].tempoUsado,
-        stops: [],
-      },
-      'Sexta-feira': {
-        limit: CAPACIDADES[4],
-        timeUsed: rotaInterna.agenda[4].tempoUsado,
-        stops: [],
-      },
-      'Sábado': {
-        limit: CAPACIDADES[5],
-        timeUsed: rotaInterna.agenda[5].tempoUsado,
-        stops: [],
-      },
-    };
-
-    return {
-      id: rotaInterna.numero,
-      nome: `ROTA ${rotaInterna.numero}`,
-      promoterId: rotaInterna.promotorId,
-      agenda,
-    };
   });
 
   const resultado: OptimizationResult = {
