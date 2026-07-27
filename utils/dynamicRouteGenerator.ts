@@ -1691,27 +1691,44 @@ export async function gerarRotasDinamicamente(
     p => typeof p.latitude === 'number' && typeof p.longitude === 'number' && !isNaN(p.latitude) && !isNaN(p.longitude)
   );
 
+  const DISTANCIA_MAXIMA_FASE2_KM = 15; // Máximo 15km entre casa do promotor e centroide da rota
+
   if (promotoresComCoord.length > 0) {
     rotasGeradas.forEach((rota, idx) => {
       // Calcula centroide da rota
       const cLat = rota.clientesNaRota.reduce((s, c) => s + c.cliente.latitude, 0) / rota.clientesNaRota.length;
       const cLng = rota.clientesNaRota.reduce((s, c) => s + c.cliente.longitude, 0) / rota.clientesNaRota.length;
 
-      // Encontra promotor mais próximo
+      // Calcula distância de TODOS os promotores ao centroide
+      const promotoresComDistancia = promotoresComCoord.map(p => ({
+        promoter: p,
+        distancia: calcularDistanciaHaversine(cLat, cLng, p.latitude, p.longitude)
+      }));
+
+      // Filtra promotores PRÓXIMOS (< 15km)
+      const promotoresProximos = promotoresComDistancia.filter(pd => pd.distancia < DISTANCIA_MAXIMA_FASE2_KM);
+
       let melhorPromotor: Promoter | null = null;
-      let menorDist = Infinity;
-      for (const p of promotoresComCoord) {
-        const d = calcularDistanciaHaversine(cLat, cLng, p.latitude, p.longitude);
-        if (d < menorDist) {
-          menorDist = d;
-          melhorPromotor = p;
-        }
+      let menorDist: number;
+
+      if (promotoresProximos.length > 0) {
+        // Se há promotores próximos, escolhe o MAIS PRÓXIMO entre eles
+        promotoresProximos.sort((a, b) => a.distancia - b.distancia);
+        melhorPromotor = promotoresProximos[0].promoter;
+        menorDist = promotoresProximos[0].distancia;
+      } else {
+        // Se NENHUM está próximo, escolhe o MAIS PRÓXIMO (mesmo que > 15km)
+        promotoresComDistancia.sort((a, b) => a.distancia - b.distancia);
+        melhorPromotor = promotoresComDistancia[0].promoter;
+        menorDist = promotoresComDistancia[0].distancia;
+        console.warn(`  ⚠️ Rota ${rota.numero}: Nenhum promotor < ${DISTANCIA_MAXIMA_FASE2_KM}km do centroide! Usando mais próximo (${menorDist.toFixed(1)}km)`);
       }
 
       if (melhorPromotor) {
         rota.promotorId = melhorPromotor.id;
+        const alertaDistancia = menorDist > 10 ? '⚠️ ' : '';
         console.log(
-          `  ✅ Rota ${rota.numero} → ${melhorPromotor.name} (centroide: ${cLat.toFixed(4)}, ${cLng.toFixed(4)}, distância: ${menorDist.toFixed(1)} km)`
+          `  ${alertaDistancia}✅ Rota ${rota.numero} → ${melhorPromotor.name} (centroide: ${cLat.toFixed(4)}, ${cLng.toFixed(4)}, distância: ${menorDist.toFixed(1)} km)`
         );
       } else {
         console.warn(`  ⚠️ Rota ${rota.numero}: nenhum promotor com coordenadas disponível`);
@@ -1735,49 +1752,6 @@ export async function gerarRotasDinamicamente(
   }
 
   // 5️⃣ Converte para estruturas de output
-  // 5a. PromotorRota: estrutura correta (um promotor com agenda semanal)
-  const promotorRotas: PromotorRota[] = rotasGeradas.map(rotaInterna => {
-    const agenda: PromotorRota['agenda'] = {
-      'Segunda-feira': {
-        limit: CAPACIDADES[0],
-        timeUsed: rotaInterna.agenda[0].tempoUsado,
-        stops: [],
-      },
-      'Terça-feira': {
-        limit: CAPACIDADES[1],
-        timeUsed: rotaInterna.agenda[1].tempoUsado,
-        stops: [],
-      },
-      'Quarta-feira': {
-        limit: CAPACIDADES[2],
-        timeUsed: rotaInterna.agenda[2].tempoUsado,
-        stops: [],
-      },
-      'Quinta-feira': {
-        limit: CAPACIDADES[3],
-        timeUsed: rotaInterna.agenda[3].tempoUsado,
-        stops: [],
-      },
-      'Sexta-feira': {
-        limit: CAPACIDADES[4],
-        timeUsed: rotaInterna.agenda[4].tempoUsado,
-        stops: [],
-      },
-      'Sábado': {
-        limit: CAPACIDADES[5],
-        timeUsed: rotaInterna.agenda[5].tempoUsado,
-        stops: [],
-      },
-    };
-
-    return {
-      id: rotaInterna.numero,
-      nome: `ROTA ${rotaInterna.numero}`,
-      promoterId: rotaInterna.promotorId,
-      agenda,
-    };
-  });
-
   // 5b. DailyRoute: compatibilidade com exportação (view por dia)
   const rotasFinais: DailyRoute[] = [];
 
@@ -1931,8 +1905,59 @@ export async function gerarRotasDinamicamente(
     alertasEficiencia.forEach(alerta => console.warn(alerta));
   }
 
-  // 7️⃣ Atribui rotas aos promoters automaticamente
+  // 7️⃣ Atribui rotas aos promoters automaticamente (COM BALANCEAMENTO E LIMITE DE DISTÂNCIA)
+  // Esta é a atribuição FINAL e DEFINITIVA que considera proximidade + balanceamento
   const routeAssignments = atribuirRotasAPromoters(rotasGeradas, rotasFinais, promoters, matrizTempos);
+  
+  // Atualiza promotorId nas rotas com a atribuição balanceada final
+  rotasGeradas.forEach(rota => {
+    if (routeAssignments[rota.numero]) {
+      rota.promotorId = routeAssignments[rota.numero];
+    }
+  });
+
+  // Reconstrói promotorRotas com as atribuições corretas
+  const promotorRotas: PromotorRota[] = rotasGeradas.map(rotaInterna => {
+    const agenda: PromotorRota['agenda'] = {
+      'Segunda-feira': {
+        limit: CAPACIDADES[0],
+        timeUsed: rotaInterna.agenda[0].tempoUsado,
+        stops: [],
+      },
+      'Terça-feira': {
+        limit: CAPACIDADES[1],
+        timeUsed: rotaInterna.agenda[1].tempoUsado,
+        stops: [],
+      },
+      'Quarta-feira': {
+        limit: CAPACIDADES[2],
+        timeUsed: rotaInterna.agenda[2].tempoUsado,
+        stops: [],
+      },
+      'Quinta-feira': {
+        limit: CAPACIDADES[3],
+        timeUsed: rotaInterna.agenda[3].tempoUsado,
+        stops: [],
+      },
+      'Sexta-feira': {
+        limit: CAPACIDADES[4],
+        timeUsed: rotaInterna.agenda[4].tempoUsado,
+        stops: [],
+      },
+      'Sábado': {
+        limit: CAPACIDADES[5],
+        timeUsed: rotaInterna.agenda[5].tempoUsado,
+        stops: [],
+      },
+    };
+
+    return {
+      id: rotaInterna.numero,
+      nome: `ROTA ${rotaInterna.numero}`,
+      promoterId: rotaInterna.promotorId,
+      agenda,
+    };
+  });
 
   const resultado: OptimizationResult = {
     rotas: promotorRotas,
