@@ -308,17 +308,24 @@ function atribuirRotasAPromoters(
   const CAPACIDADE_SEMANAL = 480 * 5 + 240 * 1; // 2880 minutos = 44h
   const UTILIZACAO_ALVO = 0.90; // 90% = ~43.2h (mínimo desejado)
   const CAPACIDADE_MINIMA = CAPACIDADE_SEMANAL * UTILIZACAO_ALVO; // 2592 min
+  const DISTANCIA_MAXIMA_KM = 15;
+
+  console.log(`\n📊 REBALANCEAMENTO: Respeitando proximidade 15km da FASE 2`);
+
+  // Promoters com coordenadas
+  const promotoresComCoord = promoters.filter(p => p.latitude && p.longitude);
+  if (promotoresComCoord.length === 0) {
+    console.warn(`⚠️ Nenhum promotor com coordenadas — sem rebalanceamento`);
+    return assignments;
+  }
 
   // Rastreia carga horária atual de cada promotor
   const cargaPromoter: { [promoterId: string]: number } = {};
-  const rotasPromoter: { [promoterId: string]: number[] } = {};
-  
-  promoters.forEach(p => {
+  promotoresComCoord.forEach(p => {
     cargaPromoter[p.id] = 0;
-    rotasPromoter[p.id] = [];
   });
 
-  // Calcula carga horária de cada rota (tempo de trabalho total)
+  // Calcula carga horária de cada rota
   const cargaRota: { [routeNumber: number]: number } = {};
   rotasGeradas.forEach(rota => {
     let tempoTotal = 0;
@@ -328,98 +335,53 @@ function atribuirRotasAPromoters(
     cargaRota[rota.numero] = tempoTotal;
   });
 
-  // Calcula centroide de cada rota (para calcular proximidade com promotores)
-  const centroideRota: { [routeNumber: number]: { lat: number; lng: number } } = {};
+  // ESTRATÉGIA: Respeita atribuição FASE 2, mas rebalanceia entre promotores próximos
   rotasGeradas.forEach(rota => {
-    let somaLat = 0, somaLng = 0, count = 0;
-    rota.clientesNaRota.forEach(cliente => {
-      somaLat += cliente.cliente.latitude;
-      somaLng += cliente.cliente.longitude;
-      count++;
-    });
-    centroideRota[rota.numero] = {
-      lat: count > 0 ? somaLat / count : 0,
-      lng: count > 0 ? somaLng / count : 0
-    };
-  });
-
-  // Ordena rotas por carga horária (descendente) - aloca rotas grandes primeiro
-  const rotasOrdenadas = [...rotasGeradas].sort(
-    (a, b) => cargaRota[b.numero] - cargaRota[a.numero]
-  );
-
-  console.log(`\n📊 Atribuindo ${rotasGeradas.length} rotas a ${promoters.length} promotores (meta: ${UTILIZACAO_ALVO * 100}% = ${Math.floor(CAPACIDADE_MINIMA / 60)}h ${CAPACIDADE_MINIMA % 60}m)`);
-
-  const DISTANCIA_MAXIMA_KM = 15; // Máximo 15km entre casa do promotor e centroide da rota
-
-  // ESTRATÉGIA: Aloca rotas aos promotores priorizando PROXIMIDADE, depois balanceamento
-  rotasOrdenadas.forEach(rota => {
     const cargaDaRota = cargaRota[rota.numero];
-    const centroide = centroideRota[rota.numero];
+    
+    // Calcula centroide da rota
+    const centroide = {
+      lat: rota.clientesNaRota.reduce((s, c) => s + c.cliente.latitude, 0) / rota.clientesNaRota.length,
+      lng: rota.clientesNaRota.reduce((s, c) => s + c.cliente.longitude, 0) / rota.clientesNaRota.length
+    };
 
-    // Calcula distância de cada promotor ao centroide da rota
-    const promotoresComDistancia = promoters.map(p => ({
-      promoter: p,
-      distancia: calcularDistanciaHaversine(p.latitude, p.longitude, centroide.lat, centroide.lng),
-      carga: cargaPromoter[p.id]
-    }));
-
-    // Filtra promotores que estão PERTO (< 15km) da rota
-    const promotoresProximos = promotoresComDistancia.filter(pd => pd.distancia < DISTANCIA_MAXIMA_KM);
+    // Promotores próximos (< 15km do centroide)
+    const promotoresProximos = promotoresComCoord
+      .map(p => ({
+        promoter: p,
+        distancia: calcularDistanciaHaversine(p.latitude, p.longitude, centroide.lat, centroide.lng),
+        carga: cargaPromoter[p.id]
+      }))
+      .filter(pd => pd.distancia < DISTANCIA_MAXIMA_KM);
 
     let promoterEscolhido: Promoter;
-    let distanciaEscolhida: number;
 
     if (promotoresProximos.length > 0) {
-      // Se há promotores próximos, escolhe o com MENOR CARGA entre eles
-      promotoresProximos.sort((a, b) => {
-        // Prioriza quem está abaixo da meta
-        const abaixoA = a.carga < CAPACIDADE_MINIMA;
-        const abaixoB = b.carga < CAPACIDADE_MINIMA;
-        if (abaixoA && !abaixoB) return -1;
-        if (!abaixoA && abaixoB) return 1;
-        
-        // Entre promotores na mesma situação, escolhe menor carga
-        if (Math.abs(a.carga - b.carga) > 60) { // Diferença > 1h
-          return a.carga - b.carga;
-        }
-        
-        // Se cargas similares, desempate por distância
-        return a.distancia - b.distancia;
-      });
-      
+      // Entre promotores PRÓXIMOS, escolhe o com menor carga
+      promotoresProximos.sort((a, b) => a.carga - b.carga);
       promoterEscolhido = promotoresProximos[0].promoter;
-      distanciaEscolhida = promotoresProximos[0].distancia;
     } else {
-      // Se NENHUM promotor está próximo, escolhe o MAIS PRÓXIMO (mesmo que longe)
-      promotoresComDistancia.sort((a, b) => a.distancia - b.distancia);
-      promoterEscolhido = promotoresComDistancia[0].promoter;
-      distanciaEscolhida = promotoresComDistancia[0].distancia;
+      // Se NENHUM próximo, usa quem está MENOS longe
+      const menosLonge = promotoresComCoord
+        .map(p => ({
+          promoter: p,
+          distancia: calcularDistanciaHaversine(p.latitude, p.longitude, centroide.lat, centroide.lng)
+        }))
+        .sort((a, b) => a.distancia - b.distancia)[0];
       
-      console.warn(`  ⚠️ Rota ${rota.numero}: Nenhum promotor < ${DISTANCIA_MAXIMA_KM}km! Atribuindo ao mais próximo (${distanciaEscolhida.toFixed(1)}km)`);
+      promoterEscolhido = menosLonge.promoter;
+      console.warn(`  ⚠️ Rota ${rota.numero}: Sem promotor < 15km! Atribuída ao mais próximo (${menosLonge.distancia.toFixed(1)}km)`);
     }
 
     assignments[rota.numero] = promoterEscolhido.id;
     cargaPromoter[promoterEscolhido.id] += cargaDaRota;
-    rotasPromoter[promoterEscolhido.id].push(rota.numero);
 
     const horasCarga = Math.floor(cargaPromoter[promoterEscolhido.id] / 60);
     const minsCarga = cargaPromoter[promoterEscolhido.id] % 60;
-    const alertaDistancia = distanciaEscolhida > 10 ? '⚠️ ' : '';
-    console.log(`  ${alertaDistancia}✓ Rota ${rota.numero} (${Math.floor(cargaDaRota / 60)}h ${cargaDaRota % 60}m) → ${promoterEscolhido.name} (${distanciaEscolhida.toFixed(1)}km, total: ${horasCarga}h ${minsCarga}m)`);
+    console.log(`  ✓ Rota ${rota.numero} → ${promoterEscolhido.name} (carga total: ${horasCarga}h ${minsCarga}m)`);
   });
 
-  // Relatório final de balanceamento
-  console.log(`\n📋 Resultado do balanceamento:`);
-  promoters.forEach(p => {
-    const carga = cargaPromoter[p.id];
-    const rotas = rotasPromoter[p.id];
-    const horas = Math.floor(carga / 60);
-    const mins = carga % 60;
-    const percentual = ((carga / CAPACIDADE_SEMANAL) * 100).toFixed(1);
-    const status = carga >= CAPACIDADE_MINIMA ? '✅' : '⚠️';
-    console.log(`  ${status} ${p.name}: ${horas}h ${mins}m (${percentual}%) - ${rotas.length} rota(s)`);
-  });
+  console.log(`\n✅ Rebalanceamento concluído\n`);
 
   return assignments;
 }
