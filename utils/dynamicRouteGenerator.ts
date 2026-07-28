@@ -1794,11 +1794,26 @@ export async function gerarRotasDinamicamente(
     };
   });
 
+  // 7️⃣ ATRIBUIÇÃO FINAL: Atribui rotas aos promoters COM PROXIMIDADE + BALANCEAMENTO
+  // Fazer ANTES de construir rotasFinais para usar IDs corretos!
+  const routeAssignments = atribuirRotasAPromoters(rotasGeradas, [], promoters, matrizTempos);
+  
+  // Atualiza promotorId nas rotas com a atribuição balanceada final
+  rotasGeradas.forEach((rota, idx) => {
+    if (routeAssignments[rota.numero]) {
+      rota.promotorId = routeAssignments[rota.numero];
+      promotorRotas[idx].promoterId = routeAssignments[rota.numero];
+    }
+  });
+
+  console.log(`\n✅ Atribuição final com limite de proximidade (15km) e balanceamento completada\n`);
+
   // 5️⃣b. DailyRoute: compatibilidade com exportação (view por dia)
+  // Constrói DEPOIS da atribuição final para usar IDs corretos
   const rotasFinais: DailyRoute[] = [];
 
+  // Busca dados do promoter para calcular deslocamento casa→clientes→casa
   for (const rotaEmConstrucao of rotasGeradas) {
-    // Busca dados do promoter para calcular deslocamento casa→clientes→casa
     const promoter = promoters.find(p => p.id === rotaEmConstrucao.promotorId);
     const promoterLatitude = promoter?.latitude ?? 0;
     const promoterLongitude = promoter?.longitude ?? 0;
@@ -1947,17 +1962,8 @@ export async function gerarRotasDinamicamente(
     alertasEficiencia.forEach(alerta => console.warn(alerta));
   }
 
-  // 7️⃣ Atribui rotas aos promoters automaticamente (COM BALANCEAMENTO E LIMITE DE DISTÂNCIA)
-  // Esta é a atribuição FINAL e DEFINITIVA que considera proximidade + balanceamento
-  const routeAssignments = atribuirRotasAPromoters(rotasGeradas, rotasFinais, promoters, matrizTempos);
-  
-  // Atualiza promotorId nas rotas e promotorRotas com a atribuição balanceada final
-  rotasGeradas.forEach((rota, idx) => {
-    if (routeAssignments[rota.numero]) {
-      rota.promotorId = routeAssignments[rota.numero];
-      promotorRotas[idx].promoterId = routeAssignments[rota.numero];
-    }
-  });
+  // Note: atribuirRotasAPromoters já foi chamada ANTES de construir rotasFinais
+  // Neste ponto, routeAssignments já contém a atribuição final com 15km de proximidade
 
   const resultado: OptimizationResult = {
     rotas: promotorRotas,
