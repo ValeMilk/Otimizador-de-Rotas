@@ -305,17 +305,14 @@ function atribuirRotasAPromoters(
 
   if (promoters.length === 0 || rotasGeradas.length === 0) return assignments;
 
-  const CAPACIDADE_SEMANAL = 480 * 5 + 240 * 1; // 2880 minutos = 44h
-  const UTILIZACAO_ALVO = 0.90; // 90% = ~43.2h (mínimo desejado)
-  const CAPACIDADE_MINIMA = CAPACIDADE_SEMANAL * UTILIZACAO_ALVO; // 2592 min
-  const DISTANCIA_MAXIMA_KM = 15;
+  const DISTANCIA_MAXIMA_KM = 15; // Absolutamente NUNCA reassignar além de 15km
 
-  console.log(`\n📊 REBALANCEAMENTO: Respeitando proximidade 15km da FASE 2`);
+  console.log(`\n🔒 VALIDAÇÃO FINAL: Garantindo todas as rotas <= 15km de promoter`);
 
   // Promoters com coordenadas
   const promotoresComCoord = promoters.filter(p => p.latitude && p.longitude);
   if (promotoresComCoord.length === 0) {
-    console.warn(`⚠️ Nenhum promotor com coordenadas — sem rebalanceamento`);
+    console.warn(`⚠️ Nenhum promotor com coordenadas — usando atribuições FASE 2 como-está`);
     return assignments;
   }
 
@@ -335,7 +332,8 @@ function atribuirRotasAPromoters(
     cargaRota[rota.numero] = tempoTotal;
   });
 
-  // ESTRATÉGIA: Respeita atribuição FASE 2, mas rebalanceia entre promotores próximos
+  // ESTRATÉGIA RÍGIDA: NUNCA reassignar além de 15km
+  let rotasComErro = 0;
   rotasGeradas.forEach(rota => {
     const cargaDaRota = cargaRota[rota.numero];
     
@@ -354,34 +352,46 @@ function atribuirRotasAPromoters(
       }))
       .filter(pd => pd.distancia < DISTANCIA_MAXIMA_KM);
 
-    let promoterEscolhido: Promoter;
+    let promoterEscolhido: Promoter | null = null;
 
     if (promotoresProximos.length > 0) {
       // Entre promotores PRÓXIMOS, escolhe o com menor carga
       promotoresProximos.sort((a, b) => a.carga - b.carga);
       promoterEscolhido = promotoresProximos[0].promoter;
-    } else {
-      // Se NENHUM próximo, usa quem está MENOS longe
-      const menosLonge = promotoresComCoord
-        .map(p => ({
-          promoter: p,
-          distancia: calcularDistanciaHaversine(p.latitude, p.longitude, centroide.lat, centroide.lng)
-        }))
-        .sort((a, b) => a.distancia - b.distancia)[0];
+      assignments[rota.numero] = promoterEscolhido.id;
+      cargaPromoter[promoterEscolhido.id] += cargaDaRota;
       
-      promoterEscolhido = menosLonge.promoter;
-      console.warn(`  ⚠️ Rota ${rota.numero}: Sem promotor < 15km! Atribuída ao mais próximo (${menosLonge.distancia.toFixed(1)}km)`);
+      const horasCarga = Math.floor(cargaPromoter[promoterEscolhido.id] / 60);
+      const minsCarga = cargaPromoter[promoterEscolhido.id] % 60;
+      const dist = promotoresProximos[0].distancia;
+      console.log(`  ✅ Rota ${rota.numero} → ${promoterEscolhido.name} (${dist.toFixed(1)}km, carga: ${horasCarga}h ${minsCarga}m)`);
+    } else {
+      // ❌ ERRO CRÍTICO: Rota passou FASE 1 mas não tem promoter < 15km aqui?
+      // Isto não deveria nunca acontecer!
+      console.error(`  ❌ ERRO CRÍTICO: Rota ${rota.numero} sem promoter < 15km!`);
+      console.error(`     Centroide: (${centroide.lat.toFixed(4)}, ${centroide.lng.toFixed(4)})`);
+      console.error(`     Distâncias mínimas por promoter:`);
+      
+      const distancias = promotoresComCoord.map(p => ({
+        nome: p.name,
+        dist: calcularDistanciaHaversine(p.latitude, p.longitude, centroide.lat, centroide.lng)
+      }));
+      distancias.sort((a, b) => a.dist - b.dist);
+      distancias.slice(0, 3).forEach(d => {
+        console.error(`        ${d.nome}: ${d.dist.toFixed(1)}km`);
+      });
+      
+      rotasComErro++;
+      // NUNCA fazer fallback para > 15km!
+      // Mantém a atribuição original (se houver) ou deixa sem assignment
     }
-
-    assignments[rota.numero] = promoterEscolhido.id;
-    cargaPromoter[promoterEscolhido.id] += cargaDaRota;
-
-    const horasCarga = Math.floor(cargaPromoter[promoterEscolhido.id] / 60);
-    const minsCarga = cargaPromoter[promoterEscolhido.id] % 60;
-    console.log(`  ✓ Rota ${rota.numero} → ${promoterEscolhido.name} (carga total: ${horasCarga}h ${minsCarga}m)`);
   });
 
-  console.log(`\n✅ Rebalanceamento concluído\n`);
+  if (rotasComErro > 0) {
+    console.error(`\n❌ ${rotasComErro} rota(s) com erro de proximidade! Validação FASE 1 falhou.`);
+  } else {
+    console.log(`\n✅ VALIDAÇÃO COMPLETA: Todas as rotas <= 15km de um promoter\n`);
+  }
 
   return assignments;
 }
@@ -1644,11 +1654,39 @@ export async function gerarRotasDinamicamente(
 
   // ──────────────────────────────────────────────────────────────
   // FASE 1B: CRIAR ROTAS SOLO PARA CLIENTES RESTANTES (Opção A)
-  // Garante que TODOS os 135 clientes sejam alocados
+  // Garante que TODOS os 135 clientes sejam alocados (se <= 15km de algum promoter)
   // ──────────────────────────────────────────────────────────────
   if (clientesNaoAlocados.length > 0) {
     console.log(`\n🎯 FASE 1B: Criando rotas solo para ${clientesNaoAlocados.length} clientes restantes...`);
-    for (const cliente of clientesNaoAlocados) {
+    
+    // Valida quais clientes podem ser alocados como rotas solo (< 15km de algum promoter)
+    const promotoresComCoordAqui = promoters.filter(
+      p => typeof p.latitude === 'number' && typeof p.longitude === 'number' && 
+           !isNaN(p.latitude) && !isNaN(p.longitude)
+    );
+
+    const clientesValidosParaSolo: ClienteExpandido[] = [];
+    const clientesRejeitadosDistancia: ClienteExpandido[] = [];
+
+    if (promotoresComCoordAqui.length > 0) {
+      for (const cliente of clientesNaoAlocados) {
+        const distancias = promotoresComCoordAqui.map(p =>
+          calcularDistanciaHaversine(cliente.cliente.latitude, cliente.cliente.longitude, p.latitude, p.longitude)
+        );
+        const distanciaMinima = Math.min(...distancias);
+
+        if (distanciaMinima < 15) {
+          clientesValidosParaSolo.push(cliente);
+        } else {
+          clientesRejeitadosDistancia.push(cliente);
+          console.warn(`  ⚠️ Cliente "${cliente.cliente.name}" REJEITADO: ${distanciaMinima.toFixed(1)}km de qualquer promoter`);
+        }
+      }
+    } else {
+      clientesValidosParaSolo.push(...clientesNaoAlocados);
+    }
+
+    for (const cliente of clientesValidosParaSolo) {
       numeroRota++;
       const rotaSolo: RotaEmConstrucao = {
         numero: numeroRota,
@@ -1685,6 +1723,11 @@ export async function gerarRotasDinamicamente(
         console.warn(`  ⚠️ Rota Solo ${numeroRota}: ${cliente.cliente.name} não alocado (agenda cheia)`);
       }
     }
+
+    if (clientesRejeitadosDistancia.length > 0) {
+      console.warn(`\n⚠️ ${clientesRejeitadosDistancia.length} cliente(s) rejeitados: > 15km de qualquer promoter`);
+    }
+
     // 🔴 Limpar clientesNaoAlocados após FASE 1B para evitar duplicação
     clientesNaoAlocados.length = 0;
   }
