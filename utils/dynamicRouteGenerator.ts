@@ -1582,6 +1582,35 @@ export async function gerarRotasDinamicamente(
     );
 
     if (clientesAlocados.length > 0) {
+      // ✅ VALIDAÇÃO: Verifica se rota tem promoter < 15km
+      const centroideRota = {
+        lat: rota.clientesNaRota.reduce((s, c) => s + c.cliente.latitude, 0) / rota.clientesNaRota.length,
+        lng: rota.clientesNaRota.reduce((s, c) => s + c.cliente.longitude, 0) / rota.clientesNaRota.length
+      };
+
+      const promotoresComCoord = promoters.filter(
+        p => typeof p.latitude === 'number' && typeof p.longitude === 'number' && 
+             !isNaN(p.latitude) && !isNaN(p.longitude)
+      );
+
+      let temPromoterProximo = false;
+      if (promotoresComCoord.length > 0) {
+        const distancias = promotoresComCoord.map(p =>
+          calcularDistanciaHaversine(centroideRota.lat, centroideRota.lng, p.latitude, p.longitude)
+        );
+        const distanciaMinima = Math.min(...distancias);
+        temPromoterProximo = distanciaMinima < 15;
+
+        if (!temPromoterProximo) {
+          console.warn(`  ⚠️ Rota ${numeroRota} REJEITADA: Nenhum promoter < 15km (distância mín: ${distanciaMinima.toFixed(1)}km)`);
+          console.log(`  🔄 Retornando ${clientesAlocados.length} clientes ao pool para novo seed...`);
+          // Recoloca clientes no pool para tentar novamente
+          poolGlobal.push(...clientesAlocados);
+          numeroRota--; // Volta o número da rota
+          continue;
+        }
+      }
+
       rotasGeradas.push(rota);
       const utilizacao = calcularUtilizacaoMediaSemanal(rota);
       console.log(
@@ -1671,29 +1700,22 @@ export async function gerarRotasDinamicamente(
       const promotoresProximos = promotoresComDistancia.filter(pd => pd.distancia < DISTANCIA_MAXIMA_FASE2_KM);
 
       let melhorPromotor: Promoter | null = null;
-      let menorDist: number;
+      let menorDist: number = Infinity;
 
       if (promotoresProximos.length > 0) {
         // Se há promotores próximos, escolhe o MAIS PRÓXIMO entre eles
         promotoresProximos.sort((a, b) => a.distancia - b.distancia);
         melhorPromotor = promotoresProximos[0].promoter;
         menorDist = promotoresProximos[0].distancia;
-      } else {
-        // Se NENHUM está próximo, escolhe o MAIS PRÓXIMO (mesmo que > 15km)
-        promotoresComDistancia.sort((a, b) => a.distancia - b.distancia);
-        melhorPromotor = promotoresComDistancia[0].promoter;
-        menorDist = promotoresComDistancia[0].distancia;
-        console.warn(`  ⚠️ Rota ${rota.numero}: Nenhum promotor < ${DISTANCIA_MAXIMA_FASE2_KM}km do centroide! Usando mais próximo (${menorDist.toFixed(1)}km)`);
-      }
-
-      if (melhorPromotor) {
+        
         rota.promotorId = melhorPromotor.id;
         const alertaDistancia = menorDist > 10 ? '⚠️ ' : '';
         console.log(
           `  ${alertaDistancia}✅ Rota ${rota.numero} → ${melhorPromotor.name} (centroide: ${cLat.toFixed(4)}, ${cLng.toFixed(4)}, distância: ${menorDist.toFixed(1)} km)`
         );
       } else {
-        console.warn(`  ⚠️ Rota ${rota.numero}: nenhum promotor com coordenadas disponível`);
+        // NUNCA DEVERIA CHEGAR AQUI - validação anterior garante promoter < 15km
+        console.error(`  ❌ ERRO: Rota ${rota.numero} passou validação mas sem promoter < 15km!`);
       }
     });
   } else {
