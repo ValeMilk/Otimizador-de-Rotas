@@ -1513,6 +1513,19 @@ export async function gerarRotasDinamicamente(
   }
   console.log(`📍 Promoters: ${promoters.length}`);
 
+  // ⚠️ VALIDAÇÃO CRÍTICA: Precisa de promoters com coordenadas!
+  const promotoresComCoordTotal = promoters.filter(
+    p => typeof p.latitude === 'number' && typeof p.longitude === 'number' && 
+         !isNaN(p.latitude) && !isNaN(p.longitude)
+  );
+
+  if (promotoresComCoordTotal.length === 0) {
+    const erro = `❌ ERRO: Nenhum promotor com coordenadas válidas cadastrado!\n` +
+                 `Por favor, faça upload do arquivo de PROMOTORES antes de otimizar.`;
+    console.error(erro);
+    throw new Error(erro);
+  }
+
   // 1. Prepara pool de clientes não alocados
   // FFD: First Fit Decreasing - ordena por frequência DESC, depois duração DESC
   const clientesOrdenados = [...clientes]
