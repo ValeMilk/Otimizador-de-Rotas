@@ -1751,6 +1751,11 @@ export async function gerarRotasDinamicamente(
     if (routeAssignments[rota.numero]) {
       rota.promotorId = routeAssignments[rota.numero];
       promotorRotas[idx].promoterId = routeAssignments[rota.numero];
+      // ✅ Atualiza nome com o nome REAL do promotor
+      const promoter = promoters.find(p => p.id === routeAssignments[rota.numero]);
+      if (promoter) {
+        promotorRotas[idx].nome = promoter.name;
+      }
     }
   });
 
