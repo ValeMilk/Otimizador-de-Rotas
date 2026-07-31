@@ -182,6 +182,8 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result }) =>
                     checked={selectedRoutes.includes(route)}
                     onChange={(e) => {
                       if (e.target.checked) {
+                        // Quando marca uma rota, limpa filtro de promoters
+                        setSelectedPromoters([]);
                         setSelectedRoutes([...selectedRoutes, route]);
                       } else {
                         setSelectedRoutes(selectedRoutes.filter(r => r !== route));
@@ -210,6 +212,8 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result }) =>
                         checked={selectedPromoters.includes(promoter.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
+                            // Quando marca um promoter, limpa filtro de rotas
+                            setSelectedRoutes([]);
                             setSelectedPromoters([...selectedPromoters, promoter.id]);
                           } else {
                             setSelectedPromoters(selectedPromoters.filter(p => p !== promoter.id));
