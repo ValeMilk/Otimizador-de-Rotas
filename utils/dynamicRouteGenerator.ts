@@ -648,7 +648,8 @@ function processarFrequenciaCliente(
   agenda: AgendaSemanalInterna,
   matrizTempos: MatrizTempos,
   isUltimaRota: boolean = false,
-  forçado: boolean = false
+  forçado: boolean = false,
+  frequenciasRastreadas?: Map<string, { solicitada: number; alocada: number }>
 ): number {
   // v4.2.9: DISTRIBUIÇÃO UNIFORME PARA CLIENTES DE ALTA FREQUÊNCIA
   // Se freq >= 4, tenta alocar 1 visita por dia (distribuição uniforme)
@@ -663,6 +664,14 @@ function processarFrequenciaCliente(
       forçado
     );
     if (resultadoUniforme > 0) {
+      // ✅ Rastreia frequência alocada
+      if (frequenciasRastreadas) {
+        if (!frequenciasRastreadas.has(clienteExpandido.cliente.id)) {
+          frequenciasRastreadas.set(clienteExpandido.cliente.id, { solicitada: frequenciaRequisitada, alocada: 0 });
+        }
+        const reg = frequenciasRastreadas.get(clienteExpandido.cliente.id)!;
+        reg.alocada = resultadoUniforme;
+      }
       return resultadoUniforme; // ✅ Sucesso com distribuição uniforme
     }
     // Se falhar, cai para estratégia padrão abaixo
@@ -700,10 +709,29 @@ function processarFrequenciaCliente(
     // Falhou em alocar nem o mínimo, faz ROLLBACK
     restaurarAgendaDoBackup(agenda, backupAgenda);
     clienteExpandido.visitasAlocadas = backupVisitas;
+    
+    // ⚠️ Rastreia frequência 0 alocada
+    if (frequenciasRastreadas) {
+      frequenciasRastreadas.set(clienteExpandido.cliente.id, { solicitada: frequenciaRequisitada, alocada: 0 });
+    }
     return 0; // Zero alocações
   }
 
   // ✅ Mantém as alocações (mesmo que parciais)
+  // ⚠️ Rastreia frequência alocada
+  if (frequenciasRastreadas) {
+    if (!frequenciasRastreadas.has(clienteExpandido.cliente.id)) {
+      frequenciasRastreadas.set(clienteExpandido.cliente.id, { solicitada: frequenciaRequisitada, alocada: 0 });
+    }
+    const reg = frequenciasRastreadas.get(clienteExpandido.cliente.id)!;
+    reg.alocada = alocadasComSucesso;
+    
+    // 🟡 Log de alocação parcial
+    if (alocadasComSucesso < frequenciaRequisitada) {
+      console.log(`  🟡 Cliente "${clienteExpandido.cliente.name}": frequência ${alocadasComSucesso}/${frequenciaRequisitada} (${Math.round((alocadasComSucesso / frequenciaRequisitada) * 100)}%)`);
+    }
+  }
+  
   return alocadasComSucesso;
 }
 
@@ -817,6 +845,7 @@ function construirRotaGreedyGeografica(
   numeroRota: number,
   poolGlobal: ClienteExpandido[],
   matrizTempos: MatrizTempos,
+  frequenciasRastreadas: Map<string, { solicitada: number; alocada: number }>,
   celularBounds?: { minLat: number; maxLat: number; minLng: number; maxLng: number }
 ): { rota: RotaEmConstrucao; clientesAlocados: ClienteExpandido[] } {
   const rota: RotaEmConstrucao = {
@@ -846,7 +875,7 @@ function construirRotaGreedyGeografica(
   }
 
   const seed = poolGlobal[melhorSeedIdx];
-  const alocSeed = processarFrequenciaCliente(seed, rota.agenda, matrizTempos);
+  const alocSeed = processarFrequenciaCliente(seed, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
 
   if (alocSeed === 0) {
     poolGlobal.splice(melhorSeedIdx, 1);
@@ -878,7 +907,7 @@ function construirRotaGreedyGeografica(
   const indicesToRemove: number[] = [];
   for (let i = 0; i < Math.min(2, vizinhosPorDist.length); i++) {
     const { idx, cliente } = vizinhosPorDist[i];
-    const alocacoes = processarFrequenciaCliente(cliente, rota.agenda, matrizTempos);
+    const alocacoes = processarFrequenciaCliente(cliente, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
     if (alocacoes > 0) {
       nucleoClientes.push(cliente);
       rota.clientesNaRota.push(cliente);
@@ -978,7 +1007,7 @@ function construirRotaGreedyGeografica(
       continue;
     }
 
-    const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos);
+    const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
 
     if (alocacoes > 0) {
       rota.clientesNaRota.push(candidato);
@@ -1023,7 +1052,8 @@ function construirRotaGreedyGeografica(
 function construirRotaComClusterizacao(
   numeroRota: number,
   clientesNaoAlocados: ClienteExpandido[],
-  matrizTempos: MatrizTempos
+  matrizTempos: MatrizTempos,
+  frequenciasRastreadas: Map<string, { solicitada: number; alocada: number }>
 ): { rota: RotaEmConstrucao; clientesAlocados: ClienteExpandido[] } {
   const rota: RotaEmConstrucao = {
     numero: numeroRota,
@@ -1042,7 +1072,7 @@ function construirRotaComClusterizacao(
   const primeiroCliente = clientesNaoAlocados[0];
   clientesNaoAlocados.splice(0, 1);
 
-  const alocacoes = processarFrequenciaCliente(primeiroCliente, rota.agenda, matrizTempos);
+  const alocacoes = processarFrequenciaCliente(primeiroCliente, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
   if (alocacoes > 0) {
     rota.clientesNaRota.push(primeiroCliente);
     clientesAlocados.push(primeiroCliente);
@@ -1062,7 +1092,7 @@ function construirRotaComClusterizacao(
     const candidato = clientesNaoAlocados[i];
 
     // Tenta alocar TODAS as frequências do candidato
-    const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos);
+    const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
 
     if (alocacoes > 0) {
       // ✅ Sucesso: adiciona à rota
@@ -1093,7 +1123,7 @@ function construirRotaComClusterizacao(
     
     for (let i = clientesNaoAlocados.length - 1; i >= 0; i--) {
       const cliente = clientesNaoAlocados[i];
-      const alocacoes = processarFrequenciaCliente(cliente, rota.agenda, matrizTempos, true, true); // força=true
+      const alocacoes = processarFrequenciaCliente(cliente, rota.agenda, matrizTempos, true, true, frequenciasRastreadas); // força=true
       
       if (alocacoes > 0) {
         rota.clientesNaRota.push(cliente);
@@ -1237,7 +1267,8 @@ function calcularUtilizacaoMediaSemanal(rota: RotaEmConstrucao): number {
 function aplicarRebalanceamentoDeCarga(
   rotasGeradas: RotaEmConstrucao[],
   clientesNaoAlocados: ClienteExpandido[],
-  matrizTempos: MatrizTempos
+  matrizTempos: MatrizTempos,
+  frequenciasRastreadas: Map<string, { solicitada: number; alocada: number }>
 ): void {
   if (rotasGeradas.length === 0) return;
 
@@ -1288,7 +1319,7 @@ function aplicarRebalanceamentoDeCarga(
         // Limpa alocações anteriores
         cliente.visitasAlocadas.clear();
         
-        const sucesso = processarFrequenciaCliente(cliente, rotaDestino.agenda, matrizTempos, true, modoForcado);
+        const sucesso = processarFrequenciaCliente(cliente, rotaDestino.agenda, matrizTempos, true, modoForcado, frequenciasRastreadas);
         if (sucesso > 0) {
           rotaDestino.clientesNaRota.push(cliente);
           alocado = true;
@@ -1332,7 +1363,8 @@ function aplicarRebalanceamentoDeCarga(
 function forcarEntradaClientesRestantes(
   rotasGeradas: RotaEmConstrucao[],
   clientesNaoAlocados: ClienteExpandido[],
-  matrizTempos: MatrizTempos
+  matrizTempos: MatrizTempos,
+  frequenciasRastreadas: Map<string, { solicitada: number; alocada: number }>
 ): void {
   if (rotasGeradas.length === 0 || clientesNaoAlocados.length === 0) return;
 
@@ -1343,7 +1375,7 @@ function forcarEntradaClientesRestantes(
 
   for (const cliente of clientesNaoAlocados) {
     // Tenta alocar com modo "forçado" - permite ultrapassar 100%
-    const sucesso = processarFrequenciaCliente(cliente, ultimaRota.agenda, matrizTempos, true, true);
+    const sucesso = processarFrequenciaCliente(cliente, ultimaRota.agenda, matrizTempos, true, true, frequenciasRastreadas);
     if (sucesso) {
       ultimaRota.clientesNaRota.push(cliente);
       clientesForçados++;
@@ -1542,6 +1574,9 @@ export async function gerarRotasDinamicamente(
   }
   console.log(`📍 Promoters: ${promoters.length}`);
 
+  // 🟡 RASTREAMENTO DE FREQUÊNCIAS: solicitada vs alocada
+  const frequenciasRastreadas = new Map<string, { solicitada: number; alocada: number }>();
+
   // 1. Prepara pool de clientes não alocados
   // FFD: First Fit Decreasing - ordena por frequência DESC, depois duração DESC
   const clientesOrdenados = [...clientes]
@@ -1607,7 +1642,8 @@ export async function gerarRotasDinamicamente(
     const { rota, clientesAlocados } = construirRotaGreedyGeografica(
       numeroRota,
       poolGlobal,
-      matrizTempos
+      matrizTempos,
+      frequenciasRastreadas
     );
 
     if (clientesAlocados.length > 0) {
@@ -1696,7 +1732,7 @@ export async function gerarRotasDinamicamente(
 
   // 4️⃣b FORÇAR ENTRADA (Cenário 3): Alocar clientes restantes na última rota com overflow
   if (clientesNaoAlocados.length > 0 && rotasGeradas.length > 0) {
-    forcarEntradaClientesRestantes(rotasGeradas, clientesNaoAlocados, matrizTempos);
+    forcarEntradaClientesRestantes(rotasGeradas, clientesNaoAlocados, matrizTempos, frequenciasRastreadas);
   }
 
   // 5️⃣a. Cria estrutura PromotorRota (será populada com stops depois)
@@ -1908,6 +1944,48 @@ export async function gerarRotasDinamicamente(
   // Gera alertas de ociosidade
   const alertasOciosidade = gerarAlertasOciosidade(rotasGeradas);
   
+  // 🟡 GERAÇÃO DE AVISOS SOBRE FREQUÊNCIA NÃO ENTREGUE
+  const alertasFrequencia: string[] = [];
+  const clientesComFrequenciaIncompleta: Array<{ nome: string; solicitada: number; alocada: number; percentual: number }> = [];
+  
+  frequenciasRastreadas.forEach((freq, clienteId) => {
+    if (freq.alocada === 0) {
+      // Cliente completamente rejeitado
+      const cliente = clientes.find(c => c.id === clienteId);
+      if (cliente) {
+        clientesComFrequenciaIncompleta.push({
+          nome: cliente.name,
+          solicitada: freq.solicitada,
+          alocada: 0,
+          percentual: 0
+        });
+      }
+    } else if (freq.alocada < freq.solicitada) {
+      // Cliente com frequência parcial
+      const cliente = clientes.find(c => c.id === clienteId);
+      if (cliente) {
+        const percentual = Math.round((freq.alocada / freq.solicitada) * 100);
+        clientesComFrequenciaIncompleta.push({
+          nome: cliente.name,
+          solicitada: freq.solicitada,
+          alocada: freq.alocada,
+          percentual
+        });
+      }
+    }
+  });
+
+  if (clientesComFrequenciaIncompleta.length > 0) {
+    console.log(`\n🟡 AVISO: ${clientesComFrequenciaIncompleta.length} cliente(s) com frequência não entregue`);
+    clientesComFrequenciaIncompleta.forEach(c => {
+      const msg = c.alocada === 0 
+        ? `⚠️ "${c.nome}": freq ${c.solicitada} - REJEITADO (0 visitas)`
+        : `⚠️ "${c.nome}": freq ${c.alocada}/${c.solicitada} (${c.percentual}%)`;
+      console.log(`   ${msg}`);
+      alertasFrequencia.push(msg);
+    });
+  }
+  
   // 6️⃣b Valida eficiência das rotas (v4.3)
   const alertasEficiencia = validarEficienciaRotas(rotasGeradas);
   if (alertasEficiencia.length > 0) {
@@ -1931,6 +2009,7 @@ export async function gerarRotasDinamicamente(
       warnings: [
         `Total de promotores criados: ${rotasGeradas.length}`,
         `Clientes alocados: ${totalClientesAlocados}/${clientes.length}`,
+        ...alertasFrequencia, // 🟡 Avisos de frequência incompleta
         ...alertasOciosidade, // Alertas de ociosidade
         ...alertasEficiencia, // Alertas de eficiência (v4.3)
       ],
