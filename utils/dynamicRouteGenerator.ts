@@ -307,7 +307,7 @@ function atribuirRotasAPromoters(
 
   const CAPACIDADE_SEMANAL = 480 * 5 + 240 * 1; // 2880 minutos = 44h
 
-  console.log(`\n📊 FASE 2: Alocando ${rotasGeradas.length} rotas aos ${promoters.length} promoters (capacidade: 44h/semana)`);
+  console.log(`\n📊 FASE 2: Alocando ${rotasGeradas.length} rotas aos ${promoters.length} promoters (RESTRIÇÃO: 1 ROTA POR PROMOTER)`);
 
   // Promoters com coordenadas
   const promotoresComCoord = promoters.filter(p => p.latitude && p.longitude);
@@ -316,10 +316,10 @@ function atribuirRotasAPromoters(
     return assignments;
   }
 
-  // Rastreia carga horária atual de cada promotor
-  const cargaPromoter: { [promoterId: string]: number } = {};
+  // 🔴 NOVO: Rastreia QUANTAS ROTAS cada promotor já tem (máximo 1!)
+  const rotasPromoter: { [promoterId: string]: number } = {};
   promotoresComCoord.forEach(p => {
-    cargaPromoter[p.id] = 0;
+    rotasPromoter[p.id] = 0;
   });
 
   // Calcula carga horária de cada rota
@@ -332,8 +332,8 @@ function atribuirRotasAPromoters(
     cargaRota[rota.numero] = tempoTotal;
   });
 
-  // ESTRATÉGIA: Para cada rota, aloca ao promoter mais próximo com CAPACIDADE
-  console.log(`\n🔄 Alocando rotas por proximidade + capacidade disponível:`);
+  // ESTRATÉGIA: Para cada rota, aloca ao promoter mais próximo DISPONÍVEL (1 rota por promoter)
+  console.log(`\n🔄 Alocando rotas por proximidade (1 rota por promoter OBRIGATÓRIO):`);
   
   rotasGeradas.forEach(rota => {
     const cargaDaRota = cargaRota[rota.numero];
@@ -349,66 +349,56 @@ function atribuirRotasAPromoters(
       .map(p => ({
         promoter: p,
         distancia: calcularDistanciaHaversine(p.latitude, p.longitude, centroide.lat, centroide.lng),
-        cargaAtual: cargaPromoter[p.id]
+        rotas: rotasPromoter[p.id], // NOVO: Quantas rotas já tem
       }))
-      .sort((a, b) => a.distancia - b.distancia); // Ordena por distância (crescente)
+      .sort((a, b) => {
+        // NOVO: Prioritária 1 - Promoter sem rota ainda
+        if (a.rotas === 0 && b.rotas > 0) return -1;
+        if (a.rotas > 0 && b.rotas === 0) return 1;
+        
+        // Prioritária 2 - Proximidade (para promoters sem rota)
+        return a.distancia - b.distancia;
+      });
 
-    // Tenta alocar ao promoter mais próximo que tiver CAPACIDADE
+    // Tenta alocar ao promoter mais próximo que ainda NÃO TEM ROTA
     let promoterEscolhido: Promoter | null = null;
     let distanciaEscolhida: number = Infinity;
-    let temCapacidade = false;
 
-    for (const { promoter, distancia, cargaAtual } of promotoresComDistancia) {
-      const capacidadeDisponivel = CAPACIDADE_SEMANAL - cargaAtual;
-      
-      if (capacidadeDisponivel >= cargaDaRota) {
-        // Promoter tem capacidade! Aloca aqui
-        promoterEscolhido = promoter;
-        distanciaEscolhida = distancia;
-        temCapacidade = true;
-        break;
+    for (const { promoter, distancia, rotas } of promotoresComDistancia) {
+      // 🔴 VALIDAÇÃO CRÍTICA: Promoter pode ter NO MÁXIMO 1 rota
+      if (rotas >= 1) {
+        console.log(`  ⏭️  ${promoter.name}: JÁ TEM ${rotas} ROTA(s) - PULA`);
+        continue;
       }
-    }
 
-    // Se nenhum tem capacidade exata, pega o que tiver mais espaço (mesmo que não caiba toda a rota)
-    if (!temCapacidade && promotoresComDistancia.length > 0) {
-      const comMaisEspaco = [...promotoresComDistancia].sort((a, b) => {
-        const espA = CAPACIDADE_SEMANAL - a.cargaAtual;
-        const espB = CAPACIDADE_SEMANAL - b.cargaAtual;
-        return espB - espA; // Ordena por espaço descending
-      })[0];
-      
-      promoterEscolhido = comMaisEspaco.promoter;
-      distanciaEscolhida = comMaisEspaco.distancia;
-      const espacoDisp = CAPACIDADE_SEMANAL - comMaisEspaco.cargaAtual;
-      console.warn(`  ⚠️ Rota ${rota.numero}: Nenhum promoter com ${Math.floor(cargaDaRota / 60)}h ${cargaDaRota % 60}m livres.`);
-      console.warn(`     Alocando ao promoter com mais espaço: ${promoterEscolhido.name} (${espacoDisp / 60}h ${espacoDisp % 60}m disponível)`);
+      // Promoter está livre! Aloca aqui
+      promoterEscolhido = promoter;
+      distanciaEscolhida = distancia;
+      break;
     }
 
     if (promoterEscolhido) {
       assignments[rota.numero] = promoterEscolhido.id;
-      cargaPromoter[promoterEscolhido.id] += cargaDaRota;
+      rotasPromoter[promoterEscolhido.id]++; // NOVO: Incrementa contador
 
-      const horasCarga = Math.floor(cargaPromoter[promoterEscolhido.id] / 60);
-      const minsCarga = cargaPromoter[promoterEscolhido.id] % 60;
       const horasRota = Math.floor(cargaDaRota / 60);
       const minsRota = cargaDaRota % 60;
       
-      console.log(`  ✅ Rota ${rota.numero} (${horasRota}h ${minsRota}m) → ${promoterEscolhido.name} (${distanciaEscolhida.toFixed(1)}km, carga total: ${horasCarga}h ${minsCarga}m)`);
+      console.log(`  ✅ Rota ${rota.numero} (${horasRota}h ${minsRota}m) → ${promoterEscolhido.name} (${distanciaEscolhida.toFixed(1)}km)`);
     } else {
-      console.error(`  ❌ Rota ${rota.numero}: NÃO FOI POSSÍVEL ALOCAR A NENHUM PROMOTER!`);
+      console.error(`  ❌ Rota ${rota.numero}: SEM PROMOTER DISPONÍVEL! (todos têm 1 rota)`);
     }
   });
 
   // Relatório final
-  console.log(`\n📋 Resumo da Alocação Final:`);
+  console.log(`\n📋 Resumo da Alocação Final (1:1 Mapping):`);
   promotoresComCoord.forEach(p => {
-    const carga = cargaPromoter[p.id];
-    const horas = Math.floor(carga / 60);
-    const mins = carga % 60;
-    const percentual = ((carga / CAPACIDADE_SEMANAL) * 100).toFixed(1);
-    const status = carga > CAPACIDADE_SEMANAL ? '❌' : '✅';
-    console.log(`  ${status} ${p.name}: ${horas}h ${mins}m (${percentual}%)`);
+    const rotas = Object.entries(assignments).filter(([_, pId]) => pId === p.id).map(([r]) => r);
+    if (rotas.length > 0) {
+      console.log(`  ✅ ${p.name}: Rota [${rotas.join(', ')}]`);
+    } else {
+      console.log(`  ⚠️  ${p.name}: SEM ROTA ATRIBUÍDA`);
+    }
   });
 
   console.log('');
