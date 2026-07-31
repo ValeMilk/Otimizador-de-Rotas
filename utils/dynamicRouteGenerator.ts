@@ -701,38 +701,33 @@ function processarFrequenciaCliente(
     }
   }
 
-  // 2. v4.2.8: Permitir alocação PARCIAL (não fazer rollback)
-  // Se conseguiu alocar pelo menos 1 frequência (50% da solicitada), mantém
-  const minFrequenciaAceita = Math.max(1, Math.ceil(frequenciaRequisitada * 0.5));
+  // 2. v4.10.0: FORÇAR FREQUÊNCIA 100% - Rejeita alocações parciais
+  // Se não conseguir alocar TODAS as visitas, faz ROLLBACK e retorna 0
+  // Cliente será alocado numa rota solo na FASE 1B
   
-  if (alocadasComSucesso < minFrequenciaAceita) {
-    // Falhou em alocar nem o mínimo, faz ROLLBACK
+  if (alocadasComSucesso < frequenciaRequisitada) {
+    // Falhou em alocar a frequência COMPLETA, faz ROLLBACK
     restaurarAgendaDoBackup(agenda, backupAgenda);
     clienteExpandido.visitasAlocadas = backupVisitas;
     
-    // ⚠️ Rastreia frequência 0 alocada
+    // ⚠️ Rastreia frequência 0 alocada (será criada rota solo)
     if (frequenciasRastreadas) {
       frequenciasRastreadas.set(clienteExpandido.cliente.id, { solicitada: frequenciaRequisitada, alocada: 0 });
     }
-    return 0; // Zero alocações
+    return 0; // REJEITA - cliente vai para FASE 1B
   }
 
-  // ✅ Mantém as alocações (mesmo que parciais)
-  // ⚠️ Rastreia frequência alocada
+  // ✅ Mantém as alocações (100% garantido)
+  // ✅ Rastreia frequência alocada
   if (frequenciasRastreadas) {
     if (!frequenciasRastreadas.has(clienteExpandido.cliente.id)) {
       frequenciasRastreadas.set(clienteExpandido.cliente.id, { solicitada: frequenciaRequisitada, alocada: 0 });
     }
     const reg = frequenciasRastreadas.get(clienteExpandido.cliente.id)!;
     reg.alocada = alocadasComSucesso;
-    
-    // 🟡 Log de alocação parcial
-    if (alocadasComSucesso < frequenciaRequisitada) {
-      console.log(`  🟡 Cliente "${clienteExpandido.cliente.name}": frequência ${alocadasComSucesso}/${frequenciaRequisitada} (${Math.round((alocadasComSucesso / frequenciaRequisitada) * 100)}%)`);
-    }
   }
   
-  return alocadasComSucesso;
+  return alocadasComSucesso; // Retorna frequência completa
 }
 
 // ============================================================================
@@ -1673,7 +1668,7 @@ export async function gerarRotasDinamicamente(
 
   // ──────────────────────────────────────────────────────────────
   // FASE 1B: CRIAR ROTAS SOLO PARA CLIENTES RESTANTES
-  // SEM VALIDAÇÃO de proximidade — alocação será feita na FASE 2
+  // Aloca FREQUÊNCIA COMPLETA distribuindo pelos dias da semana
   // ──────────────────────────────────────────────────────────────
   if (clientesNaoAlocados.length > 0) {
     console.log(`\n🎯 FASE 1B: Criando rotas solo para ${clientesNaoAlocados.length} clientes restantes...`);
@@ -1687,32 +1682,46 @@ export async function gerarRotasDinamicamente(
         clientesNaRota: [cliente],
       };
       
-      // Tenta alocar o cliente em qualquer dia disponível
-      let alocado = false;
-      for (let dia = 0; dia < 6; dia++) {
-        const CAPACIDADES = [480, 480, 480, 480, 480, 240];
-        const tempoDisponivel = CAPACIDADES[dia] - rotaSolo.agenda[dia].tempoUsado;
-        if (tempoDisponivel >= cliente.frequenciaRequisitada) {
-          rotaSolo.agenda[dia].tempoUsado += cliente.frequenciaRequisitada;
+      // ✅ v4.10.0: Aloca TODAS as frequências necessárias
+      let frequenciaRestante = cliente.frequenciaRequisitada;
+      const CAPACIDADES = [480, 480, 480, 480, 480, 240]; // minutos por dia
+      
+      // Distribui visitas pelos dias (segunda a sábado)
+      for (let dia = 0; dia < 6 && frequenciaRestante > 0; dia++) {
+        // Cada visita tem duração igual à frequência necessária
+        const duracao = Math.min(frequenciaRestante, CAPACIDADES[dia] - rotaSolo.agenda[dia].tempoUsado);
+        
+        if (duracao > 0) {
+          rotaSolo.agenda[dia].tempoUsado += duracao;
           rotaSolo.agenda[dia].visitas.push({
             clienteId: cliente.cliente.id,
             clienteNome: cliente.cliente.name,
             latitude: cliente.cliente.latitude,
             longitude: cliente.cliente.longitude,
-            duracao: cliente.frequenciaRequisitada,
+            duracao: duracao,
             frequency: cliente.cliente.frequency
           });
-          alocado = true;
-          break;
+          frequenciaRestante -= duracao;
         }
       }
 
-      if (alocado) {
+      // Verifica se conseguiu alocar FREQUÊNCIA COMPLETA
+      if (frequenciaRestante === 0) {
         rotasGeradas.push(rotaSolo);
         const util = calcularUtilizacaoMediaSemanal(rotaSolo);
-        console.log(`  ✅ Rota Solo ${numeroRota}: ${cliente.cliente.name} | ${util.toFixed(1)}%`);
+        console.log(`  ✅ Rota Solo ${numeroRota}: "${cliente.cliente.name}" | Freq: ${cliente.frequenciaRequisitada} | ${util.toFixed(1)}%`);
+        
+        // ✅ Rastreia frequência alocada 100%
+        if (frequenciasRastreadas) {
+          frequenciasRastreadas.set(cliente.cliente.id, { solicitada: cliente.frequenciaRequisitada, alocada: cliente.frequenciaRequisitada });
+        }
       } else {
-        console.warn(`  ⚠️ Rota Solo ${numeroRota}: ${cliente.cliente.name} não alocado (agenda cheia)`);
+        console.error(`  ❌ Rota Solo ${numeroRota}: "${cliente.cliente.name}" - NÃO CABE! Freq: ${cliente.frequenciaRequisitada} min, apenas ${cliente.frequenciaRequisitada - frequenciaRestante} min alocados`);
+        
+        // ⚠️ Rastreia falha de alocação
+        if (frequenciasRastreadas) {
+          frequenciasRastreadas.set(cliente.cliente.id, { solicitada: cliente.frequenciaRequisitada, alocada: cliente.frequenciaRequisitada - frequenciaRestante });
+        }
       }
     }
 
