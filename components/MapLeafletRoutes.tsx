@@ -170,11 +170,19 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
   useEffect(() => {
     if (!result.routes || result.routes.length === 0) return;
 
+    // 🔍 DEBUG: Log dos filtros aplicados
+    console.log(`\n🔍 DEBUG MapLeafletRoutes - Filtros aplicados:`);
+    console.log(`  selectedRoutes: [${selectedRoutes.join(', ')}]`);
+    console.log(`  selectedDay: ${selectedDay || 'Todos os dias'}`);
+    console.log(`  selectedPromoters: [${selectedPromoters.join(', ')}]`);
+    console.log(`  Total de rotas em result.routes: ${result.routes.length}`);
+
     const grouped: { [key: number]: RouteGroup } = {};
     let minLat = 90;
     let maxLat = -90;
     let minLng = 180;
     let maxLng = -180;
+    let rotasVisualizadas = 0;
 
     // Agrupa stops por rota
     result.routes.forEach((route) => {
@@ -268,6 +276,14 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
     // Converte para array
     const groups = Object.values(grouped);
     setRouteGroups(groups);
+    
+    // 🔍 DEBUG: Mostra resultado do filtro
+    console.log(`  📊 Resultado do filtro: ${groups.length} rota(s) visualizada(s) (de ${result.routes.length} total)`);
+    groups.forEach(g => {
+      const promoterId = result.routeAssignments?.[g.routeNumber];
+      const promoter = result.promoters?.find(p => p.id === promoterId);
+      console.log(`  ✅ Rota ${g.routeNumber} (Promoter: ${promoter?.name || 'Desconhecido'}) - ${g.markers.length} cliente(s)`);
+    });
     
     // Debug: log rotas geradas
     console.log(`📍 MapLeafletRoutes: ${groups.length} grupo(s) de rotas processados`);

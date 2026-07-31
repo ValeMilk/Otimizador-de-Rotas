@@ -1791,6 +1791,18 @@ export async function gerarRotasDinamicamente(
   // Fazer ANTES de construir rotasFinais para usar IDs corretos!
   const routeAssignments = atribuirRotasAPromoters(rotasGeradas, [], promoters, matrizTempos);
   
+  // 🔍 DEBUG: Mostra mapeamento de rotas por promoter
+  console.log(`\n🔍 DEBUG: Mapeamento de Rotas por Promoter:`);
+  const rotasPorPromoter: { [promoterId: string]: number[] } = {};
+  Object.entries(routeAssignments).forEach(([routeNum, promoterId]) => {
+    if (!rotasPorPromoter[promoterId]) rotasPorPromoter[promoterId] = [];
+    rotasPorPromoter[promoterId].push(parseInt(routeNum));
+  });
+  Object.entries(rotasPorPromoter).forEach(([promoterId, rotas]) => {
+    const promoter = promoters.find(p => p.id === promoterId);
+    console.log(`  ${promoter?.name || promoterId}: Rotas [${rotas.join(', ')}]`);
+  });
+  
   // Atualiza promotorId nas rotas com a atribuição balanceada final
   rotasGeradas.forEach((rota, idx) => {
     if (routeAssignments[rota.numero]) {
