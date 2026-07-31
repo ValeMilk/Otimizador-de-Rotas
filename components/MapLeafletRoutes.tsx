@@ -46,9 +46,9 @@ const createHouseIcon = () => {
 
 interface MapLeafletRoutesProps {
   result: OptimizationResult;
-  selectedRoute?: number | null;
+  selectedRoutes?: number[];
   selectedDay?: string | null;
-  selectedPromoter?: string | null;
+  selectedPromoters?: string[];
 }
 
 const ROUTE_COLORS = [
@@ -89,9 +89,9 @@ interface MapBounds {
 
 export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
   result,
-  selectedRoute = null,
+  selectedRoutes = [],
   selectedDay = null,
-  selectedPromoter = null,
+  selectedPromoters = [],
 }) => {
   const [routeGroups, setRouteGroups] = useState<RouteGroup[]>([]);
   const [mapCenter, setMapCenter] = useState<[number, number]>([-3.7327, -38.5270]); // Fortaleza-CE
@@ -182,12 +182,13 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
       if (selectedDay !== null && route.day !== selectedDay) return;
 
       const routeNumber = route.routeNumber || 1;
-      if (selectedRoute !== null && routeNumber !== selectedRoute) return;
+      // ✅ Filtro de múltiplas rotas: se selectedRoutes não está vazio, apenas mostra rotas selecionadas
+      if (selectedRoutes.length > 0 && !selectedRoutes.includes(routeNumber)) return;
 
-      // Aplica filtro de promotor
-      if (selectedPromoter !== null) {
+      // ✅ Filtro de múltiplos promotores: se selectedPromoters não está vazio, apenas mostra promotores selecionados
+      if (selectedPromoters.length > 0) {
         const assignedPromoterId = result.routeAssignments?.[routeNumber];
-        if (assignedPromoterId !== selectedPromoter) return;
+        if (!assignedPromoterId || !selectedPromoters.includes(assignedPromoterId)) return;
       }
 
       if (!grouped[routeNumber]) {
@@ -311,9 +312,9 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
       setBounds({ minLat, maxLat, minLng, maxLng });
     }
 
-    // Captura localização do promotor selecionado
-    if (selectedPromoter && result.promoters) {
-      const promoter = result.promoters.find((p) => p.id === selectedPromoter);
+    // Captura localização do promotor selecionado (apenas se houver 1 único selecionado)
+    if (selectedPromoters.length === 1 && result.promoters) {
+      const promoter = result.promoters.find((p) => p.id === selectedPromoters[0]);
       if (promoter) {
         setPromoterLocation({
           name: promoter.name,
@@ -327,7 +328,7 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
     } else {
       setPromoterLocation(null);
     }
-  }, [result, selectedRoute, selectedDay, selectedPromoter]);
+  }, [result, selectedRoutes, selectedDay, selectedPromoters]);
 
   // Busca traçados do OSRM para cada rota visível (PARALELIZADO)
   useEffect(() => {

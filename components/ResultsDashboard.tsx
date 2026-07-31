@@ -20,9 +20,9 @@ interface ResultsDashboardProps {
 }
 
 export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result }) => {
-  const [selectedRoute, setSelectedRoute] = useState<number | null>(null);
+  const [selectedRoutes, setSelectedRoutes] = useState<number[]>([]);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const [selectedPromoter, setSelectedPromoter] = useState<string | null>(null);
+  const [selectedPromoters, setSelectedPromoters] = useState<string[]>([]);
   
   // Ordem dos dias da semana em português
   const dayOrder: { [key: string]: number } = {
@@ -167,74 +167,98 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result }) =>
           </div>
           
           {/* Filtros */}
-          <div className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200">
+          <div className="space-y-4 p-4 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center gap-2 text-sm font-semibold text-gray-700">
               <Filter className="w-4 h-4" />
-              Filtros:
+              Filtros de Rotas (Selecione múltiplas):
             </div>
             
-            {/* Filtro de Rota */}
-            <select
-              value={selectedRoute ?? ''}
-              onChange={(e) => setSelectedRoute(e.target.value === '' ? null : parseInt(e.target.value))}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Todas as Rotas ({uniqueRoutes.length})</option>
+            {/* Filtro de Rotas - Checkboxes para múltipla seleção */}
+            <div className="flex flex-wrap gap-3">
               {uniqueRoutes.map((route) => (
-                <option key={route} value={route}>
-                  Rota {route}
-                </option>
+                <label key={route} className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-blue-50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={selectedRoutes.includes(route)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedRoutes([...selectedRoutes, route]);
+                      } else {
+                        setSelectedRoutes(selectedRoutes.filter(r => r !== route));
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-gray-300"
+                  />
+                  <span className="text-sm text-gray-700 font-medium">Rota {route}</span>
+                </label>
               ))}
-            </select>
+            </div>
+
+            {/* Separador */}
+            <div className="border-t border-gray-200 pt-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                🏍️ Filtros de Promotores (Selecione múltiplos):
+              </div>
+              
+              {/* Filtro de Promotores - Checkboxes para múltipla seleção */}
+              {uniquePromoters.length > 0 && (
+                <div className="flex flex-wrap gap-3">
+                  {uniquePromoters.map((promoter) => (
+                    <label key={promoter.id} className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-green-50 cursor-pointer transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={selectedPromoters.includes(promoter.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedPromoters([...selectedPromoters, promoter.id]);
+                          } else {
+                            setSelectedPromoters(selectedPromoters.filter(p => p !== promoter.id));
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700 font-medium">{promoter.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Filtro de Dia */}
-            <select
-              value={selectedDay ?? ''}
-              onChange={(e) => setSelectedDay(e.target.value === '' ? null : e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Todos os Dias ({uniqueDays.length})</option>
-              {uniqueDays.map((day) => (
-                <option key={day} value={day}>
-                  {day}
-                </option>
-              ))}
-            </select>
-
-            {/* Filtro de Promotor */}
-            {uniquePromoters.length > 0 && (
+            <div className="border-t border-gray-200 pt-4">
+              <div className="text-sm font-semibold text-gray-700 mb-3">📅 Filtro de Dia:</div>
               <select
-                value={selectedPromoter ?? ''}
-                onChange={(e) => setSelectedPromoter(e.target.value === '' ? null : e.target.value)}
+                value={selectedDay ?? ''}
+                onChange={(e) => setSelectedDay(e.target.value === '' ? null : e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Todos os Promotores ({uniquePromoters.length})</option>
-                {uniquePromoters.map((promoter) => (
-                  <option key={promoter.id} value={promoter.id}>
-                    🏍️ {promoter.name}
+                <option value="">Todos os Dias ({uniqueDays.length})</option>
+                {uniqueDays.map((day) => (
+                  <option key={day} value={day}>
+                    {day}
                   </option>
                 ))}
               </select>
-            )}
+            </div>
 
             {/* Botão Limpar Filtros */}
-            {(selectedRoute !== null || selectedDay !== null || selectedPromoter !== null) && (
+            {(selectedRoutes.length > 0 || selectedDay !== null || selectedPromoters.length > 0) && (
               <button
                 onClick={() => {
-                  setSelectedRoute(null);
+                  setSelectedRoutes([]);
                   setSelectedDay(null);
-                  setSelectedPromoter(null);
+                  setSelectedPromoters([]);
                 }}
-                className="ml-auto px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="mt-4 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
-                Limpar Filtros
+                ✕ Limpar Todos os Filtros
               </button>
             )}
           </div>
         </div>
         
         <div className="p-4">
-          <MapLeafletRoutes result={result} selectedRoute={selectedRoute} selectedDay={selectedDay} selectedPromoter={selectedPromoter} />
+          <MapLeafletRoutes result={result} selectedRoutes={selectedRoutes} selectedDay={selectedDay} selectedPromoters={selectedPromoters} />
         </div>
       </div>
 
