@@ -13,10 +13,10 @@ Sistema inteligente de roteirização para promotores de vendas com otimização
 
 ## 🎯 Versão Atual
 
-**v4.8.2** - Opção A Implementada
-- ✅ 135/135 clientes alocados (100%)
-- ✅ 12 rotas (8 compactas + 4 solo)
-- ✅ 92.68% utilização média
+**v4.12.0** - Rotas cheias (~44h) primeiro, promotor mais próximo depois
+- ✅ Rotas fecham por horas (não por distância): cada rota chega perto de 44h semanais
+- ✅ Rota pronta → promotor cuja casa está mais próxima (1 rota por promotor)
+- ✅ Rotas que excedem os promotores viram "Rota adicional N"
 
 ## 🚀 Quick Start (Local)
 
@@ -99,24 +99,23 @@ Todo push na branch `main` dispara:
 - Haversine formula + fallback OSRM para distâncias
 - Export via `exceljs`
 
-### Algoritmo (v4.8.2)
+### Algoritmo (v4.12.0)
 
-**Fase 1: Rotas Geographicamente Compactas**
-- Seed selection por frequência do cliente
-- Nucleus formation com 1-2 nearest neighbors
-- Centroid congelado (previne drift)
-- **Hard stop em 3km** (sem exceções)
-- ≤ 8-10 rotas compactas com 10-15 clientes cada
+**Fase 1: Rotas cheias por proximidade**
+- Seed = cliente de maior frequência; núcleo = 2 vizinhos mais próximos
+- Centroide congelado do núcleo (previne drift)
+- Percorre todos os clientes restantes do mais próximo ao mais distante, **sem limite de distância**
+- A rota só fecha quando nenhum cliente restante cabe na semana (8h seg-sex, 4h sáb)
+- Frequência sempre 100%: ou entram todas as visitas do cliente, ou nenhuma
 
-**Fase 1B: Rotas Solo para Clientes Restantes**
-- Para clientes não alocados na Fase 1
-- Cria 1 rota por cliente não alocado
-- Aceita 60-70% utilização (vs 90%+ das compactas)
-- **Garante 100% alocação (Opção A)**
+**Fase 1B: Rotas Solo**
+- Só para clientes que não cabem nem numa semana vazia (ex.: frequência maior que os dias disponíveis)
+- Último recurso permite frequência parcial, com aviso no relatório
 
 **Fase 2: Atribuição a Promotores**
-- Calcula centroid de cada rota
-- Aloca ao promoter mais próximo por distância Haversine
+- Calcula o centroide de cada rota e a distância até a casa de cada promotor
+- Casa os pares (rota, promotor) mais próximos primeiro, 1 rota por promotor
+- Rotas que sobram viram **"Rota adicional N"** (cada uma = um promotor a mais necessário)
 
 ## 📁 Estrutura do Projeto
 
@@ -192,7 +191,12 @@ Use o arquivo fornecido: `auto_servico_2026_corrigido.csv`
 
 ## 📝 Changelog
 
-### v4.8.2 (Atual - 21 Jul 2026)
+### v4.12.0 (Atual - 21 Set 2026)
+- ✅ Rotas fecham por horas (~44h), não mais por raio 4 km / diâmetro 8 km
+- ✅ Atribuição casa os pares (rota, promotor) mais próximos primeiro
+- ✅ v4.11.x: "Rota adicional N" para rotas além dos promotores; raio da Terra corrigido (6371 km); rota solo com N visitas reais; seed inviável não aborta mais a Fase 1
+
+### v4.8.2 (21 Jul 2026)
 - ✅ **Opção A Completa**: 135/135 clientes garantidos
 - ✅ 12 rotas automáticas (8 compactas + 4 solo)
 - ✅ Rebalanceamento desativado para máxima alocação

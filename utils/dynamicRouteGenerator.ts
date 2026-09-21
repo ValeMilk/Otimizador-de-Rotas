@@ -1,5 +1,14 @@
 /**
- * ⚡ NOVO MOTOR v4.0 - ESTRUTURA DE PROMOTOR COM AGENDA SEMANAL
+ * ⚡ MOTOR v4.12.0 - ROTAS CHEIAS (~44h) PRIMEIRO, PROMOTOR MAIS PRÓXIMO DEPOIS
+ *
+ * ORDEM DAS REGRAS:
+ * 1. FASE 1: forma rotas por proximidade (centroide congelado), SEM limite de
+ *    distância, e só fecha uma rota quando nenhum cliente restante cabe na
+ *    semana (8h seg-sex, 4h sáb). Resultado: rotas perto de 44h.
+ * 2. FASE 1B: clientes que não cabem nem numa semana vazia viram rota solo.
+ * 3. FASE 2: casa os pares (rota, promotor) mais próximos primeiro, 1 rota
+ *    por promotor. Rotas que sobram viram "Rota adicional N".
+ *
  * 
  * MODELO CORRETO:
  * - Uma Rota = Um Promotor
@@ -26,6 +35,7 @@ const DIAS_INGLES = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'sa
 const CAPACIDADES = [480, 480, 480, 480, 480, 240]; // minutos por dia (seg-sex: 8h, sáb: 4h)
 const HORA_INICIO = 8 * 60; // 08:00
 const HORAS_OBRIGATORIAS_SEMANA = 44 * 60; // 44h em minutos = 2640 min (8h seg-sex + 4h sab)
+const CAPACIDADE_SEMANAL_MIN = CAPACIDADES.reduce((a, b) => a + b, 0); // 2880 min (5×480 + 240)
 
 // ============================================================================
 // TIPOS INTERNOS
@@ -332,63 +342,48 @@ function atribuirRotasAPromoters(
     cargaRota[rota.numero] = tempoTotal;
   });
 
-  // ESTRATÉGIA: Para cada rota, aloca ao promoter mais próximo DISPONÍVEL (1 rota por promoter)
-  console.log(`\n🔄 Alocando rotas por proximidade (1 rota por promoter OBRIGATÓRIO):`);
-  
+  // ESTRATÉGIA v4.12.0: casa os pares (rota, promotor) MAIS PRÓXIMOS primeiro.
+  // Calcula todas as distâncias casa↔centroide, ordena e atribui enquanto
+  // rota e promotor estiverem livres (1 rota por promotor).
+  console.log(`\n🔄 Casando pares (rota, promotor) por proximidade — 1 rota por promotor:`);
+
+  const centroides: { [routeNumber: number]: { lat: number; lng: number } } = {};
   rotasGeradas.forEach(rota => {
-    const cargaDaRota = cargaRota[rota.numero];
-    
-    // Calcula centroide da rota
-    const centroide = {
+    centroides[rota.numero] = {
       lat: rota.clientesNaRota.reduce((s, c) => s + c.cliente.latitude, 0) / rota.clientesNaRota.length,
-      lng: rota.clientesNaRota.reduce((s, c) => s + c.cliente.longitude, 0) / rota.clientesNaRota.length
+      lng: rota.clientesNaRota.reduce((s, c) => s + c.cliente.longitude, 0) / rota.clientesNaRota.length,
     };
-
-    // Calcula distância de TODOS os promoters ao centroide
-    const promotoresComDistancia = promotoresComCoord
-      .map(p => ({
-        promoter: p,
-        distancia: calcularDistanciaHaversine(p.latitude, p.longitude, centroide.lat, centroide.lng),
-        rotas: rotasPromoter[p.id], // NOVO: Quantas rotas já tem
-      }))
-      .sort((a, b) => {
-        // NOVO: Prioritária 1 - Promoter sem rota ainda
-        if (a.rotas === 0 && b.rotas > 0) return -1;
-        if (a.rotas > 0 && b.rotas === 0) return 1;
-        
-        // Prioritária 2 - Proximidade (para promoters sem rota)
-        return a.distancia - b.distancia;
-      });
-
-    // Tenta alocar ao promoter mais próximo que ainda NÃO TEM ROTA
-    let promoterEscolhido: Promoter | null = null;
-    let distanciaEscolhida: number = Infinity;
-
-    for (const { promoter, distancia, rotas } of promotoresComDistancia) {
-      // 🔴 VALIDAÇÃO CRÍTICA: Promoter pode ter NO MÁXIMO 1 rota
-      if (rotas >= 1) {
-        console.log(`  ⏭️  ${promoter.name}: JÁ TEM ${rotas} ROTA(s) - PULA`);
-        continue;
-      }
-
-      // Promoter está livre! Aloca aqui
-      promoterEscolhido = promoter;
-      distanciaEscolhida = distancia;
-      break;
-    }
-
-    if (promoterEscolhido) {
-      assignments[rota.numero] = promoterEscolhido.id;
-      rotasPromoter[promoterEscolhido.id]++; // NOVO: Incrementa contador
-
-      const horasRota = Math.floor(cargaDaRota / 60);
-      const minsRota = cargaDaRota % 60;
-      
-      console.log(`  ✅ Rota ${rota.numero} (${horasRota}h ${minsRota}m) → ${promoterEscolhido.name} (${distanciaEscolhida.toFixed(1)}km)`);
-    } else {
-      console.error(`  ❌ Rota ${rota.numero}: SEM PROMOTER DISPONÍVEL! (todos têm 1 rota)`);
-    }
   });
+
+  const pares: Array<{ rota: RotaEmConstrucao; promoter: Promoter; distancia: number }> = [];
+  for (const rota of rotasGeradas) {
+    for (const promoter of promotoresComCoord) {
+      pares.push({
+        rota,
+        promoter,
+        distancia: calcularDistanciaHaversine(
+          promoter.latitude, promoter.longitude,
+          centroides[rota.numero].lat, centroides[rota.numero].lng
+        ),
+      });
+    }
+  }
+  pares.sort((a, b) => a.distancia - b.distancia);
+
+  for (const { rota, promoter, distancia } of pares) {
+    if (assignments[rota.numero] !== undefined) continue; // rota já tem promotor
+    if (rotasPromoter[promoter.id] >= 1) continue; // promotor já tem rota
+
+    assignments[rota.numero] = promoter.id;
+    rotasPromoter[promoter.id]++;
+
+    const carga = cargaRota[rota.numero];
+    console.log(`  ✅ Rota ${rota.numero} (${Math.floor(carga / 60)}h ${carga % 60}m) → ${promoter.name} (${distancia.toFixed(1)} km)`);
+  }
+
+  rotasGeradas
+    .filter(r => assignments[r.numero] === undefined)
+    .forEach(r => console.warn(`  ⚠️ Rota ${r.numero}: sem promotor livre (todos já têm 1 rota) → rota adicional`));
 
   // Relatório final
   console.log(`\n📋 Resumo da Alocação Final (1:1 Mapping):`);
@@ -844,9 +839,6 @@ function construirRotaGreedyGeografica(
 
   if (poolGlobal.length === 0) return { rota, clientesAlocados };
 
-  const RAIO_MAXIMO_ROTA_KM = 4.0; // Raio ao centroide (aumentado de 3.0 para 4.0)
-  const DIAMETRO_MAXIMO_ROTA_KM = 8.0; // Distância máxima entre quaisquer 2 clientes (aumentado de 5.0 para 8.0)
-
   // ─────────────────────────────────────────────────────────────
   // FASE 1: SEED = cliente com maior frequência
   // ─────────────────────────────────────────────────────────────
@@ -934,67 +926,29 @@ function construirRotaGreedyGeografica(
   );
 
   // ─────────────────────────────────────────────────────────────
-  // FASE 3: GREEDY AO REDOR DO CENTROIDE CONGELADO (3KM RIGOROSO)
-  // PARA quando vizinho > 3km - SEM META DE UTILIZAÇÃO
+  // FASE 3 (v4.12.0): GREEDY AO REDOR DO CENTROIDE CONGELADO, FECHA POR HORAS
+  // Percorre TODOS os candidatos do mais próximo ao mais distante. A rota só
+  // fecha quando nenhum cliente restante cabe na semana (~44h).
+  // Sem limite de distância: sempre o mais próximo disponível.
   // ─────────────────────────────────────────────────────────────
-  const rejeitados = new Set<string>();
-  let ciclosSemSucesso = 0;
-  const MAX_CICLOS_REJEITADOS = 5;
+  const candidatos = poolGlobal
+    .map(c => ({
+      cliente: c,
+      dist: calcularDistanciaHaversine(c.cliente.latitude, c.cliente.longitude, centroLat, centroLng),
+    }))
+    .sort((a, b) => a.dist - b.dist);
 
-  while (poolGlobal.length > 0 && ciclosSemSucesso < MAX_CICLOS_REJEITADOS) {
-    // Encontra vizinho MAIS PRÓXIMO DO CENTROIDE
-    let melhorIdx = -1;
-    let melhorDist = Infinity;
+  // Menor visita do pool: se nem ela cabe no tempo livre da semana, nada mais cabe
+  const menorVisitaPool = candidatos.length > 0
+    ? Math.min(...candidatos.map(x => x.cliente.cliente.visitDurationMinutes))
+    : Infinity;
 
-    for (let i = 0; i < poolGlobal.length; i++) {
-      if (rejeitados.has(poolGlobal[i].cliente.id)) continue;
-
-      const dist = calcularDistanciaHaversine(
-        poolGlobal[i].cliente.latitude, poolGlobal[i].cliente.longitude,
-        centroLat, centroLng
-      );
-
-      if (dist < melhorDist) {
-        melhorDist = dist;
-        melhorIdx = i;
-      }
-    }
-
-    if (melhorIdx === -1) {
-      console.log(`  🛑 Nenhum candidato não-rejeitado`);
+  let naoCouberam = 0;
+  for (const { cliente: candidato } of candidatos) {
+    const livreSemana = CAPACIDADE_SEMANAL_MIN - calcularTempoUsadoSemanal(rota);
+    if (livreSemana < menorVisitaPool) {
+      console.log(`  🛑 Semana cheia: ${livreSemana} min livres < menor visita do pool (${menorVisitaPool} min)`);
       break;
-    }
-
-    // 🚫 Se está muito longe, para (não tenta forçar)
-    if (melhorDist > RAIO_MAXIMO_ROTA_KM) {
-      console.log(
-        `  🛑 Vizinho mais próximo a ${melhorDist.toFixed(1)} km > raio ${RAIO_MAXIMO_ROTA_KM} km, encerrando rota`
-      );
-      break;
-    }
-
-    const candidato = poolGlobal[melhorIdx];
-    
-    // 🔍 VERIFICAÇÃO ADICIONAL: Calcula diâmetro da rota se adicionarmos este candidato
-    let diametroMax = 0;
-    for (const c1 of rota.clientesNaRota) {
-      const distToCandidato = calcularDistanciaHaversine(
-        c1.cliente.latitude, c1.cliente.longitude,
-        candidato.cliente.latitude, candidato.cliente.longitude
-      );
-      if (distToCandidato > diametroMax) {
-        diametroMax = distToCandidato;
-      }
-    }
-
-    // 🚫 Rejeita se o diâmetro ultrapassar o limite (mesmo que esteja dentro do raio do centroide)
-    if (diametroMax > DIAMETRO_MAXIMO_ROTA_KM) {
-      console.log(
-        `  ⚠️ Cliente "${candidato.cliente.name}" rejeitado: diâmetro seria ${diametroMax.toFixed(1)} km > ${DIAMETRO_MAXIMO_ROTA_KM} km`
-      );
-      rejeitados.add(candidato.cliente.id);
-      ciclosSemSucesso++;
-      continue;
     }
 
     const alocacoes = processarFrequenciaCliente(candidato, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
@@ -1002,13 +956,15 @@ function construirRotaGreedyGeografica(
     if (alocacoes > 0) {
       rota.clientesNaRota.push(candidato);
       clientesAlocados.push(candidato);
-      poolGlobal.splice(melhorIdx, 1);
-      ciclosSemSucesso = 0;
+      const idx = poolGlobal.indexOf(candidato);
+      if (idx >= 0) poolGlobal.splice(idx, 1);
     } else {
-      // Não coube, marca como rejeitado
-      rejeitados.add(candidato.cliente.id);
-      ciclosSemSucesso++;
+      naoCouberam++;
     }
+  }
+
+  if (naoCouberam > 0) {
+    console.log(`  ℹ️ ${naoCouberam} candidato(s) não couberam na agenda desta rota (ficam para a próxima)`);
   }
 
   const utilFinal = calcularUtilizacaoMediaSemanal(rota);
@@ -1234,15 +1190,17 @@ function validarEficienciaRotas(rotasGeradas: RotaEmConstrucao[]): string[] {
  * Calcula utilização média semanal de uma rota
  * Retorna percentual (0-100)
  */
-function calcularUtilizacaoMediaSemanal(rota: RotaEmConstrucao): number {
+function calcularTempoUsadoSemanal(rota: RotaEmConstrucao): number {
   let tempoTotalUsado = 0;
   for (let dia = 0; dia <= 5; dia++) {
     tempoTotalUsado += rota.agenda[dia].tempoUsado;
   }
-  
+  return tempoTotalUsado;
+}
+
+function calcularUtilizacaoMediaSemanal(rota: RotaEmConstrucao): number {
   // Total de capacidade semanal: 2880 min (480*5 + 240*1)
-  const capacidadeSemanal = 480 * 5 + 240 * 1; // 2880
-  return (tempoTotalUsado / capacidadeSemanal) * 100;
+  return (calcularTempoUsadoSemanal(rota) / CAPACIDADE_SEMANAL_MIN) * 100;
 }
 
 /**
@@ -1602,14 +1560,12 @@ export async function gerarRotasDinamicamente(
   // NOVO: Calcular demanda total e número ótimo de rotas (Cenário 1)
   const demandaTotal = calcularDemandaTotal(clientes);
   const rotasOtimas = Math.ceil(demandaTotal / HORAS_OBRIGATORIAS_SEMANA);
-  const limiteRotas = Math.min(rotasOtimas, promoters.length > 0 ? promoters.length : 100);
   
   console.log(`\n📊 NOVO MODELO - 43h30/44h OBRIGATÓRIO POR PROMOTER:`);
   console.log(`  - Demanda total: ${demandaTotal} min (${(demandaTotal / 60).toFixed(1)}h)`);
   console.log(`  - Horas obrigatórias/promoter: ${HORAS_OBRIGATORIAS_SEMANA} min (44h)`);
   console.log(`  - Rotas ótimas calculadas: ${rotasOtimas}`);
   console.log(`  - Promoters disponíveis: ${promoters.length}`);
-  console.log(`  - Limite de rotas (min): ${limiteRotas} (Cenário 1: ${limiteRotas} promoters usados, ${promoters.length - limiteRotas} parados)\n`);
 
   // 3. CONSTRUÇÃO GREEDY GEOGRÁFICA v4.3 — ROTAS ANTES DOS PROMOTORES
   //    - PRIORIDADE 1: Agrupar lojas por proximidade (geolocalização)
