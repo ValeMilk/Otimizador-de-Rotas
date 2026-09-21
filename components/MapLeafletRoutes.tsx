@@ -76,6 +76,8 @@ interface RouteGroup {
     day?: string;
   }>;
   polylinePath: Array<[number, number]>;
+  nome: string; // nome do promotor ou "Rota adicional N"
+  temPromotor: boolean; // false = rota adicional (sem casa de promotor)
   promoterLat: number;
   promoterLng: number;
 }
@@ -109,8 +111,14 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
   const mapRef = useRef<any>(null);
 
   // Função interna para buscar traçado OSRM com garantia de renderização
-  async function buscarTrassadoOSRM(clientes: any[], casa: any): Promise<[number, number][]> {
-    const pontos = [casa, ...clientes, casa];
+  async function buscarTrassadoOSRM(clientes: any[], casa: any | null): Promise<[number, number][]> {
+    // Rota adicional (sem promotor): traça apenas cliente→cliente, sem casa
+    const pontos = casa ? [casa, ...clientes, casa] : [...clientes];
+
+    // OSRM exige ao menos 2 coordenadas; com 1 ponto não há linha para traçar
+    if (pontos.length < 2) {
+      return pontos.map(p => [p.latitude, p.longitude]);
+    }
     
     // OSRM Route API tem limite de 100 coordenadas
     // Para rotas muito longas, simplifica pegando pontos chave
@@ -119,7 +127,7 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
       // Mantém casa inicial, casa final, e pontos espaçados uniformemente
       const step = Math.ceil(clientes.length / 48);
       const clientesSelecionados = clientes.filter((_, i) => i % step === 0);
-      pontosSimplificados = [casa, ...clientesSelecionados, casa];
+      pontosSimplificados = casa ? [casa, ...clientesSelecionados, casa] : clientesSelecionados;
       console.log(`🗺️ Rota simplificada: ${pontos.length} → ${pontosSimplificados.length} pontos`);
     }
     
@@ -193,22 +201,27 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
       // ✅ Filtro de múltiplas rotas: se selectedRoutes não está vazio, apenas mostra rotas selecionadas
       if (selectedRoutes.length > 0 && !selectedRoutes.includes(routeNumber)) return;
 
+      // Identificador do "dono" da rota: promotor real ou id interno da rota adicional
+      const rotaInfo = result.rotas?.find((r) => r.id === routeNumber);
+      const ownerId = rotaInfo?.promoterId ?? result.routeAssignments?.[routeNumber];
+
       // ✅ Filtro de múltiplos promotores: se selectedPromoters não está vazio, apenas mostra promotores selecionados
+      // (rotas adicionais também são filtráveis pelo seu id interno)
       if (selectedPromoters.length > 0) {
-        const assignedPromoterId = result.routeAssignments?.[routeNumber];
-        if (!assignedPromoterId || !selectedPromoters.includes(assignedPromoterId)) return;
+        if (!ownerId || !selectedPromoters.includes(ownerId)) return;
       }
 
       if (!grouped[routeNumber]) {
-        const promoterId = result.routeAssignments?.[routeNumber];
-        const promoter = result.promoters?.find((p) => p.id === promoterId);
+        const promoter = result.promoters?.find((p) => p.id === ownerId);
 
         grouped[routeNumber] = {
           routeNumber,
           color: ROUTE_COLORS[routeNumber % ROUTE_COLORS.length],
           markers: [],
           polylinePath: [],
-          // Se não houver promotor, usa a primeira parada como referência (evita coord 0,0)
+          nome: promoter?.name ?? rotaInfo?.nome ?? `Rota ${routeNumber}`,
+          // Rota adicional (sem promotor): não há casa; nunca usar 0,0 como fallback
+          temPromotor: !!promoter,
           promoterLat: promoter?.latitude ?? 0,
           promoterLng: promoter?.longitude ?? 0,
         };
@@ -224,8 +237,8 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
                   Math.abs(lat) > 0.001 && Math.abs(lng) > 0.001);
       };
       
-      // Verifica se promotor tem coordenadas válidas
-      const promoterValido = isCoordValida(group.promoterLat, group.promoterLng);
+      // Verifica se promotor existe e tem coordenadas válidas
+      const promoterValido = group.temPromotor && isCoordValida(group.promoterLat, group.promoterLng);
 
       // Adiciona casa do promotor como ponto inicial (apenas se válido)
       if (group.polylinePath.length === 0 && promoterValido) {
@@ -280,15 +293,14 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
     // 🔍 DEBUG: Mostra resultado do filtro
     console.log(`  📊 Resultado do filtro: ${groups.length} rota(s) visualizada(s) (de ${result.routes.length} total)`);
     groups.forEach(g => {
-      const promoterId = result.routeAssignments?.[g.routeNumber];
-      const promoter = result.promoters?.find(p => p.id === promoterId);
-      console.log(`  ✅ Rota ${g.routeNumber} (Promoter: ${promoter?.name || 'Desconhecido'}) - ${g.markers.length} cliente(s)`);
+      console.log(`  ✅ Rota ${g.routeNumber} (${g.temPromotor ? 'Promoter: ' : ''}${g.nome}) - ${g.markers.length} cliente(s)`);
     });
     
     // Debug: log rotas geradas
     console.log(`📍 MapLeafletRoutes: ${groups.length} grupo(s) de rotas processados`);
     groups.forEach(g => {
-      console.log(`  Rota ${g.routeNumber}: ${g.markers.length} marcador(es), promoter em [${g.promoterLat.toFixed(4)}, ${g.promoterLng.toFixed(4)}]`);
+      const casaInfo = g.temPromotor ? `promoter em [${g.promoterLat.toFixed(4)}, ${g.promoterLng.toFixed(4)}]` : 'sem promotor (rota adicional)';
+      console.log(`  Rota ${g.routeNumber}: ${g.markers.length} marcador(es), ${casaInfo}`);
       console.log(`    polylinePath tem ${g.polylinePath.length} ponto(s)`);
       if (g.polylinePath.length > 0) {
         console.log(`    Primeiro ponto: [${g.polylinePath[0][0].toFixed(4)}, ${g.polylinePath[0][1].toFixed(4)}]`);
@@ -302,8 +314,8 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
       let count = 0;
 
       groups.forEach((group) => {
-        // Adiciona promoter apenas se coordenadas válidas
-        if (group.promoterLat !== 0 && group.promoterLng !== 0) {
+        // Adiciona promoter apenas se existir e tiver coordenadas válidas
+        if (group.temPromotor && group.promoterLat !== 0 && group.promoterLng !== 0) {
           sumLat += group.promoterLat;
           sumLng += group.promoterLng;
           count++;
@@ -372,7 +384,7 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
           const chave = `${group.routeNumber}-${group.markers.map((m) => m.label).join(',')}`;
           const trajetoReal = await buscarTrassadoOSRM(
             group.markers.map((m) => ({ latitude: m.lat, longitude: m.lng })),
-            { latitude: group.promoterLat, longitude: group.promoterLng }
+            group.temPromotor ? { latitude: group.promoterLat, longitude: group.promoterLng } : null
           );
           return { chave, trajeto: trajetoReal };
         })
@@ -489,7 +501,7 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
                       </p>
                     )}
                     <p>
-                      <strong>🛣️ Rota:</strong> {group.routeNumber}
+                      <strong>🛣️ Rota:</strong> {group.routeNumber} ({group.nome})
                     </p>
                     {marker.day && (
                       <p>
@@ -515,8 +527,8 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
           ))
         )}
 
-        {/* Marcadores da Casa do Promotor */}
-        {routeGroups.map((group) => (
+        {/* Marcadores da Casa do Promotor (rotas adicionais não têm casa) */}
+        {routeGroups.filter((group) => group.temPromotor).map((group) => (
           <Marker
             key={`house-${group.routeNumber}`}
             position={[group.promoterLat, group.promoterLng]}
@@ -578,6 +590,7 @@ export const MapLeafletRoutes: React.FC<MapLeafletRoutesProps> = ({
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-gray-800">Rota {group.routeNumber}</p>
+                <p className={group.temPromotor ? 'text-gray-600' : 'text-amber-700 font-medium'}>{group.nome}</p>
                 <p className="text-gray-600">{group.markers.length} parada(s)</p>
               </div>
             </div>

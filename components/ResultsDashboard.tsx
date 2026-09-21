@@ -41,21 +41,23 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result }) =>
   // Extrai rotas únicas
   const uniqueRoutes = Array.from(new Set(result.routes?.map(r => r.routeNumber || 1) || [])).sort((a, b) => a - b);
 
-  // Extrai promotores únicos com suas rotas atribuídas
-  const uniquePromoters = Array.from(new Set(
-    Object.entries(result.routeAssignments || {})
-      .map(([_, promoterId]) => promoterId)
-  )).map(promoterId => {
-    const promoter = result.promoters?.find(p => p.id === promoterId);
-    const assignedRoutes = Object.entries(result.routeAssignments || {})
-      .filter(([_, pId]) => pId === promoterId)
-      .map(([routeNum, _]) => parseInt(routeNum));
-    return {
-      id: promoterId,
-      name: promoter?.name || 'Desconhecido',
-      routes: assignedRoutes,
-    };
-  });
+  // Extrai promotores únicos com suas rotas atribuídas.
+  // Fonte: result.rotas — promoterId é o promotor real ou, para rotas adicionais
+  // (sem promotor), o id interno da rota; o nome vem de rota.nome ("Rota adicional N").
+  const uniquePromoters = (result.rotas || []).reduce<{ id: string; name: string; routes: number[] }[]>((acc, rota) => {
+    const promoter = result.promoters?.find(p => p.id === rota.promoterId);
+    const existing = acc.find(e => e.id === rota.promoterId);
+    if (existing) {
+      existing.routes.push(rota.id);
+    } else {
+      acc.push({
+        id: rota.promoterId,
+        name: promoter?.name || rota.nome || 'Desconhecido',
+        routes: [rota.id],
+      });
+    }
+    return acc;
+  }, []);
 
   const handleExport = () => {
     exportRoutesToExcelNew(result);
@@ -88,6 +90,7 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result }) =>
             {uniqueRoutes.map((routeNumber) => {
               const promoterId = result.routeAssignments![routeNumber];
               const promoter = result.promoters?.find(p => p.id === promoterId);
+              const rotaInfo = result.rotas?.find(r => r.id === routeNumber);
               const routeClients = result.routes?.filter(r => r.routeNumber === routeNumber) || [];
               const totalClients = routeClients.length;
 
@@ -111,7 +114,8 @@ export const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ result }) =>
                     </div>
                   ) : (
                     <div className="border-t border-gray-200 pt-3">
-                      <p className="text-sm text-gray-500 italic">Promotor não atribuído</p>
+                      <p className="text-sm font-semibold text-amber-700">{rotaInfo?.nome || 'Rota adicional'}</p>
+                      <p className="text-xs text-gray-500 italic mt-1">Sem promotor cadastrado</p>
                     </div>
                   )}
                 </div>

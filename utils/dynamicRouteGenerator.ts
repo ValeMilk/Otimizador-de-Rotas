@@ -1806,6 +1806,25 @@ export async function gerarRotasDinamicamente(
     }
   });
 
+  // 7️⃣b ROTAS ADICIONAIS: rotas que excedem os promotores cadastrados
+  // Cada rota sem promotor recebe o nome "Rota adicional N" (N sequencial)
+  const rotasAdicionais: string[] = [];
+  if (promoters.length > 0) {
+    let contadorAdicional = 0;
+    rotasGeradas.forEach((rota, idx) => {
+      if (routeAssignments[rota.numero]) return;
+      contadorAdicional++;
+      const nomeAdicional = `Rota adicional ${contadorAdicional}`;
+      promotorRotas[idx].nome = nomeAdicional;
+      rotasAdicionais.push(`${nomeAdicional} = Rota ${rota.numero} (${rota.clientesNaRota.length} cliente(s))`);
+    });
+
+    if (rotasAdicionais.length > 0) {
+      console.warn(`\n⚠️ ${rotasAdicionais.length} rota(s) excedem os ${promoters.length} promotor(es) cadastrado(s):`);
+      rotasAdicionais.forEach(r => console.warn(`   ${r}`));
+    }
+  }
+
   console.log(`\n✅ Atribuição final com limite de proximidade (15km) e balanceamento completada\n`);
 
   // 5️⃣b. DailyRoute: compatibilidade com exportação (view por dia)
@@ -1815,6 +1834,8 @@ export async function gerarRotasDinamicamente(
   // Busca dados do promoter para calcular deslocamento casa→clientes→casa
   for (const rotaEmConstrucao of rotasGeradas) {
     const promoter = promoters.find(p => p.id === rotaEmConstrucao.promotorId);
+    // Rota adicional (sem promotor): não há casa, logo não há trajeto casa↔cliente
+    const temPromotor = !!promoter;
     const promoterLatitude = promoter?.latitude ?? 0;
     const promoterLongitude = promoter?.longitude ?? 0;
 
@@ -1832,7 +1853,7 @@ export async function gerarRotasDinamicamente(
       // Calcula tempo de deslocamento: casa do promoter → primeiro cliente
       // Aplica fator 1.3x por ser horário de pico (início do expediente)
       const tempoDeslocamentoInicial =
-        visitasOrdenadas.length > 0
+        temPromotor && visitasOrdenadas.length > 0
           ? Math.ceil(calcularTempoFallback(
               promoterLatitude,
               promoterLongitude,
@@ -1883,7 +1904,7 @@ export async function gerarRotasDinamicamente(
       // Calcula tempo de deslocamento: último cliente → casa do promoter
       // Aplica fator 1.3x por ser horário de pico (fim do expediente)
       const tempoDeslocamentoFinal =
-        visitasOrdenadas.length > 0
+        temPromotor && visitasOrdenadas.length > 0
           ? Math.ceil(calcularTempoFallback(
               visitasOrdenadas[visitasOrdenadas.length - 1].latitude,
               visitasOrdenadas[visitasOrdenadas.length - 1].longitude,
@@ -2020,6 +2041,12 @@ export async function gerarRotasDinamicamente(
       warnings: [
         `Total de promotores criados: ${rotasGeradas.length}`,
         `Clientes alocados: ${totalClientesAlocados}/${clientes.length}`,
+        ...(rotasAdicionais.length > 0
+          ? [
+              `⚠️ ${rotasAdicionais.length} rota(s) excedem os ${promoters.length} promotor(es) cadastrado(s) e foram criadas como rotas adicionais:`,
+              ...rotasAdicionais.map(r => `⚠️ ${r}`),
+            ]
+          : []),
         ...alertasFrequencia, // 🟡 Avisos de frequência incompleta
         ...alertasOciosidade, // Alertas de ociosidade
         ...alertasEficiencia, // Alertas de eficiência (v4.3)
