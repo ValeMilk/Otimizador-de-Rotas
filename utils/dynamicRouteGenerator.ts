@@ -1,10 +1,15 @@
 /**
- * ⚡ MOTOR v4.12.0 - ROTAS CHEIAS (~44h) PRIMEIRO, PROMOTOR MAIS PRÓXIMO DEPOIS
+ * ⚡ MOTOR v4.13.0 - TERRITÓRIOS SEM SOBREPOSIÇÃO → ROTAS ~44h → PROMOTOR MAIS PRÓXIMO
  *
  * ORDEM DAS REGRAS:
- * 1. FASE 1: forma rotas por proximidade (centroide congelado), SEM limite de
- *    distância, e só fecha uma rota quando nenhum cliente restante cabe na
- *    semana (8h seg-sex, 4h sáb). Resultado: rotas perto de 44h.
+ * 1. FASE 1A: divide os clientes em K territórios geográficos compactos
+ *    (k-means com capacidade), K = demanda total ÷ 44h. Cada cliente fica no
+ *    território mais próximo que ainda tem carga; se nenhum vizinho tem,
+ *    abre-se um novo território ali. Territórios não se cruzam.
+ *    FASE 1B: cada território vira uma rota, preenchida do centro para a borda
+ *    até nenhum cliente caber na semana (8h seg-sex, 4h sáb).
+ *    Sobras de borda tentam qualquer território a até 8 km; o resto forma rotas
+ *    compactas próprias (FASE 1C).
  * 2. FASE 1B: clientes que não cabem nem numa semana vazia viram rota solo.
  * 3. FASE 2: casa os pares (rota, promotor) mais próximos primeiro, 1 rota
  *    por promotor. Rotas que sobram viram "Rota adicional N".
@@ -1497,6 +1502,151 @@ function agruparClientesPorProximidade(
 }
 
 // ============================================================================
+// PARTIÇÃO TERRITORIAL (v4.13.0) - K-MEANS COM CAPACIDADE
+// ============================================================================
+
+/**
+ * Divide os clientes em K territórios geográficos compactos e balanceados por carga.
+ * - K = ceil(demanda total / capacidade semanal com folga) — fixo, nunca cresce
+ * - Sementes: setores angulares de demanda igual em volta do centro dos clientes
+ *   (espalhadas pela massa de clientes, nunca em outliers)
+ * - K-means com capacidade: clientes mais "comprometidos" com um centroide
+ *   escolhem primeiro; cada um vai para o centroide mais próximo com carga livre,
+ *   e se nenhum tiver, para o menos carregado (a agenda real filtra depois)
+ * - Centroides recalculados até estabilizar
+ * Retorna clusters com clientes ordenados por carga (maior primeiro) para empacotar
+ * melhor a agenda; compacidade já é garantida pelo território.
+ */
+function particionarTerritorios(
+  clientes: ClienteExpandido[]
+): { clusters: ClienteExpandido[][]; centroides: Array<{ lat: number; lng: number }> } {
+  if (clientes.length === 0) return { clusters: [], centroides: [] };
+
+  const TEMPO_DESLOC_ESTIMADO = 12; // min por visita, só para balancear a carga
+  const FOLGA = 0.88; // a agenda real (dias, gaps) não enche 100%; dimensiona K com folga
+  const LEAK_MAX_KM = 3; // um cliente só pode ir a outro território se ele estiver a até 1.5×d1 + 3 km
+  const CAP = CAPACIDADE_SEMANAL_MIN;
+  const demanda = (c: ClienteExpandido) =>
+    c.frequenciaRequisitada * (c.cliente.visitDurationMinutes + TEMPO_DESLOC_ESTIMADO);
+  const dist = (c: ClienteExpandido, p: { lat: number; lng: number }) =>
+    calcularDistanciaHaversine(c.cliente.latitude, c.cliente.longitude, p.lat, p.lng);
+
+  const demandaTotal = clientes.reduce((s, c) => s + demanda(c), 0);
+  const K = Math.min(clientes.length, Math.max(1, Math.ceil(demandaTotal / (CAP * FOLGA))));
+
+  // Sementes por setores angulares de demanda igual (varredura em volta do centro geral)
+  const centroGeral = {
+    lat: clientes.reduce((s, c) => s + c.cliente.latitude, 0) / clientes.length,
+    lng: clientes.reduce((s, c) => s + c.cliente.longitude, 0) / clientes.length,
+  };
+  const porAngulo = [...clientes].sort(
+    (a, b) =>
+      Math.atan2(a.cliente.latitude - centroGeral.lat, a.cliente.longitude - centroGeral.lng) -
+      Math.atan2(b.cliente.latitude - centroGeral.lat, b.cliente.longitude - centroGeral.lng)
+  );
+  const centroides: Array<{ lat: number; lng: number }> = [];
+  {
+    const alvo = demandaTotal / K;
+    let acumulado = 0;
+    let grupo: ClienteExpandido[] = [];
+    for (const c of porAngulo) {
+      grupo.push(c);
+      acumulado += demanda(c);
+      if (acumulado >= alvo && centroides.length < K - 1) {
+        centroides.push({
+          lat: grupo.reduce((s, x) => s + x.cliente.latitude, 0) / grupo.length,
+          lng: grupo.reduce((s, x) => s + x.cliente.longitude, 0) / grupo.length,
+        });
+        grupo = [];
+        acumulado = 0;
+      }
+    }
+    if (grupo.length > 0) {
+      centroides.push({
+        lat: grupo.reduce((s, x) => s + x.cliente.latitude, 0) / grupo.length,
+        lng: grupo.reduce((s, x) => s + x.cliente.longitude, 0) / grupo.length,
+      });
+    }
+  }
+
+  console.log(
+    `\n🗺️ FASE 1A: Partição territorial — demanda ${(demandaTotal / 60).toFixed(0)}h → ${centroides.length} território(s)`
+  );
+
+  let atribuicao: number[] = new Array(clientes.length).fill(-1);
+  const MAX_ITER = 60;
+  for (let iter = 0; iter < MAX_ITER; iter++) {
+    const carga = new Array(centroides.length).fill(0);
+    const nova: number[] = new Array(clientes.length).fill(-1);
+
+    // Ordem: quem está claramente mais perto de UM centroide escolhe primeiro;
+    // quem está "no meio" entre dois escolhe por último (vai para onde houver carga)
+    const ordem = clientes
+      .map((c, i) => {
+        const vizinhos = centroides.map((ct, k) => ({ k, d: dist(c, ct) })).sort((a, b) => a.d - b.d);
+        const compromisso = vizinhos.length > 1 ? vizinhos[1].d - vizinhos[0].d : Infinity;
+        return { i, vizinhos, compromisso };
+      })
+      .sort((a, b) => b.compromisso - a.compromisso);
+
+    for (const { i, vizinhos } of ordem) {
+      const d = demanda(clientes[i]);
+      // Só territórios "razoavelmente perto" do mais próximo são candidatos: evita que um
+      // cliente vaze para o outro lado da cidade só porque lá tem carga sobrando
+      const limiteDist = vizinhos[0].d * 1.5 + LEAK_MAX_KM;
+      const candidatos = vizinhos.filter(v => v.d <= limiteDist);
+      let escolhido = candidatos.find(v => carga[v.k] + d <= CAP || carga[v.k] === 0)?.k;
+      if (escolhido === undefined) {
+        // Ninguém perto tem carga: vai para o menos carregado entre os candidatos
+        // (a agenda real decide depois; o que não couber vira sobra de borda)
+        escolhido = candidatos.reduce((a, b) => (carga[b.k] < carga[a.k] ? b : a)).k;
+      }
+      nova[i] = escolhido;
+      carga[escolhido] += d;
+    }
+
+    // Recalcula centroides
+    let mudou = false;
+    centroides.forEach((ct, k) => {
+      const membros = clientes.filter((_, i) => nova[i] === k);
+      if (membros.length === 0) return;
+      const lat = membros.reduce((s, c) => s + c.cliente.latitude, 0) / membros.length;
+      const lng = membros.reduce((s, c) => s + c.cliente.longitude, 0) / membros.length;
+      if (Math.abs(lat - ct.lat) > 1e-5 || Math.abs(lng - ct.lng) > 1e-5) mudou = true;
+      ct.lat = lat;
+      ct.lng = lng;
+    });
+
+    const igual = nova.every((k, i) => k === atribuicao[i]);
+    atribuicao = nova;
+    if (igual || !mudou) {
+      console.log(`  ✅ Territórios estabilizados em ${iter + 1} iteração(ões)`);
+      break;
+    }
+  }
+
+  // Monta clusters (sem vazios). Ordem interna: maior carga primeiro (FFD) para
+  // empacotar melhor a agenda; compacidade já vem do território.
+  const clusters: ClienteExpandido[][] = [];
+  const centroidesFinais: Array<{ lat: number; lng: number }> = [];
+  centroides.forEach((ct, k) => {
+    const membros = clientes.filter((_, i) => atribuicao[i] === k);
+    if (membros.length === 0) return;
+    membros.sort((a, b) => demanda(b) - demanda(a) || dist(a, ct) - dist(b, ct));
+    clusters.push(membros);
+    centroidesFinais.push(ct);
+  });
+
+  clusters.forEach((cl, k) => {
+    const cargaH = cl.reduce((s, c) => s + demanda(c), 0) / 60;
+    const raio = Math.max(...cl.map(c => dist(c, centroidesFinais[k])));
+    console.log(`  🧭 Território ${k + 1}: ${cl.length} clientes | ~${cargaH.toFixed(0)}h | raio ${raio.toFixed(1)} km`);
+  });
+
+  return { clusters, centroides: centroidesFinais };
+}
+
+// ============================================================================
 // GERAÇÃO DINÂMICA DE ROTAS
 // ============================================================================
 
@@ -1575,13 +1725,74 @@ export async function gerarRotasDinamicamente(
   console.log(`   Fase 1: Agrupa lojas por proximidade (vizinho mais próximo)`);
   console.log(`   Fase 2: Para cada rota, aloca ao promotor cuja casa está mais perto do centroide\n`);
 
-  const poolGlobal: ClienteExpandido[] = [...clientesOrdenados];
   const rotasGeradas: RotaEmConstrucao[] = [];
   const seedsDescartados: ClienteExpandido[] = []; // clientes que não cabem nem numa agenda vazia
   let numeroRota = 0;
 
-  // FASE 1: Cria rotas baseado em GEOLOCALIZAÇÃO PURA (sem pensar em promotor)
-  // SEM LIMITE DE ROTAS - continua até alocar TODOS os clientes
+  // ──────────────────────────────────────────────────────────────
+  // FASE 1A: PARTIÇÃO TERRITORIAL (territórios compactos, sem sobreposição)
+  // ──────────────────────────────────────────────────────────────
+  const { clusters, centroides } = particionarTerritorios(clientesOrdenados);
+
+  // ──────────────────────────────────────────────────────────────
+  // FASE 1B: CADA TERRITÓRIO VIRA UMA ROTA (preenchida do centro para a borda)
+  // ──────────────────────────────────────────────────────────────
+  const sobras: ClienteExpandido[] = [];
+  const rotasTerritorio: Array<{ rota: RotaEmConstrucao; centro: { lat: number; lng: number } }> = [];
+
+  clusters.forEach((cluster, k) => {
+    numeroRota++;
+    const rota: RotaEmConstrucao = {
+      numero: numeroRota,
+      promotorId: `ROTA_${numeroRota}`,
+      agenda: criarAgendaSemanalInterna(),
+      clientesNaRota: [],
+    };
+
+    for (const cliente of cluster) {
+      const aloc = processarFrequenciaCliente(cliente, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
+      if (aloc > 0) rota.clientesNaRota.push(cliente);
+      else sobras.push(cliente);
+    }
+
+    if (rota.clientesNaRota.length > 0) {
+      rotasGeradas.push(rota);
+      rotasTerritorio.push({ rota, centro: centroides[k] });
+      console.log(
+        `  ✅ Rota ${numeroRota} (território ${k + 1}): ${rota.clientesNaRota.length}/${cluster.length} clientes | ${calcularUtilizacaoMediaSemanal(rota).toFixed(1)}%`
+      );
+    } else {
+      numeroRota--;
+    }
+  });
+
+  // Sobras de borda: tentam qualquer território a até 8 km (mais próximo primeiro)
+  const SOBRA_RAIO_KM = 8;
+  const poolGlobal: ClienteExpandido[] = [];
+  for (const cliente of sobras) {
+    const vizinhos = rotasTerritorio
+      .map(t => ({
+        t,
+        d: calcularDistanciaHaversine(cliente.cliente.latitude, cliente.cliente.longitude, t.centro.lat, t.centro.lng),
+      }))
+      .sort((a, b) => a.d - b.d)
+      .filter(v => v.d <= SOBRA_RAIO_KM);
+
+    let encaixou = false;
+    for (const { t } of vizinhos) {
+      if (processarFrequenciaCliente(cliente, t.rota.agenda, matrizTempos, false, false, frequenciasRastreadas) > 0) {
+        t.rota.clientesNaRota.push(cliente);
+        encaixou = true;
+        break;
+      }
+    }
+    if (!encaixou) poolGlobal.push(cliente);
+  }
+  console.log(`\n📦 FASE 1B: ${rotasGeradas.length} rotas territoriais | ${sobras.length} sobras, ${sobras.length - poolGlobal.length} encaixadas em vizinhos, ${poolGlobal.length} para FASE 1C`);
+
+  // ──────────────────────────────────────────────────────────────
+  // FASE 1C: SOBRAS FORMAM ROTAS COMPACTAS PRÓPRIAS (greedy por proximidade)
+  // ──────────────────────────────────────────────────────────────
   while (poolGlobal.length > 0) {
     numeroRota++;
     console.log(`\n🚗 Rota ${numeroRota}: pool restante = ${poolGlobal.length} clientes`);

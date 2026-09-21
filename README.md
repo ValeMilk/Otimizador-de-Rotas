@@ -13,7 +13,7 @@ Sistema inteligente de roteirização para promotores de vendas com otimização
 
 ## 🎯 Versão Atual
 
-**v4.12.0** - Rotas cheias (~44h) primeiro, promotor mais próximo depois
+**v4.13.0** - Territórios sem sobreposição → rotas ~44h → promotor mais próximo
 - ✅ Rotas fecham por horas (não por distância): cada rota chega perto de 44h semanais
 - ✅ Rota pronta → promotor cuja casa está mais próxima (1 rota por promotor)
 - ✅ Rotas que excedem os promotores viram "Rota adicional N"
@@ -101,12 +101,15 @@ Todo push na branch `main` dispara:
 
 ### Algoritmo (v4.12.0)
 
-**Fase 1: Rotas cheias por proximidade**
-- Seed = cliente de maior frequência; núcleo = 2 vizinhos mais próximos
-- Centroide congelado do núcleo (previne drift)
-- Percorre todos os clientes restantes do mais próximo ao mais distante, **sem limite de distância**
-- A rota só fecha quando nenhum cliente restante cabe na semana (8h seg-sex, 4h sáb)
+**Fase 1A: Territórios sem sobreposição**
+- Divide os clientes em K territórios compactos (k-means com capacidade), K = demanda total ÷ 44h
+- Cada cliente vai para o território mais próximo que ainda tem carga (só os 2 vizinhos mais próximos valem)
+- Se nenhum vizinho tem carga, abre-se um novo território ali; centroides recalculados até estabilizar
+
+**Fase 1B: Cada território vira uma rota**
+- Preenchida do centro para a borda até nenhum cliente caber na semana (8h seg-sex, 4h sáb)
 - Frequência sempre 100%: ou entram todas as visitas do cliente, ou nenhuma
+- Sobras de borda tentam os 2 territórios vizinhos; o resto forma rotas compactas próprias (Fase 1C)
 
 **Fase 1B: Rotas Solo**
 - Só para clientes que não cabem nem numa semana vazia (ex.: frequência maior que os dias disponíveis)
@@ -191,7 +194,12 @@ Use o arquivo fornecido: `auto_servico_2026_corrigido.csv`
 
 ## 📝 Changelog
 
-### v4.12.0 (Atual - 21 Set 2026)
+### v4.13.0 (Atual - 21 Set 2026)
+- ✅ Territórios sem sobreposição antes do preenchimento (k-means com capacidade, K = demanda ÷ 44h)
+- ✅ Cliente só pode "vazar" para outro território a até 1,5× a distância do mais próximo + 3 km
+- ✅ Sobras de borda tentam territórios a até 8 km; o resto forma rotas próprias
+
+### v4.12.0 (21 Set 2026)
 - ✅ Rotas fecham por horas (~44h), não mais por raio 4 km / diâmetro 8 km
 - ✅ Atribuição casa os pares (rota, promotor) mais próximos primeiro
 - ✅ v4.11.x: "Rota adicional N" para rotas além dos promotores; raio da Terra corrigido (6371 km); rota solo com N visitas reais; seed inviável não aborta mais a Fase 1
