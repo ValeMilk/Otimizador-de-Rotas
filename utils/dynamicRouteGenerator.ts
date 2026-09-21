@@ -105,7 +105,7 @@ function calcularDemandaTotal(clientes: Client[]): number {
  * Usado apenas se matriz de OSRM falhar
  */
 function calcularDistanciaHaversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6.371;
+  const R = 6371; // raio da Terra em km (antes estava 6.371, o que dividia toda distância por 1000)
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -1672,46 +1672,30 @@ export async function gerarRotasDinamicamente(
         clientesNaRota: [cliente],
       };
       
-      // ✅ v4.10.0: Aloca TODAS as frequências necessárias
-      let frequenciaRestante = cliente.frequenciaRequisitada;
-      const CAPACIDADES = [480, 480, 480, 480, 480, 240]; // minutos por dia
-      
-      // Distribui visitas pelos dias (segunda a sábado)
-      for (let dia = 0; dia < 6 && frequenciaRestante > 0; dia++) {
-        // Cada visita tem duração igual à frequência necessária
-        const duracao = Math.min(frequenciaRestante, CAPACIDADES[dia] - rotaSolo.agenda[dia].tempoUsado);
-        
-        if (duracao > 0) {
-          rotaSolo.agenda[dia].tempoUsado += duracao;
-          rotaSolo.agenda[dia].visitas.push({
-            clienteId: cliente.cliente.id,
-            clienteNome: cliente.cliente.name,
-            latitude: cliente.cliente.latitude,
-            longitude: cliente.cliente.longitude,
-            duracao: duracao,
-            frequency: cliente.cliente.frequency
-          });
-          frequenciaRestante -= duracao;
+      // ✅ v4.11.1: Aloca N visitas (N = frequência), cada uma com o tempo médio
+      // real do cliente, respeitando dias disponíveis, gap e capacidade diária.
+      // (Antes a frequência era tratada como minutos: freq 2 virava 1 visita de 2 min.)
+      cliente.visitasAlocadas.clear();
+      let alocadas = processarFrequenciaCliente(cliente, rotaSolo.agenda, matrizTempos, false, false, frequenciasRastreadas);
+
+      // Se não coube nem sozinho (ex.: visita > 8h), força ignorando o limite diário
+      if (alocadas === 0) {
+        cliente.visitasAlocadas.clear();
+        alocadas = processarFrequenciaCliente(cliente, rotaSolo.agenda, matrizTempos, true, true, frequenciasRastreadas);
+        if (alocadas > 0) {
+          console.warn(`  ⚠️ Rota Solo ${numeroRota}: "${cliente.cliente.name}" só coube com overflow da jornada diária`);
         }
       }
 
-      // Verifica se conseguiu alocar FREQUÊNCIA COMPLETA
-      if (frequenciaRestante === 0) {
+      if (alocadas > 0) {
         rotasGeradas.push(rotaSolo);
         const util = calcularUtilizacaoMediaSemanal(rotaSolo);
-        console.log(`  ✅ Rota Solo ${numeroRota}: "${cliente.cliente.name}" | Freq: ${cliente.frequenciaRequisitada} | ${util.toFixed(1)}%`);
-        
-        // ✅ Rastreia frequência alocada 100%
-        if (frequenciasRastreadas) {
-          frequenciasRastreadas.set(cliente.cliente.id, { solicitada: cliente.frequenciaRequisitada, alocada: cliente.frequenciaRequisitada });
-        }
+        console.log(`  ✅ Rota Solo ${numeroRota}: "${cliente.cliente.name}" | ${alocadas} visita(s) de ${cliente.cliente.visitDurationMinutes} min | ${util.toFixed(1)}%`);
       } else {
-        console.error(`  ❌ Rota Solo ${numeroRota}: "${cliente.cliente.name}" - NÃO CABE! Freq: ${cliente.frequenciaRequisitada} min, apenas ${cliente.frequenciaRequisitada - frequenciaRestante} min alocados`);
-        
-        // ⚠️ Rastreia falha de alocação
-        if (frequenciasRastreadas) {
-          frequenciasRastreadas.set(cliente.cliente.id, { solicitada: cliente.frequenciaRequisitada, alocada: cliente.frequenciaRequisitada - frequenciaRestante });
-        }
+        // Sem dias disponíveis suficientes para a frequência pedida
+        numeroRota--;
+        console.error(`  ❌ "${cliente.cliente.name}": impossível alocar ${cliente.frequenciaRequisitada} visita(s) — dias disponíveis insuficientes`);
+        frequenciasRastreadas.set(cliente.cliente.id, { solicitada: cliente.frequenciaRequisitada, alocada: 0 });
       }
     }
 
