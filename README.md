@@ -99,19 +99,20 @@ Todo push na branch `main` dispara:
 - Haversine formula + fallback OSRM para distâncias
 - Export via `exceljs`
 
-### Algoritmo (v4.12.0)
+### Algoritmo (v4.13.0)
 
 **Fase 1A: Territórios sem sobreposição**
-- Divide os clientes em K territórios compactos (k-means com capacidade), K = demanda total ÷ 44h
-- Cada cliente vai para o território mais próximo que ainda tem carga (só os 2 vizinhos mais próximos valem)
-- Se nenhum vizinho tem carga, abre-se um novo território ali; centroides recalculados até estabilizar
+- Divide os clientes em K territórios compactos (k-means com capacidade), K = demanda total ÷ 44h com folga
+- Sementes espalhadas pela massa de clientes (setores angulares de demanda igual)
+- Cada cliente vai para o território mais próximo que ainda tem carga; só pode "vazar" para outro a até 1,5× a distância do mais próximo + 3 km
+- Centroides recalculados até estabilizar
 
 **Fase 1B: Cada território vira uma rota**
-- Preenchida do centro para a borda até nenhum cliente caber na semana (8h seg-sex, 4h sáb)
+- Preenchida por maior carga primeiro até nenhum cliente caber na semana (8h seg-sex, 4h sáb)
 - Frequência sempre 100%: ou entram todas as visitas do cliente, ou nenhuma
-- Sobras de borda tentam os 2 territórios vizinhos; o resto forma rotas compactas próprias (Fase 1C)
+- Sobras de borda tentam qualquer território a até 8 km; o resto forma rotas compactas próprias (Fase 1C)
 
-**Fase 1B: Rotas Solo**
+**Rotas Solo**
 - Só para clientes que não cabem nem numa semana vazia (ex.: frequência maior que os dias disponíveis)
 - Último recurso permite frequência parcial, com aviso no relatório
 
