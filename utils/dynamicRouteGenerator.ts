@@ -639,7 +639,8 @@ function processarFrequenciaCliente(
   matrizTempos: MatrizTempos,
   isUltimaRota: boolean = false,
   forçado: boolean = false,
-  frequenciasRastreadas?: Map<string, { solicitada: number; alocada: number }>
+  frequenciasRastreadas?: Map<string, { solicitada: number; alocada: number }>,
+  permitirParcial: boolean = false // v4.11.2: só para rotas solo de último recurso
 ): number {
   // v4.2.9: DISTRIBUIÇÃO UNIFORME PARA CLIENTES DE ALTA FREQUÊNCIA
   // Se freq >= 4, tenta alocar 1 visita por dia (distribuição uniforme)
@@ -695,7 +696,7 @@ function processarFrequenciaCliente(
   // Se não conseguir alocar TODAS as visitas, faz ROLLBACK e retorna 0
   // Cliente será alocado numa rota solo na FASE 1B
   
-  if (alocadasComSucesso < frequenciaRequisitada) {
+  if (alocadasComSucesso < frequenciaRequisitada && !(permitirParcial && alocadasComSucesso > 0)) {
     // Falhou em alocar a frequência COMPLETA, faz ROLLBACK
     restaurarAgendaDoBackup(agenda, backupAgenda);
     clienteExpandido.visitasAlocadas = backupVisitas;
@@ -832,7 +833,7 @@ function construirRotaGreedyGeografica(
   matrizTempos: MatrizTempos,
   frequenciasRastreadas: Map<string, { solicitada: number; alocada: number }>,
   celularBounds?: { minLat: number; maxLat: number; minLng: number; maxLng: number }
-): { rota: RotaEmConstrucao; clientesAlocados: ClienteExpandido[] } {
+): { rota: RotaEmConstrucao; clientesAlocados: ClienteExpandido[]; seedDescartado?: ClienteExpandido } {
   const rota: RotaEmConstrucao = {
     numero: numeroRota,
     promotorId: `ROTA_${numeroRota}`,
@@ -863,9 +864,13 @@ function construirRotaGreedyGeografica(
   const alocSeed = processarFrequenciaCliente(seed, rota.agenda, matrizTempos, false, false, frequenciasRastreadas);
 
   if (alocSeed === 0) {
+    // v4.11.2: o seed sai do pool mas é DEVOLVIDO ao chamador para ir à FASE 1B.
+    // Antes ele era perdido e a FASE 1 inteira era abortada por causa de um cliente.
     poolGlobal.splice(melhorSeedIdx, 1);
-    console.warn(`  ⚠️ SEED "${seed.cliente.name}" não coube, descartado`);
-    return { rota, clientesAlocados };
+    console.warn(
+      `  ⚠️ SEED "${seed.cliente.name}" (freq ${seed.frequenciaRequisitada}, ${seed.cliente.visitDurationMinutes} min) não cabe numa agenda vazia → FASE 1B`
+    );
+    return { rota, clientesAlocados, seedDescartado: seed };
   }
 
   rota.clientesNaRota.push(seed);
@@ -1616,6 +1621,7 @@ export async function gerarRotasDinamicamente(
 
   const poolGlobal: ClienteExpandido[] = [...clientesOrdenados];
   const rotasGeradas: RotaEmConstrucao[] = [];
+  const seedsDescartados: ClienteExpandido[] = []; // clientes que não cabem nem numa agenda vazia
   let numeroRota = 0;
 
   // FASE 1: Cria rotas baseado em GEOLOCALIZAÇÃO PURA (sem pensar em promotor)
@@ -1624,12 +1630,19 @@ export async function gerarRotasDinamicamente(
     numeroRota++;
     console.log(`\n🚗 Rota ${numeroRota}: pool restante = ${poolGlobal.length} clientes`);
 
-    const { rota, clientesAlocados } = construirRotaGreedyGeografica(
+    const { rota, clientesAlocados, seedDescartado } = construirRotaGreedyGeografica(
       numeroRota,
       poolGlobal,
       matrizTempos,
       frequenciasRastreadas
     );
+
+    if (seedDescartado) {
+      // v4.11.2: um seed inviável não aborta a FASE 1; segue com o próximo cliente
+      seedsDescartados.push(seedDescartado);
+      numeroRota--;
+      continue;
+    }
 
     if (clientesAlocados.length > 0) {
       // ✅ FASE 1: Rota geográfica aceita SEM validação de proximidade
@@ -1653,8 +1666,8 @@ export async function gerarRotasDinamicamente(
     }
   }
 
-  const clientesNaoAlocados: ClienteExpandido[] = [...poolGlobal];
-  console.log(`\n✅ FASE 1 COMPLETA: ${rotasGeradas.length} rotas geradas | ${clientesNaoAlocados.length} restantes`);
+  const clientesNaoAlocados: ClienteExpandido[] = [...poolGlobal, ...seedsDescartados];
+  console.log(`\n✅ FASE 1 COMPLETA: ${rotasGeradas.length} rotas geradas | ${clientesNaoAlocados.length} restantes (${seedsDescartados.length} inviáveis em agenda vazia)`);
 
   // ──────────────────────────────────────────────────────────────
   // FASE 1B: CRIAR ROTAS SOLO PARA CLIENTES RESTANTES
@@ -1687,14 +1700,26 @@ export async function gerarRotasDinamicamente(
         }
       }
 
+      // Último recurso: frequência maior que os dias disponíveis (ex.: freq 8, ou freq 6
+      // com sábado bloqueado). Aloca o máximo possível e registra a frequência parcial.
+      if (alocadas === 0) {
+        cliente.visitasAlocadas.clear();
+        alocadas = processarFrequenciaCliente(cliente, rotaSolo.agenda, matrizTempos, true, true, frequenciasRastreadas, true);
+        if (alocadas > 0) {
+          console.warn(
+            `  ⚠️ Rota Solo ${numeroRota}: "${cliente.cliente.name}" freq ${alocadas}/${cliente.frequenciaRequisitada} — dias disponíveis insuficientes para a frequência pedida`
+          );
+        }
+      }
+
       if (alocadas > 0) {
         rotasGeradas.push(rotaSolo);
         const util = calcularUtilizacaoMediaSemanal(rotaSolo);
         console.log(`  ✅ Rota Solo ${numeroRota}: "${cliente.cliente.name}" | ${alocadas} visita(s) de ${cliente.cliente.visitDurationMinutes} min | ${util.toFixed(1)}%`);
       } else {
-        // Sem dias disponíveis suficientes para a frequência pedida
+        // Nenhum dia disponível (todos bloqueados na planilha)
         numeroRota--;
-        console.error(`  ❌ "${cliente.cliente.name}": impossível alocar ${cliente.frequenciaRequisitada} visita(s) — dias disponíveis insuficientes`);
+        console.error(`  ❌ "${cliente.cliente.name}": nenhum dia disponível para visita — verifique as colunas SEG..SAB da planilha`);
         frequenciasRastreadas.set(cliente.cliente.id, { solicitada: cliente.frequenciaRequisitada, alocada: 0 });
       }
     }
